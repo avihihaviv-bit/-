@@ -1,0 +1,2765 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d121e">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="מסלול">
+<meta name="mobile-web-app-capable" content="yes">
+<title>מסלול</title>
+<meta name="description" content="מערכת חיים אישית - לוח יומי, הרגלים, פוקוס וכושר, במקום אחד.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #0d121e;
+    --surface: #141b2b;
+    --surface-2: #1b2436;
+    --surface-3: #232e44;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --text: #eef1f8;
+    --text-soft: #8d96b3;
+    --text-faint: #5c6483;
+    --accent: #45d6c8;
+    --accent-ink: #04211d;
+    --accent-2: #f5a94e;
+    --accent-2-ink: #2b1a04;
+    --success: #55cf8f;
+    --warning: #f2c14e;
+    --danger: #ef6f6a;
+    --shadow: rgba(0,0,0,0.45);
+    --glass: rgba(255,255,255,0.04);
+    --cat-fitness: #d97b78;
+    --cat-learning: #7f9bdb;
+    --cat-health: #8fbf74;
+    --cat-personal: #a98bd0;
+    --cat-hobby: #d3ab5f;
+    --cat-social: #63b4bb;
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-l: 20px;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f3f5fa;
+      --surface: #ffffff;
+      --surface-2: #eef1f7;
+      --surface-3: #e4e8f1;
+      --border: rgba(15,20,32,0.08);
+      --border-strong: rgba(15,20,32,0.14);
+      --text: #14192a;
+      --text-soft: #5c6480;
+      --text-faint: #9399b3;
+      --accent: #0e9c8f;
+      --accent-ink: #ffffff;
+      --accent-2: #b3771c;
+      --accent-2-ink: #ffffff;
+      --success: #2f9e63;
+      --warning: #a2760c;
+      --danger: #c94c46;
+      --shadow: rgba(20,25,42,0.12);
+      --glass: rgba(255,255,255,0.5);
+      --cat-fitness: #c15d59;
+      --cat-learning: #5170b8;
+      --cat-health: #5c9440;
+      --cat-personal: #82609e;
+      --cat-hobby: #a97c1f;
+      --cat-social: #2f8b92;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f3f5fa;
+    --surface: #ffffff;
+    --surface-2: #eef1f7;
+    --surface-3: #e4e8f1;
+    --border: rgba(15,20,32,0.08);
+    --border-strong: rgba(15,20,32,0.14);
+    --text: #14192a;
+    --text-soft: #5c6480;
+    --text-faint: #9399b3;
+    --accent: #0e9c8f;
+    --accent-ink: #ffffff;
+    --accent-2: #b3771c;
+    --accent-2-ink: #ffffff;
+    --success: #2f9e63;
+    --warning: #a2760c;
+    --danger: #c94c46;
+    --shadow: rgba(20,25,42,0.12);
+    --glass: rgba(255,255,255,0.5);
+    --cat-fitness: #c15d59;
+    --cat-learning: #5170b8;
+    --cat-health: #5c9440;
+    --cat-personal: #82609e;
+    --cat-hobby: #a97c1f;
+    --cat-social: #2f8b92;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Rubik", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .num { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  button { font-family: inherit; }
+  input, select, textarea { font-family: inherit; }
+
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+
+  a { color: var(--accent); }
+
+  svg.icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+  /* ---------- app shell ---------- */
+  .app {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border-inline-end: 1px solid var(--border);
+    padding: 22px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px 22px;
+  }
+  .brand-mark {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .brand-mark svg { width: 18px; height: 18px; stroke: var(--accent-ink); stroke-width: 2.2; }
+  .brand-name { font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-soft);
+    border-radius: var(--radius-s);
+    font-size: 14.5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: right;
+    transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out), transform 0.1s var(--ease-out);
+  }
+  .nav-btn:hover { background: var(--surface-2); color: var(--text); }
+  .nav-btn:active { transform: scale(0.98); }
+  .nav-btn.active { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .nav-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .nav-spacer { flex: 1; }
+  .nav-foot { font-size: 11.5px; color: var(--text-faint); padding: 10px 12px 0; }
+
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; inset-inline: 0;
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -10px 28px -14px var(--shadow);
+    padding: 7px 6px calc(7px + env(safe-area-inset-bottom));
+    z-index: 30;
+  }
+  @media (max-width: 860px) { .bottom-nav { display: flex; justify-content: space-around; gap: 2px; } .main { padding-bottom: 82px; } }
+  .bottom-nav button {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    background: none; border: none; color: var(--text-faint);
+    font-size: 10.5px; font-weight: 500; padding: 7px 13px; border-radius: 14px; cursor: pointer;
+    flex: 1; max-width: 78px;
+    transition: color 0.18s var(--ease-out), background-color 0.18s var(--ease-out), transform 0.1s var(--ease-out);
+  }
+  .bottom-nav button svg { transition: transform 0.2s var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .bottom-nav button:hover { color: var(--text-soft); }
+  }
+  .bottom-nav button:active { transform: scale(0.9); }
+  .bottom-nav button.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+  }
+  .bottom-nav button.active svg { transform: translateY(-1px) scale(1.08); }
+
+  .main { padding: 26px 24px 60px; max-width: 1080px; }
+  @media (max-width: 560px) { .main { padding: 18px 14px 60px; } }
+
+  .panel[hidden] { display: none; }
+  .panel.panel-enter { animation: panel-in 0.32s var(--ease-out) both; }
+  @keyframes panel-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .page-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .page-title { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; margin: 0; }
+  .page-sub { color: var(--text-soft); font-size: 13.5px; margin: 4px 0 0; }
+
+  /* ---------- cards & primitives ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    padding: 20px;
+  }
+  .card-tight { padding: 16px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border: none; border-radius: var(--radius-s);
+    padding: 10px 16px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: transform 0.12s ease, opacity 0.15s ease, background 0.15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-ghost { background: var(--surface-2); color: var(--text); }
+  .btn-ghost:hover { background: var(--surface-3); }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--border-strong); }
+  .btn-danger:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); }
+  .btn-icon { padding: 8px; border-radius: 50%; background: transparent; color: var(--text-soft); }
+  .btn-icon:hover { background: var(--surface-2); color: var(--text); }
+  .btn-sm { padding: 7px 12px; font-size: 12.5px; }
+  .btn-block { width: 100%; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
+  .field input[type="text"], .field input[type="time"], .field select, .field textarea, .field input[type="number"] {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 14px;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ---------- dashboard header ---------- */
+  .hero {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    margin-bottom: 22px; flex-wrap: wrap;
+  }
+  .hero h1 { font-size: 26px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .hero .date-line { color: var(--text-soft); font-size: 14px; }
+  .clock-chip {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-m);
+    padding: 10px 18px; text-align: center;
+  }
+  .clock-chip .time { font-size: 22px; font-weight: 700; }
+  .clock-chip .zone { font-size: 10.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* now card */
+  .now-card {
+    position: relative;
+    background: linear-gradient(135deg, var(--surface-3), var(--surface));
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-l);
+    padding: 22px;
+    overflow: hidden;
+  }
+  .now-card::before {
+    content: "";
+    position: absolute; inset: -40% -20% auto auto; width: 260px; height: 260px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  .now-label { display:flex; align-items:center; gap:7px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .now-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .now-title { font-size: 22px; font-weight: 700; margin: 0 0 4px; position: relative; }
+  .now-time { color: var(--text-soft); font-size: 13.5px; margin-bottom: 16px; position: relative; }
+  .now-actions { display: flex; gap: 8px; flex-wrap: wrap; position: relative; }
+  .now-empty { color: var(--text-soft); font-size: 14px; }
+
+  .next-later-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .mini-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 13px 15px; }
+  .mini-card .lbl { font-size: 10.5px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .mini-card .ttl { font-size: 14.5px; font-weight: 600; }
+  .mini-card .tm { font-size: 12px; color: var(--text-soft); }
+
+  /* progress ring */
+  .ring-wrap { display: flex; align-items: center; gap: 18px; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-track { stroke: var(--surface-3); }
+  .ring-fill { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset 0.6s var(--ease-out); }
+  .ring-pct { font-size: 24px; font-weight: 800; }
+  .stat-list { display: flex; flex-direction: column; gap: 6px; }
+  .stat-list .row { display: flex; justify-content: space-between; gap: 14px; font-size: 13px; color: var(--text-soft); min-width: 150px; }
+  .stat-list .row b { color: var(--text); font-weight: 600; }
+
+  /* life balance */
+  .balance-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; }
+  .balance-row:last-child { margin-bottom: 0; }
+  .balance-label { width: 108px; flex-shrink: 0; color: var(--text-soft); display: flex; align-items: center; gap: 6px; }
+  .balance-track { flex: 1; height: 7px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+  .balance-fill { height: 100%; border-radius: 4px; transition: width 0.6s var(--ease-out); }
+  .balance-val { width: 34px; text-align: left; color: var(--text-faint); font-size: 12px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* schedule */
+  .day-switch { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .day-pill { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-soft); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .day-pill.active { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .day-pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .day-pill-add { background: transparent; border-style: dashed; color: var(--text-faint); }
+  .day-pill-add:hover { color: var(--accent); border-color: var(--accent); }
+  .day-pill-wrap { position: relative; display: inline-block; }
+  .day-pill-del {
+    position: absolute; top: -7px; left: -7px; width: 19px; height: 19px; border-radius: 50%;
+    border: 2px solid var(--surface); background: var(--danger); color: #fff; font-size: 12px; line-height: 1; padding: 0;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 1;
+    box-shadow: 0 1px 3px var(--shadow); z-index: 1;
+  }
+  .day-pill-del:hover { transform: scale(1.1); }
+
+  .timeline { position: relative; padding-inline-start: 20px; }
+  .timeline::before { content: ""; position: absolute; inset-inline-start: 5px; top: 4px; bottom: 4px; width: 2px; background: var(--border); }
+  .t-item { position: relative; padding: 0 0 18px 16px; margin-inline-start: 0; }
+  .t-item:last-child { padding-bottom: 0; }
+  .t-item.dragging { opacity: 0.35; }
+  .t-item.drop-indicator { padding: 0; margin: -3px 0 15px 16px; height: 3px; border-radius: 2px; background: var(--accent); list-style: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .drag-handle {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 6px; border: none; background: transparent;
+    color: var(--text-faint); cursor: grab; display: flex; align-items: center; justify-content: center;
+    touch-action: none; -webkit-user-select: none; user-select: none;
+  }
+  .drag-handle:hover { background: var(--surface-2); color: var(--text-soft); }
+  .drag-handle:active { cursor: grabbing; }
+  .t-item::before {
+    content: ""; position: absolute; inset-inline-start: -19px; top: 4px; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--cat, var(--accent));
+  }
+  .t-item.done::before { background: var(--cat, var(--accent)); }
+  .t-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 11px 14px; cursor: pointer; transition: border-color 0.15s var(--ease-out), transform 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .t-row:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: 0 4px 14px -8px var(--shadow); }
+  }
+  .t-row:active { transform: scale(0.99); }
+  .t-row.now { border-color: var(--cat, var(--accent)); box-shadow: 0 0 0 1px var(--cat, var(--accent)) inset; }
+  .t-check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border-strong); flex-shrink: 0; cursor: pointer; background: transparent; position: relative; }
+  .t-check.done { background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); }
+  .t-check.done::after { content: ""; position: absolute; inset: 0; margin: auto; width: 5px; height: 9px; border-bottom: 2px solid var(--accent-ink); border-inline-end: 2px solid var(--accent-ink); transform: rotate(35deg) translate(-1px,-2px); }
+  .t-time { font-size: 12px; color: var(--text-soft); flex: 0 0 42px; }
+  .t-title { flex: 1; font-size: 14.5px; font-weight: 500; }
+  .t-row.done .t-title { text-decoration: line-through; color: var(--text-faint); }
+  .t-cat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cat, var(--accent)); flex-shrink: 0; }
+  .empty-msg { text-align: center; color: var(--text-soft); padding: 30px 0; font-size: 14px; }
+
+  /* habits */
+  .habit-card { display: flex; align-items: center; gap: 14px; }
+  .habit-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: var(--surface-2); }
+  .habit-body { flex: 1; min-width: 0; }
+  .habit-name { font-weight: 600; font-size: 14.5px; }
+  .habit-streak { font-size: 12px; color: var(--text-soft); display: flex; align-items: center; gap: 4px; }
+  .habit-toggle { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border-strong); background: transparent; cursor: pointer; color: var(--text-soft); display:flex; align-items:center; justify-content:center; flex-shrink: 0; }
+  .habit-toggle.done { background: var(--success); border-color: var(--success); color: #fff; }
+  .habit-exempt-note { font-size: 11.5px; color: var(--accent); margin-top: 2px; }
+  .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .week-day { border-radius: var(--radius-s); padding: 8px 4px; text-align: center; background: var(--surface-2); border: 1px solid var(--border); }
+  .week-day.is-today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .week-day .wd-name { font-size: 11px; color: var(--text-faint); margin-bottom: 4px; }
+  .week-day .wd-num { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .week-day .wd-icons { display: flex; justify-content: center; gap: 3px; font-size: 12px; min-height: 16px; }
+  .holiday-list { list-style: none; margin: 0; padding: 0; }
+  .holiday-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .holiday-list li:last-child { border-bottom: none; }
+
+  /* focus */
+  .focus-wrap { display: flex; flex-direction: column; align-items: center; padding: 30px 10px; }
+  .focus-ring { position: relative; width: 240px; height: 240px; }
+  .focus-ring svg { transform: rotate(-90deg); }
+  .focus-time { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 700; }
+  .focus-task { color: var(--text-soft); font-size: 13.5px; margin: 16px 0 4px; }
+  .focus-controls { display: flex; gap: 10px; margin-top: 18px; }
+  .focus-presets { display: flex; gap: 8px; margin-top: 22px; }
+  .preset-btn { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-soft); font-size: 12.5px; cursor: pointer; }
+  .preset-btn.active { background: var(--surface-3); color: var(--text); border-color: var(--border-strong); }
+
+  /* advisor */
+  .advisor-intro { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+  .advisor-avatar { width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .advisor-avatar svg { stroke: var(--accent-ink); width: 19px; height: 19px; }
+  .advisor-form { display: flex; gap: 8px; margin-bottom: 18px; }
+  .advisor-form textarea {
+    flex: 1; resize: none; min-height: 46px; max-height: 140px; padding: 11px 14px; border-radius: var(--radius-m);
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-size: 14px;
+  }
+  .advisor-form textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .advisor-mic-btn { align-self: stretch; }
+  .advisor-mic-btn.listening { color: var(--danger); background: color-mix(in srgb, var(--danger) 16%, transparent); animation: mic-pulse 1.2s ease-in-out infinite; }
+  @keyframes mic-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 35%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
+  .advisor-examples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .advisor-ex { font-size: 12.5px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-soft); cursor: pointer; }
+  .advisor-ex:hover { border-color: var(--accent); color: var(--accent); }
+  .advisor-thinking { display: flex; align-items: center; gap: 10px; color: var(--text-soft); font-size: 13.5px; padding: 16px 0; }
+  .advisor-dots span { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-inline-end: 3px; animation: advisor-pulse 1s ease-in-out infinite; }
+  .advisor-dots span:nth-child(2) { animation-delay: .15s; }
+  .advisor-dots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes advisor-pulse { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+  .advice-card { border-radius: var(--radius-l); border: 1px solid var(--border-strong); background: var(--surface); padding: 18px 20px; margin-bottom: 14px; }
+  .advice-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .advice-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .advice-speak-btn.speaking { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .advice-badge.yes { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .advice-badge.maybe { background: color-mix(in srgb, var(--warning) 18%, transparent); color: var(--warning); }
+  .advice-badge.no { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+  .advice-headline { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .advice-reason { font-size: 13.5px; color: var(--text-soft); margin-bottom: 10px; }
+  .advice-conflicts { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .advice-conflicts li { font-size: 12.5px; color: var(--danger); }
+  .advice-action { background: var(--surface-2); border-radius: var(--radius-m); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .advice-action .at { font-weight: 600; font-size: 13.5px; }
+  .advice-action .am { font-size: 12px; color: var(--text-soft); }
+  .advice-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* fitness */
+  .split-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 18px; }
+  .split-card { border-radius: var(--radius-m); padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); }
+  .split-card .k { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+  .split-card .v { font-size: 13.5px; margin-top: 4px; }
+  .ex-list { list-style: none; margin: 0; padding: 0; }
+  .ex-list li { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; gap: 10px; }
+  .ex-list li:last-child { border-bottom: none; }
+  .ex-list .lb { color: var(--text-soft); }
+  .ex-list a { text-decoration: none; font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+  .ex-list a:hover { text-decoration: underline; }
+  .ex-list .plain { font-size: 12px; color: var(--text-faint); font-style: italic; }
+  .tip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tip-chip { font-size: 12.5px; padding: 7px 12px; border-radius: var(--radius-s); background: var(--surface-2); border: 1px solid var(--border); text-decoration: none; color: var(--text); }
+  .tip-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* goals */
+  .goal-card { margin-bottom: 14px; }
+  .goal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .goal-head h3 { font-size: 16px; margin: 0; }
+  .goal-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .ms-list { list-style: none; margin: 0 0 10px; padding: 0; }
+  .ms-item { display: flex; align-items: center; gap: 9px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .ms-item:last-child { border-bottom: none; }
+  .ms-item.done .ms-title { text-decoration: line-through; color: var(--text-faint); }
+  .ms-check { width: 19px; height: 19px; border-radius: 6px; border: 1.5px solid var(--border-strong); background: transparent; flex-shrink: 0; cursor: pointer; color: var(--accent-ink); display: flex; align-items: center; justify-content: center; }
+  .ms-check.done { background: var(--accent); border-color: var(--accent); }
+  .ms-check svg { width: 12px; height: 12px; }
+  .ms-title { flex: 1; }
+  .ms-del { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 2px; }
+  .ms-del:hover { color: var(--danger); }
+  .ms-add-row { display: flex; gap: 8px; }
+  .ms-input { flex: 1; padding: 8px 10px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 13px; }
+  .ms-input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .exam-meta { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--surface-2); color: var(--text-faint); white-space: nowrap; }
+  .exam-meta.soon { background: color-mix(in srgb, var(--warning) 22%, transparent); color: var(--warning); }
+  .exam-meta.urgent { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+  .exam-add-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .exam-add-row .ms-input { flex: 1; min-width: 140px; }
+  .exam-add-row input[type="date"] { padding: 8px 10px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 13px; }
+  .exam-add-row input[type="date"]:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .goal-manual-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-soft); }
+  .goal-manual-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+
+  /* money */
+  .money-summary { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
+  .money-balance { font-size: 30px; font-weight: 800; }
+  .money-sub { display: flex; gap: 16px; font-size: 13px; color: var(--text-soft); margin-top: 10px; }
+  .money-sub b { color: var(--text); }
+  .money-add-row { display: flex; gap: 8px; margin: 16px 0; }
+  .money-entries { list-style: none; margin: 0; padding: 0; }
+  .money-entry { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .money-entry:last-child { border-bottom: none; }
+  .money-entry .em { font-size: 17px; flex-shrink: 0; }
+  .money-entry .mt { flex: 1; min-width: 0; }
+  .money-entry .mt .cat { color: var(--text-soft); font-size: 12px; }
+  .money-entry .amt { font-weight: 700; }
+  .money-entry .amt.income { color: var(--success); }
+  .money-entry .amt.expense { color: var(--danger); }
+  .money-entry .m-del { background: none; border: none; color: var(--text-faint); cursor: pointer; }
+  .money-entry .m-del:hover { color: var(--danger); }
+  .type-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+  .type-toggle button { flex: 1; padding: 10px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft); font-weight: 600; cursor: pointer; }
+  .type-toggle button.active.income { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); border-color: var(--success); }
+  .type-toggle button.active.expense { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); border-color: var(--danger); }
+  .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+  .cat-opt { padding: 8px 4px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft); font-size: 11.5px; cursor: pointer; text-align: center; }
+  .cat-opt.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft, var(--surface-3)); }
+
+  /* settings */
+  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); gap: 16px; }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .lbl { font-weight: 600; font-size: 14px; }
+  .settings-row .desc { font-size: 12.5px; color: var(--text-soft); margin-top: 2px; }
+  .seg { display: flex; background: var(--surface-2); border-radius: var(--radius-s); padding: 3px; gap: 2px; }
+  .seg button { border: none; background: transparent; padding: 7px 13px; border-radius: 6px; font-size: 12.5px; color: var(--text-soft); cursor: pointer; }
+  .seg button.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px var(--shadow); }
+
+  /* modal */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(5,8,14,0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; opacity: 0; animation: fadein 0.18s var(--ease-out) forwards; }
+  @keyframes fadein { to { opacity: 1; } }
+  .modal { background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-l); padding: 22px; width: 100%; max-width: 420px; max-height: 88vh; overflow-y: auto; opacity: 0; transform: translateY(10px) scale(0.97); animation: modalin 0.24s var(--ease-out) forwards; }
+  @keyframes modalin { to { opacity: 1; transform: translateY(0) scale(1); } }
+  .modal h3 { margin: 0 0 16px; font-size: 18px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+
+  /* toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(6px) scale(0.96); background: var(--text); color: var(--bg); padding: 11px 20px; border-radius: 999px; font-size: 13.5px; font-weight: 500; z-index: 200; box-shadow: 0 8px 24px var(--shadow); opacity: 0; animation: toastin 0.28s var(--ease-out) forwards, toastout 0.22s var(--ease-in-out) 1.9s forwards; }
+  @keyframes toastin { to { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1); } }
+  @keyframes toastout { to { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(0.97); } }
+
+  .cat-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text-soft); margin-top: 14px; }
+  .cat-legend span { display: flex; align-items: center; gap: 5px; }
+
+  /* splash intro */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    cursor: pointer;
+    animation: splash-out 0.55s var(--ease-in-out) 2.5s forwards;
+  }
+  #splash .splash-mark {
+    width: 68px; height: 68px; border-radius: 22px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: scale(0.7);
+    animation: splash-mark-in 0.65s var(--ease-out) 0.2s forwards;
+  }
+  #splash .splash-mark svg { width: 34px; height: 34px; stroke: var(--accent-ink); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  #splash .splash-word {
+    font-family: "Rubik", sans-serif; font-weight: 800; font-size: 32px; letter-spacing: -0.01em; color: var(--text);
+    opacity: 0; transform: translateY(16px);
+    animation: splash-rise-in 0.55s var(--ease-out) 0.55s forwards;
+  }
+  #splash .splash-tag {
+    font-size: 13px; color: var(--text-soft); opacity: 0;
+    animation: splash-fade-in 0.5s var(--ease-out) 1.15s forwards;
+  }
+  #splash .splash-line {
+    width: 130px; height: 2px; border-radius: 2px; background: var(--surface-3); overflow: hidden; position: relative;
+    opacity: 0; animation: splash-fade-in 0.4s var(--ease-out) 1.4s forwards;
+  }
+  #splash .splash-line::after {
+    content: ""; position: absolute; inset: 0; width: 40%; background: var(--accent); border-radius: 2px;
+    animation: splash-sweep 1s var(--ease-in-out) 1.45s forwards;
+  }
+  #splash .splash-skip {
+    position: absolute; bottom: 28px; font-size: 12px; color: var(--text-faint);
+    opacity: 0; animation: splash-fade-in 0.5s var(--ease-out) 1.6s forwards;
+  }
+  @keyframes splash-mark-in { to { opacity: 1; transform: scale(1); } }
+  @keyframes splash-rise-in { to { opacity: 1; transform: translateY(0); } }
+  @keyframes splash-fade-in { to { opacity: 1; } }
+  @keyframes splash-sweep { from { transform: translateX(-120%); } to { transform: translateX(260%); } }
+  @keyframes splash-out { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    #splash { display: none; }
+  }
+</style>
+
+<script>
+  window.addEventListener('error', function (e) {
+    try {
+      var box = document.createElement('div');
+      box.style.cssText = 'position:fixed;inset:0;background:#0d121e;color:#eef1f8;padding:20px;font:13px/1.5 monospace;white-space:pre-wrap;z-index:99999;overflow:auto;direction:ltr;text-align:left;';
+      var msg = 'שגיאה בטעינת האפליקציה - תשלח צילום מסך של זה:\n\n' + (e.message || e) +
+        (e.filename ? ('\n' + e.filename + ':' + e.lineno + ':' + e.colno) : '') +
+        (e.error && e.error.stack ? ('\n\n' + e.error.stack) : '');
+      box.textContent = msg;
+      document.body.appendChild(box);
+    } catch (err) {}
+  });
+</script>
+
+<div id="splash">
+  <div class="splash-mark"><svg viewBox="0 0 24 24"><path d="M4 18 L10 8 L14 14 L20 4"/></svg></div>
+  <div class="splash-word">מסלול</div>
+  <div class="splash-tag">המערכת האישית שלך</div>
+  <div class="splash-line"></div>
+  <div class="splash-skip">גע כדי לדלג</div>
+</div>
+<script>
+  (function () {
+    try {
+      if (sessionStorage.getItem('maslul_intro_played')) {
+        var s = document.getElementById('splash');
+        if (s) s.style.display = 'none';
+      } else {
+        sessionStorage.setItem('maslul_intro_played', '1');
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<div class="app" id="app" dir="rtl" lang="he">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M4 18 L10 8 L14 14 L20 4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="brand-name">מסלול</div>
+    </div>
+    <div id="nav-desktop"></div>
+    <div class="nav-spacer"></div>
+    <div class="nav-foot">הנתונים נשמרים בדפדפן הזה בלבד</div>
+  </aside>
+
+  <main class="main">
+    <section class="panel" id="panel-dashboard"></section>
+    <section class="panel" id="panel-schedule" hidden></section>
+    <section class="panel" id="panel-habits" hidden></section>
+    <section class="panel" id="panel-advisor" hidden></section>
+    <section class="panel" id="panel-focus" hidden></section>
+    <section class="panel" id="panel-fitness" hidden></section>
+    <section class="panel" id="panel-goals" hidden></section>
+    <section class="panel" id="panel-money" hidden></section>
+    <section class="panel" id="panel-learning" hidden></section>
+    <section class="panel" id="panel-settings" hidden></section>
+  </main>
+
+  <nav class="bottom-nav" id="nav-mobile"></nav>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= icons ================= */
+  var ICONS = {
+    home: '<path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/>',
+    calendar: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16"/><path d="M8 3v4M16 3v4"/>',
+    flame: '<path d="M12 3s4 3.5 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9.3 10 9 11.5 9 12a3 3 0 0 0 6 0c0-3-2-5-3-9z"/>',
+    target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6" fill="currentColor"/>',
+    dumbbell: '<path d="M4 9v6M2 10v4M20 9v6M22 10v4M8 12h8M6 9v6M18 9v6"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.7a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2L10 21h4l.6-2.7a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    check: '<path d="M5 12l5 5L20 7"/>',
+    trash: '<path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12"/>',
+    x: '<path d="M6 6l12 12M18 6 6 18"/>',
+    sun: '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>',
+    moon: '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>',
+    laptop: '<path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>',
+    play: '<path d="M7 5l12 7-12 7z"/>',
+    pause: '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>',
+    reset: '<path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M4.5 15a8 8 0 0 0 14.7 2.5M19.5 9a8 8 0 0 0-14.7-2.5"/>',
+    skip: '<path d="M6 5v14l10-7z"/><path d="M18 5v14"/>',
+    edit: '<path d="M4 20h4L18.5 9.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 15v5z"/>',
+    grip: '<circle cx="9" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.2" fill="currentColor" stroke="none"/>',
+    spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+    send: '<path d="M4 12 20 4l-6 16-2.5-7L4 12z"/>',
+    speaker: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>',
+    speakerMute: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5 5M21 9l-5 5"/>',
+    mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M8.5 21h7"/>',
+    flag: '<path d="M6 3v18"/><path d="M6 4h11l-2.5 4L17 12H6"/>',
+    wallet: '<path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-4"/><path d="M15 13h4v3h-4a1.5 1.5 0 0 1 0-3z"/>',
+    book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15.5"/><path d="M20 18.5H6.5a2.5 2.5 0 0 0 0 5H20"/>',
+    more: '<circle cx="6" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.4" fill="currentColor" stroke="none"/>'
+  };
+  function icon(name, cls) { return '<svg class="icon ' + (cls || '') + '" viewBox="0 0 24 24">' + (ICONS[name] || '') + '</svg>'; }
+
+  /* ================= data: templates & library ================= */
+  var CATS = {
+    fitness: { label: 'כושר', color: 'var(--cat-fitness)' },
+    learning: { label: 'למידה', color: 'var(--cat-learning)' },
+    health: { label: 'אוכל ובריאות', color: 'var(--cat-health)' },
+    personal: { label: 'אישי ומנוחה', color: 'var(--cat-personal)' },
+    hobby: { label: 'תחביבים', color: 'var(--cat-hobby)' },
+    social: { label: 'חברים', color: 'var(--cat-social)' }
+  };
+
+  function tpl(list) { return list.map(function (x) { return { time: x[0], title: x[1], category: x[2] }; }); }
+
+  var TEMPLATES = {
+    normal: { label: 'יום חופש', items: tpl([
+      ['05:30','שירותים, מים','personal'],['05:35','תפילין','personal'],['06:00','מקלחת','personal'],
+      ['06:15','התארגנות לגוף','personal'],['06:25','סידור חדר','personal'],['06:30','למידה - תכנות','learning'],
+      ['07:00','אתר','learning'],['07:30','פסנתר','hobby'],['07:40','ללכת לחד״כ','fitness'],
+      ['08:10','אימון בחד״כ','fitness'],['09:15','לחזור הביתה','personal'],['09:40','להכין אוכל','health'],
+      ['10:00','לאכול ולראות סרטונים לחיים','health'],['10:30','מנוחה','personal'],['11:00','פסיכולוגיה','learning'],
+      ['11:15','למידה','learning'],['11:30','מנוחה','personal'],['13:00','הליכה','fitness'],
+      ['13:30','פגישה עם חברים או מנוחה','social'],['16:00','הכנת אוכל','health'],['16:20','לאכול','health'],
+      ['16:50','פסנתר','hobby'],['17:00','אימון ביתי קטן','fitness'],['17:15','מתיחות, מנוחה, אתר','personal'],
+      ['20:00','אוכל','health'],['20:20','לאכול','health'],['20:50','מנוחה','personal'],['21:15','ללכת לישון','personal']
+    ])},
+    saturday: { label: 'שבת', items: tpl([
+      ['05:30','שירותים, מים','personal'],['05:35','סרטונים / אימון בוקר','fitness'],['06:00','מקלחת','personal'],
+      ['06:15','התארגנות לגוף','personal'],['06:25','סידור חדר','personal'],['06:30','למידה - תכנות','learning'],
+      ['07:00','אתר','learning'],['07:30','פסנתר','hobby'],['07:40','ללכת לספורט','fitness'],
+      ['08:10','ספורט','fitness'],['09:15','לחזור הביתה','personal'],['09:40','להכין אוכל','health'],
+      ['10:00','לאכול ולראות סרטונים לחיים','health'],['10:30','מנוחה','personal'],['11:00','פסיכולוגיה','learning'],
+      ['11:15','למידה','learning'],['11:30','מנוחה','personal'],['13:00','הליכה','fitness'],
+      ['13:30','פגישה עם חברים או מנוחה','social'],['16:00','הכנת אוכל','health'],['16:20','לאכול','health'],
+      ['16:50','פסנתר','hobby'],['17:00','אימון ביתי קטן','fitness'],['17:15','מתיחות, מנוחה, אתר','personal'],
+      ['20:00','אוכל','health'],['20:20','לאכול','health'],['20:50','מנוחה','personal'],['21:15','ללכת לישון','personal']
+    ])},
+    school: { label: 'יום בית ספר', items: tpl([
+      ['05:30','שירותים, מים','personal'],['05:35','תפילין','personal'],['06:00','מקלחת','personal'],
+      ['06:15','התארגנות לגוף','personal'],['06:25','סידור חדר','personal'],['06:30','למידה - תכנות','learning'],
+      ['07:00','אתר','learning'],['07:15','להכין אוכל ומים','health'],['07:35','פסנתר','hobby'],
+      ['07:40','ללכת לבית ספר','learning'],['15:00','חוזר הביתה, הולך לחד״כ','personal'],['15:30','אימון בחד״כ','fitness'],
+      ['16:05','לחזור','personal'],['16:30','הכנת אוכל','health'],['16:50','סרטונים לחיים ותרגילים לפנים','personal'],
+      ['17:25','פסיכולוגיה / קריאת שפתיים וגוף','learning'],['17:50','למידה','learning'],['18:30','הכנת אוכל','health'],
+      ['19:00','אתר','learning'],['19:15','פסנתר','hobby'],['19:30','מנוחה','personal'],['20:00','אימון ביתי','fitness'],
+      ['20:30','רפלקסים, חושים, האקי','fitness'],['20:45','מהירות וקפיצות / קליסטניקס / איגרוף / אתלטיקה','fitness'],
+      ['21:00','למידה - שפות / תכנות','learning'],['21:15','ללכת לישון','personal']
+    ])},
+    long: { label: 'יום ארוך', items: tpl([
+      ['05:30','שירותים, מים','personal'],['05:35','תפילין','personal'],['06:00','מקלחת','personal'],
+      ['06:15','התארגנות לגוף','personal'],['06:25','סידור חדר','personal'],['06:30','למידה - תכנות','learning'],
+      ['07:00','אתר','learning'],['07:15','להכין אוכל ומים','health'],['07:35','פסנתר','hobby'],
+      ['07:40','ללכת לבית ספר','learning'],['15:40','חוזר הביתה, הולך לחד״כ','personal'],['16:00','חד״כ','fitness'],
+      ['17:00','לחזור','personal'],['17:20','הכנת אוכל','health'],['17:35','סרטונים ותרגילים לפנים','personal'],
+      ['18:20','פסיכולוגיה','learning'],['18:50','למידה','learning'],['19:30','הכנת אוכל','health'],
+      ['20:00','אתר','learning'],['20:15','פסנתר','hobby'],['20:25','מנוחה','personal'],['20:35','אימון ביתי','fitness'],
+      ['20:50','האקי','fitness'],['21:00','מהירות וקפיצות / קליסטניקס / איגרוף / אתלטיקה','fitness'],
+      ['21:15','ללכת לישון','personal']
+    ])}
+  };
+
+  function autoTemplateFor(date) {
+    var d = date.getDay(); // 0 Sun .. 6 Sat
+    if (d === 6) return 'saturday';
+    if (d === 5) return 'normal';
+    return 'school';
+  }
+
+  function allTemplates() {
+    var merged = {};
+    Object.keys(TEMPLATES).forEach(function (k) { merged[k] = TEMPLATES[k]; });
+    Object.keys(state.customTemplates).forEach(function (k) { merged[k] = state.customTemplates[k]; });
+    return merged;
+  }
+  function isCustomTemplate(key) { return !TEMPLATES[key] && !!state.customTemplates[key]; }
+
+  var HABITS = [
+    { id: 'water', name: 'מים', emoji: '💧' },
+    { id: 'read', name: 'קריאה - 10 עמ׳', emoji: '📖' },
+    { id: 'piano', name: 'פסנתר', emoji: '🎹' },
+    { id: 'code', name: 'תפילין', emoji: '🙏' },
+    { id: 'train', name: 'אימון', emoji: '🏋️' },
+    { id: 'sleep', name: 'שינה בזמן', emoji: '😴' },
+    { id: 'music', name: 'לשים מוזיקה', emoji: '🎵' }
+  ];
+
+  /* ================= tefillin/workout calendar-aware streaks =================
+     Dates are Israel single-day Yom Tov, cross-checked against multiple sources
+     for Hebrew years 5786-5789 (roughly Sept 2025 - May 2029). Chol HaMoed is
+     NOT included (custom-dependent) - only the core Yom Tov days where tefillin
+     is universally not worn. Shabbat is handled separately (every week, always). */
+  var NO_TEFILLIN_DATES = {
+    '2025-09-23': 'ראש השנה', '2025-09-24': 'ראש השנה', '2025-10-02': 'יום כיפור',
+    '2025-10-07': 'סוכות', '2025-10-14': 'שמחת תורה',
+    '2026-04-02': 'פסח', '2026-04-08': 'שביעי של פסח', '2026-05-22': 'שבועות',
+    '2026-09-12': 'ראש השנה', '2026-09-13': 'ראש השנה', '2026-09-21': 'יום כיפור',
+    '2026-09-26': 'סוכות', '2026-10-03': 'שמחת תורה',
+    '2027-04-22': 'פסח', '2027-04-28': 'שביעי של פסח', '2027-06-11': 'שבועות',
+    '2027-10-02': 'ראש השנה', '2027-10-03': 'ראש השנה', '2027-10-11': 'יום כיפור',
+    '2027-10-16': 'סוכות', '2027-10-23': 'שמחת תורה',
+    '2028-04-11': 'פסח', '2028-04-17': 'שביעי של פסח', '2028-05-31': 'שבועות',
+    '2028-09-21': 'ראש השנה', '2028-09-22': 'ראש השנה', '2028-09-30': 'יום כיפור',
+    '2028-10-05': 'סוכות', '2028-10-12': 'שמחת תורה',
+    '2029-03-31': 'פסח', '2029-04-06': 'שביעי של פסח', '2029-05-20': 'שבועות'
+  };
+  var WORKOUT_WEEKDAYS = [0, 1, 3, 4]; // Sun, Mon, Wed, Thu
+  function isNoTefillinDay(date) { return date.getDay() === 6 || !!NO_TEFILLIN_DATES[dkey(date)]; }
+  function isWorkoutDay(date) { return WORKOUT_WEEKDAYS.indexOf(date.getDay()) >= 0; }
+  function isHabitExemptDay(habitId, date) {
+    if (habitId === 'code') return isNoTefillinDay(date);
+    if (habitId === 'train') return !isWorkoutDay(date);
+    return false;
+  }
+
+  var SPLIT = [
+    ['Upper 1', 'חזה, ידיים, בטן, גב, כתפיים'],
+    ['Lower 1', 'רגליים, בטן'],
+    ['Upper 2', 'חזה, ידיים, בטן, גב, כתפיים'],
+    ['Lower 2 / קרדיו', 'כדורגל, פינגפונג, איגרוף, אתלטיקה, אירובי']
+  ];
+
+  var EX_LIBRARY = [
+    { group: 'ידיים', items: [
+      ['Spider curls', 'https://vt.tiktok.com/ZS47d4pMD/'], ['קדמי', 'https://vt.tiktok.com/ZS4WMfudT/'],
+      ['קדמי - נוסף', 'https://vt.tiktok.com/ZS47epWob/'], ['אחורית', null],
+      ['קדמית', 'https://vt.tiktok.com/ZS4tRGokK/'], ['אמות', 'https://vt.tiktok.com/ZS4tRgK8o/']
+    ]},
+    { group: 'בטן', items: [
+      ['כללי', 'https://vt.tiktok.com/ZS4tRSLMG/'], ['תחתונה', 'https://vt.tiktok.com/ZS4tRxh6d/'],
+      ['עליונה', 'https://vt.tiktok.com/ZS4tRghye/'], ['ליבה', 'https://vt.tiktok.com/ZS4tR6aNb/'],
+      ['צדדים', 'https://vt.tiktok.com/ZS4tR6Y7R/'], ['V line', 'https://vt.tiktok.com/ZS4tRQEcX/'],
+      ['נוסף', 'https://vt.tiktok.com/ZS4WQaWHL/']
+    ]},
+    { group: 'גב', items: [
+      ['כללי', 'https://vt.tiktok.com/ZS4tREe7Q/'], ['Lats', 'https://vt.tiktok.com/ZS4t81M4G/'],
+      ['Traps', 'https://vt.tiktok.com/ZS4tRthPM/'], ['תחתון', 'https://vt.tiktok.com/ZS4tRcfka/'],
+      ['אמצע', 'https://vt.tiktok.com/ZS4t8dVrw/'], ['עליון', 'https://vt.tiktok.com/ZS4t8dnhr/']
+    ]},
+    { group: 'כתפיים', items: [
+      ['כללי', 'https://vt.tiktok.com/ZS4tNx3ub/'], ['נוסף', 'https://vt.tiktok.com/ZS4tRtndR/'],
+      ['קדמי', 'https://vt.tiktok.com/ZS4tR3Hk2/'], ['אחורי', 'https://vt.tiktok.com/ZS4tRWoU7/'],
+      ['צדדי', 'https://vt.tiktok.com/ZS4t8dXJw/']
+    ]},
+    { group: 'חזה', items: [
+      ['כללי', 'https://vt.tiktok.com/ZS4tR2MyU/'], ['תחתון', null],
+      ['אמצע', 'https://vt.tiktok.com/ZS4tRa3u3/'], ['עליון', 'https://vt.tiktok.com/ZS4tRfbBQ/'],
+      ['עליון - נוסף', 'https://vt.tiktok.com/ZS4vvYkXX/']
+    ]},
+    { group: 'רגליים', items: [
+      ['כללי', 'https://vt.tiktok.com/ZS4t8JJvJ/'], ['תאומים', 'https://vt.tiktok.com/ZS4tRoApL/'],
+      ['ארבע ראשי', 'https://vt.tiktok.com/ZS4tRgoQK/']
+    ]}
+  ];
+
+  var SCIENCE_LINKS = [
+    ['חזה - אלוף', 'https://vt.tiktok.com/ZS4W9wm9R/'], ['כתפיים - מדע', 'https://vt.tiktok.com/ZS4W5G3SW/'],
+    ['בטן', 'https://vt.tiktok.com/ZS4Wau2JX/'], ['גב', 'https://vt.tiktok.com/ZS4W6FbAY/'],
+    ['יד - מדע 1', 'https://vt.tiktok.com/ZS4Wbtx86/'], ['יד - מדע 2', 'https://vt.tiktok.com/ZS4W2MExx/'],
+    ['יד - אלוף', 'https://vt.tiktok.com/ZS4WMkUsY/']
+  ];
+
+  var TIP_LINKS = [
+    ['שריפת שומן', 'https://vt.tiktok.com/ZS4t83Qx6/'], ['דרכים קלות', 'https://vt.tiktok.com/ZS4t8XCAQ/'],
+    ['תרגיל', 'https://vt.tiktok.com/ZS4t8XN8R/'], ['ריצה', 'https://vt.tiktok.com/ZS4t8bL4M/'],
+    ['חוק 20/80', 'https://vt.tiktok.com/ZS4tLSpjd/'], ['שריר יד - תרגילים', 'https://vt.tiktok.com/ZS4tNmUXN/'],
+    ['V shape', 'https://vt.tiktok.com/ZS4tNaQuQ/'], ['צדדים', 'https://vt.tiktok.com/ZS4Wr7hKg/'],
+    ['בניית תוכנית ידיים', 'https://vt.tiktok.com/ZS47dtGkK/'], ['שריפת שומן בשינה', 'https://vt.tiktok.com/ZS4tNQqoM/']
+  ];
+
+  var EXTERNAL_FITNESS_APP = 'https://cloud-to-awesome.lovable.app/';
+
+  var MONEY_CATS = [
+    { id: 'food', label: 'אוכל', emoji: '🍔' },
+    { id: 'games', label: 'משחקים', emoji: '🎮' },
+    { id: 'tech', label: 'טכנולוגיה', emoji: '💻' },
+    { id: 'fitness', label: 'כושר', emoji: '🏋️' },
+    { id: 'hobby', label: 'תחביבים', emoji: '🎹' },
+    { id: 'edu', label: 'לימודים', emoji: '📚' },
+    { id: 'shopping', label: 'קניות', emoji: '🛍️' },
+    { id: 'other', label: 'אחר', emoji: '📦' }
+  ];
+
+  var INCOME_CATS = [
+    { id: 'allowance', label: 'דמי כיס', emoji: '💵' },
+    { id: 'website', label: 'אתר / עבודה', emoji: '🌐' },
+    { id: 'gift', label: 'מתנה', emoji: '🎁' },
+    { id: 'sale', label: 'מכירה', emoji: '🏷️' },
+    { id: 'other', label: 'אחר', emoji: '📦' }
+  ];
+
+  /* ================= state ================= */
+  var STORE_KEY = 'maslul_state_v1';
+  var state = loadState();
+
+  function loadState() {
+    var def = { theme: 'system', userName: '', tasksByDate: {}, dayOverride: {}, habitLog: {}, focusLog: {}, customTemplates: {}, goals: [], money: { entries: [], savingsGoals: [], ideas: [] }, advisorLog: [], learning: { homework: [], methods: [], exams: [] } };
+    try {
+      var raw = JSON.parse(localStorage.getItem(STORE_KEY));
+      var merged = raw ? Object.assign(def, raw) : def;
+      merged.money = Object.assign({ entries: [], savingsGoals: [], ideas: [] }, merged.money || {});
+      merged.learning = Object.assign({ homework: [], methods: [], exams: [] }, merged.learning || {});
+      if (!Array.isArray(merged.learning.exams)) merged.learning.exams = [];
+      if (!Array.isArray(merged.money.savingsGoals)) merged.money.savingsGoals = [];
+      if (merged.money.savingsGoal && typeof merged.money.savingsGoal === 'object') {
+        merged.money.savingsGoals.push(Object.assign({ id: uid() }, merged.money.savingsGoal));
+      }
+      delete merged.money.savingsGoal;
+      return merged;
+    } catch (e) { return def; }
+  }
+  function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+
+  function dkey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function todayDate() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function timeToMin(t) { var p = t.split(':'); return (+p[0]) * 60 + (+p[1]); }
+  function minToTime(m) { m = Math.max(0, Math.min(1439, Math.round(m))); return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); }
+
+  function templateKeyForToday() {
+    var k = dkey(todayDate());
+    return state.dayOverride[k] || autoTemplateFor(todayDate());
+  }
+  function ensureTodayTasks() {
+    var k = dkey(todayDate());
+    if (!state.tasksByDate[k]) {
+      var tplKey = templateKeyForToday();
+      var tpl = allTemplates()[tplKey] || TEMPLATES[autoTemplateFor(todayDate())];
+      state.tasksByDate[k] = tpl.items.map(function (it) {
+        return { id: uid(), time: it.time, title: it.title, category: it.category, done: false, notes: '' };
+      });
+      saveState();
+    }
+    return state.tasksByDate[k];
+  }
+  function todayTasks() { return ensureTodayTasks().sort(function (a, b) { return a.time.localeCompare(b.time); }); }
+
+  /* ================= theme ================= */
+  function applyTheme() {
+    var root = document.documentElement;
+    if (state.theme === 'light') root.setAttribute('data-theme', 'light');
+    else if (state.theme === 'dark') root.setAttribute('data-theme', 'dark');
+    else root.removeAttribute('data-theme');
+  }
+
+  /* ================= toast ================= */
+  function toast(msg) {
+    var root = document.getElementById('toast-root');
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    root.appendChild(el);
+    setTimeout(function () { el.remove(); }, 2200);
+  }
+
+  /* ================= modal ================= */
+  function closeModal() { document.getElementById('modal-root').innerHTML = ''; }
+
+  function openConfirmModal(message, onConfirm, opts) {
+    opts = opts || {};
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="alertdialog" aria-modal="true">' +
+        '<h3>' + escapeAttr(opts.title || 'לאשר?') + '</h3>' +
+        '<p class="page-sub" style="margin-bottom:18px;">' + escapeAttr(message) + '</p>' +
+        '<div class="modal-actions">' +
+          '<button class="btn ' + (opts.danger === false ? 'btn-primary' : 'btn-danger') + ' btn-block" id="confirm-yes">' + icon('check') + (opts.confirmLabel || 'אישור') + '</button>' +
+          '<button class="btn btn-ghost" id="confirm-no">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('confirm-no').addEventListener('click', closeModal);
+    document.getElementById('confirm-yes').addEventListener('click', function () { closeModal(); onConfirm(); });
+  }
+  function openTaskModal(existing) {
+    var root = document.getElementById('modal-root');
+    var isEdit = !!(existing && existing.id);
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+
+    var catOptions = Object.keys(CATS).map(function (k) {
+      return '<option value="' + k + '"' + (existing && existing.category === k ? ' selected' : '') + '>' + CATS[k].label + '</option>';
+    }).join('');
+
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (isEdit ? 'עריכת פעילות' : 'פעילות חדשה') + '</h3>' +
+        '<div class="field" style="margin-bottom:12px;"><label>שם</label><input type="text" id="f-title" maxlength="80" value="' + (existing ? escapeAttr(existing.title) : '') + '" placeholder="מה עושים?"></div>' +
+        '<div class="field-row" style="margin-bottom:12px;">' +
+          '<div class="field"><label>שעה</label><input type="time" id="f-time" value="' + (existing ? existing.time : '') + '"></div>' +
+          '<div class="field"><label>קטגוריה</label><select id="f-cat">' + catOptions + '</select></div>' +
+        '</div>' +
+        '<div class="field"><label>הערות</label><textarea id="f-notes" placeholder="אופציונלי">' + (existing ? escapeAttr(existing.notes || '') : '') + '</textarea></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="f-save">' + icon('check') + (isEdit ? 'שמור' : 'הוסף') + '</button>' +
+          (isEdit ? '<button class="btn btn-danger" id="f-del">' + icon('trash') + '</button>' : '') +
+          '<button class="btn btn-ghost" id="f-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('f-cancel').addEventListener('click', closeModal);
+    document.getElementById('f-title').focus();
+    if (isEdit) document.getElementById('f-del').addEventListener('click', function () {
+      var list = todayTasks();
+      state.tasksByDate[dkey(todayDate())] = list.filter(function (t) { return t.id !== existing.id; });
+      saveState(); closeModal(); renderSchedule(); renderDashboard();
+      toast('נמחק');
+    });
+    document.getElementById('f-save').addEventListener('click', function () {
+      var title = document.getElementById('f-title').value.trim();
+      if (!title) { document.getElementById('f-title').focus(); return; }
+      var time = document.getElementById('f-time').value || '00:00';
+      var cat = document.getElementById('f-cat').value;
+      var notes = document.getElementById('f-notes').value.trim();
+      var k = dkey(todayDate());
+      if (isEdit) {
+        var item = state.tasksByDate[k].find(function (t) { return t.id === existing.id; });
+        item.title = title; item.time = time; item.category = cat; item.notes = notes;
+      } else {
+        state.tasksByDate[k].push({ id: uid(), time: time, title: title, category: cat, done: false, notes: notes });
+      }
+      saveState(); closeModal(); renderSchedule(); renderDashboard();
+      toast(isEdit ? 'עודכן' : 'נוסף ללוח');
+    });
+  }
+  function escapeAttr(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  function openNewDayTypeModal() {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>סוג יום חדש</h3>' +
+        '<div class="field" style="margin-bottom:14px;"><label>שם</label><input type="text" id="new-tpl-name" maxlength="30" placeholder="למשל: יום חוג פסנתר"></div>' +
+        '<p class="page-sub" style="margin-bottom:16px;">היום יתחיל ריק - תוכל להוסיף לו פעילויות כרגיל, ואז ללחוץ על "שמור כתבנית" כדי שהוא יהיה זמין לבחירה גם בעתיד.</p>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="new-tpl-save">' + icon('check') + 'צור' + '</button>' +
+          '<button class="btn btn-ghost" id="new-tpl-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('new-tpl-cancel').addEventListener('click', closeModal);
+    document.getElementById('new-tpl-name').focus();
+    document.getElementById('new-tpl-save').addEventListener('click', function () {
+      var nameInput = document.getElementById('new-tpl-name');
+      var name = nameInput.value.trim();
+      if (!name) { nameInput.focus(); return; }
+      var key = 'custom_' + uid();
+      state.customTemplates[key] = { label: name, items: [] };
+      var k = dkey(todayDate());
+      state.dayOverride[k] = key;
+      state.tasksByDate[k] = [];
+      saveState();
+      closeModal();
+      renderSchedule();
+      renderDashboard();
+      toast('נוצר סוג יום: ' + name);
+    });
+  }
+
+  function openSaveAsDayTypeModal(actions) {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>יצירת סוג יום מההצעה</h3>' +
+        '<p class="page-sub" style="margin-bottom:14px;">' + actions.length + ' פעילויות יהפכו לסוג יום חדש, זמין לבחירה גם בעתיד.</p>' +
+        '<div class="field" style="margin-bottom:16px;"><label>שם סוג היום</label><input type="text" id="ai-tpl-name" maxlength="30" placeholder="למשל: יום איגרוף"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="ai-tpl-save">' + icon('check') + 'צור' + '</button>' +
+          '<button class="btn btn-ghost" id="ai-tpl-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('ai-tpl-cancel').addEventListener('click', closeModal);
+    document.getElementById('ai-tpl-name').focus();
+    document.getElementById('ai-tpl-save').addEventListener('click', function () {
+      var input = document.getElementById('ai-tpl-name');
+      var name = input.value.trim();
+      if (!name) { input.focus(); return; }
+      var key = 'custom_' + uid();
+      state.customTemplates[key] = { label: name, items: actions.map(function (a) { return { time: a.time, title: a.title, category: a.category }; }) };
+      var k = dkey(todayDate());
+      state.dayOverride[k] = key;
+      state.tasksByDate[k] = actions.map(function (a) { return { id: uid(), time: a.time, title: a.title, category: a.category, done: false, notes: '' }; });
+      saveState();
+      closeModal();
+      renderSchedule();
+      renderDashboard();
+      toast('נוצר סוג יום: ' + name);
+    });
+  }
+
+  /* ================= nav ================= */
+  var NAV_ITEMS = [
+    { id: 'dashboard', label: 'בית', icon: 'home', primary: true },
+    { id: 'schedule', label: 'לוח יומי', icon: 'calendar', primary: true },
+    { id: 'habits', label: 'הרגלים', icon: 'flame', primary: true },
+    { id: 'advisor', label: 'יועץ', icon: 'spark', primary: true },
+    { id: 'focus', label: 'פוקוס', icon: 'target' },
+    { id: 'fitness', label: 'כושר', icon: 'dumbbell' },
+    { id: 'goals', label: 'יעדים', icon: 'flag' },
+    { id: 'money', label: 'כסף', icon: 'wallet' },
+    { id: 'learning', label: 'למידה', icon: 'book' },
+    { id: 'settings', label: 'הגדרות', icon: 'settings' }
+  ];
+  var activePanel = 'dashboard';
+
+  function renderNav() {
+    var d = document.getElementById('nav-desktop');
+    d.innerHTML = NAV_ITEMS.map(function (n) {
+      return '<button class="nav-btn' + (activePanel === n.id ? ' active' : '') + '" data-panel="' + n.id + '">' + icon(n.icon) + '<span>' + n.label + '</span></button>';
+    }).join('');
+    Array.prototype.forEach.call(d.querySelectorAll('.nav-btn'), function (b) {
+      b.addEventListener('click', function () { showPanel(b.dataset.panel); });
+    });
+    var m = document.getElementById('nav-mobile');
+    var primaryItems = NAV_ITEMS.filter(function (n) { return n.primary; });
+    var moreItems = NAV_ITEMS.filter(function (n) { return !n.primary; });
+    var moreActive = moreItems.some(function (n) { return n.id === activePanel; });
+    m.innerHTML = primaryItems.map(function (n) {
+      return '<button class="' + (activePanel === n.id ? 'active' : '') + '" data-panel="' + n.id + '">' + icon(n.icon) + '<span>' + n.label + '</span></button>';
+    }).join('') + '<button class="' + (moreActive ? 'active' : '') + '" id="nav-more-btn">' + icon('more') + '<span>עוד</span></button>';
+    Array.prototype.forEach.call(m.querySelectorAll('[data-panel]'), function (b) {
+      b.addEventListener('click', function () { showPanel(b.dataset.panel); });
+    });
+    document.getElementById('nav-more-btn').addEventListener('click', function () { openMoreSheet(moreItems); });
+  }
+
+  function openMoreSheet(items) {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    var modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = '<h3>עוד</h3>';
+    var list = document.createElement('div');
+    list.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+    items.forEach(function (n) {
+      var b = document.createElement('button');
+      b.className = 'nav-btn';
+      b.style.width = '100%';
+      b.innerHTML = icon(n.icon) + '<span>' + n.label + '</span>';
+      b.addEventListener('click', function () { closeModal(); showPanel(n.id); });
+      list.appendChild(b);
+    });
+    modal.appendChild(list);
+    wrap.appendChild(modal);
+    root.innerHTML = '';
+    root.appendChild(wrap);
+  }
+
+  function showPanel(id) {
+    activePanel = id;
+    NAV_ITEMS.forEach(function (n) {
+      document.getElementById('panel-' + n.id).hidden = n.id !== id;
+    });
+    renderNav();
+    if (id === 'dashboard') renderDashboard();
+    if (id === 'schedule') renderSchedule();
+    if (id === 'habits') renderHabits();
+    if (id === 'advisor') renderAdvisor();
+    if (id === 'focus') renderFocus();
+    if (id === 'fitness') renderFitness();
+    if (id === 'goals') renderGoals();
+    if (id === 'money') renderMoney();
+    if (id === 'learning') renderLearning();
+    if (id === 'settings') renderSettings();
+    window.scrollTo(0, 0);
+    var activeEl = document.getElementById('panel-' + id);
+    activeEl.classList.remove('panel-enter');
+    void activeEl.offsetWidth;
+    activeEl.classList.add('panel-enter');
+  }
+
+  /* ================= dashboard ================= */
+  function greeting() {
+    var h = new Date().getHours();
+    if (h < 5) return 'לילה טוב';
+    if (h < 12) return 'בוקר טוב';
+    if (h < 17) return 'צהריים טובים';
+    if (h < 21) return 'ערב טוב';
+    return 'לילה טוב';
+  }
+
+  function nowNextLater() {
+    var list = todayTasks();
+    var now = new Date();
+    var nowMin = now.getHours() * 60 + now.getMinutes();
+    var idx = -1;
+    for (var i = 0; i < list.length; i++) { if (timeToMin(list[i].time) <= nowMin) idx = i; else break; }
+    return { now: list[idx] || null, next: list[idx + 1] || null, later: list[idx + 2] || null, idx: idx, list: list };
+  }
+
+  function catColor(cat) { return CATS[cat] ? CATS[cat].color : 'var(--accent)'; }
+
+  function renderDashboard() {
+    var el = document.getElementById('panel-dashboard');
+    var list = todayTasks();
+    var doneCount = list.filter(function (t) { return t.done; }).length;
+    var pct = list.length ? Math.round(doneCount / list.length * 100) : 0;
+    var r = 46, c = 2 * Math.PI * r;
+    var nnl = nowNextLater();
+    var d = new Date();
+
+    var habitsToday = HABITS.filter(function (h) { return (state.habitLog[h.id] || {})[dkey(todayDate())]; }).length;
+
+    var balances = Object.keys(CATS).map(function (k) {
+      var items = list.filter(function (t) { return t.category === k; });
+      var p = items.length ? Math.round(items.filter(function (t) { return t.done; }).length / items.length * 100) : null;
+      return { key: k, p: p, items: items.length };
+    });
+
+    el.innerHTML =
+      '<div class="hero">' +
+        '<div><h1>' + greeting() + (state.userName ? ', ' + escapeAttr(state.userName) : '') + ' 👋</h1>' +
+          '<div class="date-line">' + d.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + (allTemplates()[templateKeyForToday()] || {}).label + '</div></div>' +
+        '<div class="clock-chip"><div class="time num" id="live-clock">--:--</div><div class="zone">שעון מקומי</div></div>' +
+      '</div>' +
+
+      '<button class="btn btn-ghost btn-sm" id="free-time-btn" style="margin-bottom:16px;">' + icon('target') + 'מצא זמן פנוי' + '</button>' +
+
+      '<div class="grid-2" style="margin-bottom:16px;">' +
+        '<div class="now-card">' + renderNowCard(nnl) + '</div>' +
+        '<div class="card">' +
+          '<div class="ring-wrap">' +
+            '<svg width="108" height="108" viewBox="0 0 108 108">' +
+              '<circle class="ring-track" cx="54" cy="54" r="' + r + '" stroke-width="10" fill="none"/>' +
+              '<circle class="ring-fill" cx="54" cy="54" r="' + r + '" stroke-width="10" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + (c - (pct / 100) * c) + '"/>' +
+            '</svg>' +
+            '<div>' +
+              '<div class="ring-pct">' + pct + '%</div>' +
+              '<div class="stat-list" style="margin-top:8px;">' +
+                '<div class="row"><span>הושלמו</span><b dir="ltr" class="num">' + doneCount + ' / ' + list.length + '</b></div>' +
+                '<div class="row"><span>הרגלים היום</span><b dir="ltr" class="num">' + habitsToday + ' / ' + HABITS.length + '</b></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:14px;">איזון היום</h3>' +
+        balances.map(function (b) {
+          if (b.p === null) return '<div class="balance-row" style="opacity:.45;"><span class="balance-label"><span class="dot" style="background:' + catColor(b.key) + '"></span>' + CATS[b.key].label + '</span><div class="balance-track"></div><span class="balance-val">-</span></div>';
+          return '<div class="balance-row"><span class="balance-label"><span class="dot" style="background:' + catColor(b.key) + '"></span>' + CATS[b.key].label + '</span><div class="balance-track"><div class="balance-fill" style="width:' + b.p + '%;background:' + catColor(b.key) + '"></div></div><span class="balance-val num">' + b.p + '%</span></div>';
+        }).join('') +
+      '</div>' +
+
+      '<div class="card">' +
+        '<h3 style="margin-bottom:12px;">הרגלים</h3>' +
+        '<div class="grid-3">' + HABITS.map(habitMiniHtml).join('') + '</div>' +
+      '</div>';
+
+    Array.prototype.forEach.call(el.querySelectorAll('[data-habit-toggle]'), function (b) {
+      b.addEventListener('click', function () { toggleHabit(b.dataset.habitToggle); renderDashboard(); });
+    });
+    document.getElementById('free-time-btn').addEventListener('click', function () { openFreeTimeModal(); });
+    wireNowCard(el, nnl);
+    tickClock();
+  }
+
+  function openFreeTimeModal(initialMinutes) {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    var options = [15, 30, 45, 60, 90];
+    var chosen = initialMinutes || 30;
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>מצא זמן פנוי</h3>' +
+        '<div class="field" style="margin-bottom:6px;"><label>כמה זמן אתה צריך?</label></div>' +
+        '<div class="cat-grid" id="ft-durations" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px;">' +
+          options.map(function (m) { return '<button type="button" class="cat-opt' + (m === chosen ? ' active' : '') + '" data-min="' + m + '">' + m + '</button>'; }).join('') +
+        '</div>' +
+        '<div id="ft-results"></div>' +
+        '<div class="modal-actions"><button class="btn btn-ghost btn-block" id="ft-close">' + icon('x') + 'סגור' + '</button></div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('ft-close').addEventListener('click', closeModal);
+
+    function paintResults() {
+      var gaps = findFreeGaps(chosen);
+      var resultsEl = document.getElementById('ft-results');
+      if (!gaps.length) {
+        resultsEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">אין חלון פנוי של ' + chosen + ' דקות היום. אולי כדאי לבדוק ביום עמוס פחות.</p>';
+        return;
+      }
+      resultsEl.innerHTML = gaps.map(function (g, i) {
+        var hrs = Math.floor(g.minutes / 60), mins = g.minutes % 60;
+        var lenLabel = (hrs ? hrs + ' שעות ' : '') + (mins ? mins + ' דק׳' : '');
+        return '<div class="advice-action" style="margin-bottom:10px;"><div><div class="at num" dir="ltr">' + minToTime(g.start) + ' – ' + minToTime(g.end) + '</div><div class="am">' + lenLabel + ' פנויות</div></div>' +
+          '<button class="btn btn-primary btn-sm" data-ft-pick="' + i + '">' + icon('plus') + 'קבע כאן' + '</button></div>';
+      }).join('');
+      Array.prototype.forEach.call(resultsEl.querySelectorAll('[data-ft-pick]'), function (b) {
+        b.addEventListener('click', function () {
+          var g = gaps[+b.dataset.ftPick];
+          closeModal();
+          openTaskModal({ title: '', time: minToTime(g.start), category: 'personal', notes: '' });
+        });
+      });
+    }
+    Array.prototype.forEach.call(wrap.querySelectorAll('[data-min]'), function (b) {
+      b.addEventListener('click', function () {
+        chosen = +b.dataset.min;
+        Array.prototype.forEach.call(wrap.querySelectorAll('[data-min]'), function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        paintResults();
+      });
+    });
+    paintResults();
+  }
+
+  function smartNowSuggestion(nnl) {
+    var now = new Date();
+    var nowMin = now.getHours() * 60 + now.getMinutes();
+    var nextMin = nnl.next ? timeToMin(nnl.next.time) : (23 * 60 + 30);
+    var freeMin = Math.max(0, nextMin - nowMin);
+    var todayKey = dkey(todayDate());
+
+    var goalWithStep = null, stepTitle = null;
+    state.goals.some(function (g) {
+      var step = g.milestones.filter(function (m) { return !m.done; })[0];
+      if (step) { goalWithStep = g; stepTitle = step.title; return true; }
+      return false;
+    });
+    if (freeMin >= 20 && goalWithStep) {
+      return { icon: '🎯', title: stepTitle, sub: 'שלב הבא ביעד "' + goalWithStep.title + '" · ' + freeMin + ' דקות פנויות עד "' + (nnl.next ? nnl.next.title : '') + '"' };
+    }
+
+    var pendingHabit = HABITS.filter(function (h) { return !((state.habitLog[h.id] || {})[todayKey]); })[0];
+    if (pendingHabit) {
+      return { icon: pendingHabit.emoji, title: pendingHabit.name, sub: 'הרגל שעוד לא סימנת היום · ' + freeMin + ' דקות פנויות' };
+    }
+    return null;
+  }
+
+  function findFreeGaps(minMinutes) {
+    var list = todayTasks();
+    var now = new Date();
+    var nowMin = now.getHours() * 60 + now.getMinutes();
+    var upcoming = list.filter(function (t) { return timeToMin(t.time) > nowMin; })
+      .sort(function (a, b) { return timeToMin(a.time) - timeToMin(b.time); });
+    var sleepTask = upcoming.filter(function (t) { return /לישון|שינה/.test(t.title); })[0];
+    var dayEnd = sleepTask ? timeToMin(sleepTask.time) : 23 * 60 + 30;
+    var points = [nowMin];
+    upcoming.forEach(function (t) { var m = timeToMin(t.time); if (m <= dayEnd) points.push(m); });
+    if (points[points.length - 1] !== dayEnd) points.push(dayEnd);
+    var gaps = [];
+    for (var i = 0; i < points.length - 1; i++) {
+      var len = points[i + 1] - points[i];
+      if (len >= minMinutes) gaps.push({ start: points[i], end: points[i + 1], minutes: len });
+    }
+    return gaps;
+  }
+
+  function renderNowCard(nnl) {
+    var html = '';
+    if (nnl.now) {
+      html += '<div class="now-label"><span class="now-dot"></span>עכשיו</div>' +
+        '<div class="now-title" style="color:' + catColor(nnl.now.category) + '">' + escapeAttr(nnl.now.title) + '</div>' +
+        '<div class="now-time num" dir="ltr">' + nnl.now.time + (nnl.next ? ' – ' + nnl.next.time : '') + '</div>' +
+        '<div class="now-actions">' +
+          '<button class="btn btn-primary btn-sm" data-now-complete>' + icon('check') + 'סיימתי' + '</button>' +
+          '<button class="btn btn-ghost btn-sm" data-now-edit>' + icon('edit') + 'ערוך' + '</button>' +
+        '</div>';
+    } else {
+      var sug = smartNowSuggestion(nnl);
+      if (sug) {
+        html += '<div class="now-label"><span class="now-dot"></span>מה לעשות עכשיו</div>' +
+          '<div class="now-title">' + sug.icon + ' ' + escapeAttr(sug.title) + '</div>' +
+          '<div class="now-time">' + escapeAttr(sug.sub) + '</div>';
+      } else {
+        html += '<div class="now-label"><span class="now-dot"></span>עכשיו</div><div class="now-empty">אין פעילות מתוזמנת כרגע. זמן טוב למנוחה או ליזום משהו מהרשימה.</div>';
+      }
+    }
+    html += '<div class="next-later-row">' +
+      '<div class="mini-card"><div class="lbl">הבא</div>' + (nnl.next ? '<div class="ttl">' + escapeAttr(nnl.next.title) + '</div><div class="tm num">' + nnl.next.time + '</div>' : '<div class="tm">-</div>') + '</div>' +
+      '<div class="mini-card"><div class="lbl">אחר כך</div>' + (nnl.later ? '<div class="ttl">' + escapeAttr(nnl.later.title) + '</div><div class="tm num">' + nnl.later.time + '</div>' : '<div class="tm">-</div>') + '</div>' +
+    '</div>';
+    return html;
+  }
+  function wireNowCard(el, nnl) {
+    if (!nnl.now) return;
+    var c = el.querySelector('[data-now-complete]');
+    if (c) c.addEventListener('click', function () { setTaskDone(nnl.now.id, true); renderDashboard(); toast('בוצע ✓'); });
+    var ed = el.querySelector('[data-now-edit]');
+    if (ed) ed.addEventListener('click', function () { openTaskModal(nnl.now); });
+  }
+
+  var clockTimer = null;
+  function tickClock() {
+    clearInterval(clockTimer);
+    function upd() {
+      var elc = document.getElementById('live-clock');
+      if (!elc) { clearInterval(clockTimer); return; }
+      var d = new Date();
+      elc.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+    upd();
+    clockTimer = setInterval(upd, 1000 * 15);
+  }
+
+  /* ================= schedule ================= */
+  function setTaskDone(id, val) {
+    var k = dkey(todayDate());
+    var t = state.tasksByDate[k].find(function (x) { return x.id === id; });
+    if (t) t.done = val !== undefined ? val : !t.done;
+    saveState();
+  }
+  function renderSchedule() {
+    var el = document.getElementById('panel-schedule');
+    var list = todayTasks();
+    var nnl = nowNextLater();
+    var nowId = nnl.now ? nnl.now.id : null;
+    var currentTpl = templateKeyForToday();
+
+    var tpls = allTemplates();
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">לוח יומי</h2><p class="page-sub">' + new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' }) + '</p></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          (isCustomTemplate(currentTpl) ? '<button class="btn btn-ghost btn-sm" id="save-tpl-btn">' + icon('check') + 'שמור כתבנית' + '</button>' : '') +
+          '<button class="btn btn-primary" id="add-task-btn">' + icon('plus') + 'פעילות' + '</button>' +
+        '</div></div>' +
+      '<div class="day-switch">' + Object.keys(tpls).map(function (k) {
+        var custom = isCustomTemplate(k);
+        return '<span class="day-pill-wrap">' +
+          '<button class="day-pill' + (k === currentTpl ? ' active' : '') + '" data-tpl="' + k + '">' + escapeAttr(tpls[k].label) + '</button>' +
+          (custom ? '<button class="day-pill-del" data-del-tpl="' + k + '" aria-label="מחק סוג יום">×</button>' : '') +
+        '</span>';
+      }).join('') + '<button type="button" class="day-pill day-pill-add" id="add-day-type-btn">+ סוג יום</button></div>' +
+      (list.length ?
+        '<div class="timeline" id="t-timeline">' + list.map(function (t) {
+          return '<div class="t-item' + (t.done ? ' done' : '') + '" style="--cat:' + catColor(t.category) + '" data-id="' + t.id + '">' +
+            '<div class="t-row' + (t.id === nowId ? ' now' : '') + (t.done ? ' done' : '') + '" data-open="' + t.id + '">' +
+              '<button class="drag-handle" data-drag="' + t.id + '" aria-label="גרור כדי לשנות שעה">' + icon('grip') + '</button>' +
+              '<button class="t-check' + (t.done ? ' done' : '') + '" data-check="' + t.id + '" aria-label="סמן כבוצע"></button>' +
+              '<span class="t-time num">' + t.time + '</span>' +
+              '<span class="t-title">' + escapeAttr(t.title) + '</span>' +
+              '<span class="t-cat-dot" title="' + CATS[t.category].label + '"></span>' +
+            '</div></div>';
+        }).join('') + '</div>'
+        : '<p class="empty-msg">אין פעילויות ליום הזה עדיין.</p>') +
+      '<div class="cat-legend">' + Object.keys(CATS).map(function (k) { return '<span><span class="dot" style="background:' + catColor(k) + '"></span>' + CATS[k].label + '</span>'; }).join('') + '</div>';
+
+    document.getElementById('add-task-btn').addEventListener('click', function () { openTaskModal(null); });
+    var saveTplBtn = document.getElementById('save-tpl-btn');
+    if (saveTplBtn) saveTplBtn.addEventListener('click', function () {
+      var key = templateKeyForToday();
+      if (!isCustomTemplate(key)) return;
+      state.customTemplates[key].items = todayTasks().map(function (t) { return { time: t.time, title: t.title, category: t.category }; });
+      saveState();
+      toast('התבנית "' + state.customTemplates[key].label + '" עודכנה');
+    });
+    var addDayTypeBtn = document.getElementById('add-day-type-btn');
+    if (addDayTypeBtn) addDayTypeBtn.addEventListener('click', openNewDayTypeModal);
+    Array.prototype.forEach.call(el.querySelectorAll('[data-tpl]'), function (b) {
+      b.addEventListener('click', function () {
+        var k = dkey(todayDate());
+        var tpl = allTemplates()[b.dataset.tpl];
+        if (!tpl) return;
+        state.dayOverride[k] = b.dataset.tpl;
+        state.tasksByDate[k] = tpl.items.map(function (it) {
+          return { id: uid(), time: it.time, title: it.title, category: it.category, done: false, notes: '' };
+        });
+        saveState(); renderSchedule(); renderDashboard();
+        toast('הלוח עודכן ל' + tpl.label);
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-del-tpl]'), function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var key = b.dataset.delTpl;
+        var label = (state.customTemplates[key] || {}).label || 'סוג היום';
+        openConfirmModal('למחוק את סוג היום "' + label + '"? זה לא ימחק ימים שכבר נשמרו - רק את האפשרות לבחור אותו קדימה.', function () {
+          delete state.customTemplates[key];
+          var k = dkey(todayDate());
+          if (state.dayOverride[k] === key) delete state.dayOverride[k];
+          saveState();
+          renderSchedule(); renderDashboard();
+          toast('סוג היום נמחק');
+        });
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-check]'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); setTaskDone(b.dataset.check); renderSchedule(); renderDashboard(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-open]'), function (row) {
+      row.addEventListener('click', function () {
+        var t = list.find(function (x) { return x.id === row.dataset.open; });
+        openTaskModal(t);
+      });
+    });
+    wireDragReorder(el.querySelector('#t-timeline'), list);
+  }
+
+  function wireDragReorder(container, list) {
+    if (!container) return;
+    Array.prototype.forEach.call(container.querySelectorAll('.drag-handle'), function (handle) {
+      handle.addEventListener('click', function (e) { e.stopPropagation(); });
+      handle.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var row = handle.closest('.t-item');
+        var dragId = row.dataset.id;
+        row.classList.add('dragging');
+        var placeholder = document.createElement('div');
+        placeholder.className = 't-item drop-indicator';
+        row.after(placeholder);
+        try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+
+        function itemsExcludingDragged() {
+          return Array.prototype.filter.call(container.querySelectorAll('.t-item'), function (it) {
+            return it !== row && it !== placeholder;
+          });
+        }
+        function onMove(ev) {
+          var items = itemsExcludingDragged();
+          var placed = false;
+          for (var i = 0; i < items.length; i++) {
+            var rect = items[i].getBoundingClientRect();
+            if (ev.clientY < rect.top + rect.height / 2) {
+              items[i].before(placeholder);
+              placed = true;
+              break;
+            }
+          }
+          if (!placed) container.appendChild(placeholder);
+        }
+        function onUp(ev) {
+          document.removeEventListener('pointermove', onMove);
+          document.removeEventListener('pointerup', onUp);
+          try { handle.releasePointerCapture(ev.pointerId); } catch (err) {}
+          row.classList.remove('dragging');
+
+          var prevEl = placeholder.previousElementSibling;
+          var nextEl = placeholder.nextElementSibling;
+          var prevTask = prevEl && prevEl.dataset.id ? list.find(function (t) { return t.id === prevEl.dataset.id; }) : null;
+          var nextTask = nextEl && nextEl.dataset.id ? list.find(function (t) { return t.id === nextEl.dataset.id; }) : null;
+          placeholder.remove();
+
+          var dragTask = list.find(function (t) { return t.id === dragId; });
+          var newMin;
+          if (prevTask && nextTask) {
+            var a = timeToMin(prevTask.time), b = timeToMin(nextTask.time);
+            newMin = (b - a) >= 2 ? Math.round((a + b) / 2) : a + 1;
+          } else if (prevTask) {
+            newMin = timeToMin(prevTask.time) + 5;
+          } else if (nextTask) {
+            newMin = timeToMin(nextTask.time) - 5;
+          } else {
+            newMin = timeToMin(dragTask.time);
+          }
+          var newTime = minToTime(newMin);
+          if (newTime !== dragTask.time) {
+            dragTask.time = newTime;
+            saveState();
+            toast('הועבר לשעה ' + newTime);
+          }
+          renderSchedule();
+          renderDashboard();
+        }
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onUp);
+      });
+    });
+  }
+
+  /* ================= habits ================= */
+  function toggleHabit(id) {
+    var k = dkey(todayDate());
+    state.habitLog[id] = state.habitLog[id] || {};
+    state.habitLog[id][k] = !state.habitLog[id][k];
+    if (!state.habitLog[id][k]) delete state.habitLog[id][k];
+    saveState();
+  }
+  function habitStreak(id) {
+    var log = state.habitLog[id] || {};
+    var d = todayDate();
+    if (!isHabitExemptDay(id, d) && !log[dkey(d)]) return 0;
+    var streak = 0, guard = 0;
+    while (guard++ < 3650) {
+      var k = dkey(d);
+      if (log[k]) streak++;
+      else if (!isHabitExemptDay(id, d)) break;
+      d.setDate(d.getDate() - 1);
+    }
+    return streak;
+  }
+  function habitExemptNote(id) {
+    var today = todayDate();
+    if (!isHabitExemptDay(id, today)) return '';
+    if (id === 'code') {
+      var label = NO_TEFILLIN_DATES[dkey(today)];
+      return 'היום ' + (label || 'שבת') + ' - לא מניחים תפילין, זה בסדר';
+    }
+    if (id === 'train') return 'היום יום מנוחה מתוכנן - לא חובה להתאמן';
+    return '';
+  }
+  function habitMiniHtml(h) {
+    var k = dkey(todayDate());
+    var done = !!(state.habitLog[h.id] || {})[k];
+    var streak = habitStreak(h.id);
+    var note = habitExemptNote(h.id);
+    return '<div class="card card-tight habit-card">' +
+      '<div class="habit-icon">' + h.emoji + '</div>' +
+      '<div class="habit-body"><div class="habit-name">' + h.name + '</div><div class="habit-streak">' + icon('flame', 'icon') + '<span class="num">' + streak + '</span> ימים ברצף</div>' +
+      (note ? '<div class="habit-exempt-note">' + escapeAttr(note) + '</div>' : '') +
+      '</div>' +
+      '<button class="habit-toggle' + (done ? ' done' : '') + '" data-habit-toggle="' + h.id + '">' + (done ? icon('check') : '') + '</button>' +
+    '</div>';
+  }
+  function weekStripHtml() {
+    var today = todayDate();
+    var sunday = new Date(today);
+    sunday.setDate(sunday.getDate() - sunday.getDay());
+    var names = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+    var days = [];
+    for (var i = 0; i < 7; i++) { var d = new Date(sunday); d.setDate(sunday.getDate() + i); days.push(d); }
+    return '<div class="week-strip">' + days.map(function (d, i) {
+      var isToday = dkey(d) === dkey(today);
+      var icons = (isWorkoutDay(d) ? '🏋️' : '') + (isNoTefillinDay(d) ? '🚫🙏' : '');
+      return '<div class="week-day' + (isToday ? ' is-today' : '') + '">' +
+        '<div class="wd-name">' + names[i] + '</div>' +
+        '<div class="wd-num num">' + d.getDate() + '</div>' +
+        '<div class="wd-icons">' + (icons || '&nbsp;') + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+  function upcomingHolidaysHtml() {
+    var todayKey = dkey(todayDate());
+    var dates = Object.keys(NO_TEFILLIN_DATES).filter(function (k) { return k >= todayKey; }).sort();
+    if (!dates.length) return '<p class="page-sub">אין נתונים לתאריכים הבאים - הרשימה מכסה עד שנת 2029, צריך לבקש עדכון שלה.</p>';
+    return '<ul class="holiday-list">' + dates.map(function (k) {
+      return '<li><span>' + escapeAttr(NO_TEFILLIN_DATES[k]) + '</span><span class="num" dir="ltr">' + k + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  function openYearlyHolidaysModal() {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>ימים בלי תפילין</h3>' +
+        '<p class="page-sub" style="margin-bottom:12px;">בנוסף לכל שבת - חגים שבהם לא מניחים תפילין. בלי ימי חול המועד, כי המנהג בהם משתנה בין אנשים.</p>' +
+        upcomingHolidaysHtml() +
+        '<div class="modal-actions" style="margin-top:16px;"><button class="btn btn-ghost btn-block" id="yh-close">' + icon('x') + 'סגור' + '</button></div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('yh-close').addEventListener('click', closeModal);
+  }
+  function renderHabits() {
+    var el = document.getElementById('panel-habits');
+    el.innerHTML = '<div class="page-head"><div><h2 class="page-title">הרגלים</h2><p class="page-sub">סימון יומי ורצף ימים</p></div></div>' +
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:4px;">השבוע</h3>' +
+        '<p class="page-sub" style="margin-bottom:10px;">🏋️ יום אימון מתוכנן (א׳, ב׳, ד׳, ה׳) · 🚫🙏 שבת או חג - לא מניחים תפילין</p>' +
+        weekStripHtml() +
+      '</div>' +
+      '<div class="grid-3">' + HABITS.map(habitMiniHtml).join('') + '</div>' +
+      '<div class="card" style="margin-top:16px;">' +
+        '<div class="settings-row" style="border:none;padding:0;"><div><div class="lbl">לוח שנה</div><div class="desc">רשימת החגים הקרובים שבהם לא מניחים תפילין</div></div>' +
+        '<button class="btn btn-ghost btn-sm" id="open-yearly-holidays">' + icon('flag') + 'הצג' + '</button></div>' +
+      '</div>';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-habit-toggle]'), function (b) {
+      b.addEventListener('click', function () { toggleHabit(b.dataset.habitToggle); renderHabits(); });
+    });
+    document.getElementById('open-yearly-holidays').addEventListener('click', openYearlyHolidaysModal);
+  }
+
+  /* ================= advisor (local rule-based engine - no server, no account needed) ================= */
+  var advisorEntries = state.advisorLog; // { question, advice } or { question, error } - persisted across reloads
+  var advisorPending = false;
+
+  /* ================= data export (copy-to-clipboard, works everywhere) ================= */
+  function openExportTextModal() {
+    var payload = { exportedAt: new Date().toISOString(), app: 'מסלול', data: state };
+    var text = JSON.stringify(payload, null, 2);
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true" style="max-width:560px;">' +
+        '<h3>הנתונים שלך</h3>' +
+        '<p class="page-sub" style="margin-bottom:10px;">כל הטקסט כבר מסומן - אפשר להעתיק (Ctrl+C / Cmd+C) ולהדביק בקובץ טקסט אצלך.</p>' +
+        '<textarea id="export-text-area" readonly style="width:100%;height:280px;font-family:ui-monospace,monospace;font-size:11.5px;direction:ltr;text-align:left;padding:10px;border-radius:var(--radius-s);border:1px solid var(--border);background:var(--surface-2);color:var(--text);resize:vertical;"></textarea>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="export-text-copy">' + icon('check') + 'העתק' + '</button>' +
+          '<button class="btn btn-ghost" id="export-text-close">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    var ta = document.getElementById('export-text-area');
+    ta.value = text;
+    ta.focus();
+    ta.select();
+    document.getElementById('export-text-close').addEventListener('click', closeModal);
+    document.getElementById('export-text-copy').addEventListener('click', function () {
+      ta.focus();
+      ta.select();
+      var done = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { toast('הועתק ✓'); }).catch(function () {
+          try { done = document.execCommand('copy'); } catch (err) {}
+          toast(done ? 'הועתק ✓' : 'ההעתקה האוטומטית לא עבדה - הטקסט מסומן, אפשר להעתיק ידנית');
+        });
+      } else {
+        try { done = document.execCommand('copy'); } catch (err) {}
+        toast(done ? 'הועתק ✓' : 'ההעתקה האוטומטית לא עבדה - הטקסט מסומן, אפשר להעתיק ידנית');
+      }
+    });
+  }
+
+  /* text-to-speech (Hebrew) for advisor answers */
+  var speechActiveBtn = null;
+  function speechSupported() { return typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined'; }
+  function pickHebrewVoice() {
+    try {
+      var voices = window.speechSynthesis.getVoices() || [];
+      return voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf('he') === 0; })[0] || null;
+    } catch (e) { return null; }
+  }
+  function resetSpeakBtn(btn) {
+    if (!btn) return;
+    btn.classList.remove('speaking');
+    btn.innerHTML = icon('speaker');
+  }
+  function speakText(text, btn) {
+    if (!speechSupported()) return;
+    var synth = window.speechSynthesis;
+    if (speechActiveBtn === btn) {
+      synth.cancel();
+      resetSpeakBtn(btn);
+      speechActiveBtn = null;
+      return;
+    }
+    synth.cancel();
+    if (speechActiveBtn) resetSpeakBtn(speechActiveBtn);
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'he-IL';
+    var voice = pickHebrewVoice();
+    if (voice) utter.voice = voice;
+    utter.rate = 1;
+    speechActiveBtn = btn;
+    btn.classList.add('speaking');
+    btn.innerHTML = icon('speakerMute');
+    utter.onend = function () { if (speechActiveBtn === btn) { resetSpeakBtn(btn); speechActiveBtn = null; } };
+    utter.onerror = function () { if (speechActiveBtn === btn) { resetSpeakBtn(btn); speechActiveBtn = null; } };
+    synth.speak(utter);
+  }
+  if (speechSupported() && window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = function () {};
+  }
+
+  function speechRecognitionSupported() {
+    return typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  }
+  var micRecognition = null;
+  var micActive = false;
+  function toggleVoiceInput(textareaEl, micBtn) {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR || !textareaEl || !micBtn) return;
+    if (micActive && micRecognition) {
+      micRecognition.stop();
+      return;
+    }
+    var rec = new SR();
+    rec.lang = 'he-IL';
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+    micRecognition = rec;
+    micActive = true;
+    micBtn.classList.add('listening');
+    var baseValue = textareaEl.value.trim();
+    var stopped = false;
+    var stop = function () {
+      if (stopped) return;
+      stopped = true;
+      micActive = false;
+      micBtn.classList.remove('listening');
+      micRecognition = null;
+    };
+    rec.onresult = function (event) {
+      var interim = '', final = '';
+      for (var i = event.resultIndex; i < event.results.length; i++) {
+        var res = event.results[i];
+        if (res.isFinal) final += res[0].transcript;
+        else interim += res[0].transcript;
+      }
+      textareaEl.value = (baseValue ? baseValue + ' ' : '') + final + interim;
+    };
+    rec.onerror = function (e) {
+      stop();
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('אין הרשאה למיקרופון');
+      else if (e.error !== 'aborted' && e.error !== 'no-speech') toast('לא הצלחתי להקשיב. אפשר לנסות שוב.');
+    };
+    rec.onend = stop;
+    try { rec.start(); } catch (err) { stop(); }
+  }
+
+  function normalizeAdvice(data) {
+    data = data && typeof data === 'object' ? data : {};
+    var rec = ['yes', 'maybe', 'no'].indexOf(data.recommendation) >= 0 ? data.recommendation : 'maybe';
+    var headline = typeof data.headline === 'string' && data.headline.trim() ? data.headline.trim() : 'קיבלתי כמה מחשבות על זה';
+    var reasoning = typeof data.reasoning === 'string' ? data.reasoning.trim() : '';
+    var conflicts = Array.isArray(data.conflicts) ? data.conflicts.filter(function (c) { return typeof c === 'string' && c.trim(); }) : [];
+    var rawActions = Array.isArray(data.suggestedActions) ? data.suggestedActions
+      : (data.suggestedAction && typeof data.suggestedAction === 'object' ? [data.suggestedAction] : []);
+    var actions = rawActions.map(function (sa) {
+      if (!sa || typeof sa !== 'object') return null;
+      var time = typeof sa.time === 'string' && /^([01]?\d|2[0-3]):[0-5]\d$/.test(sa.time) ? sa.time : null;
+      var title = typeof sa.title === 'string' && sa.title.trim() ? sa.title.trim().slice(0, 80) : null;
+      var cat = CATS[sa.category] ? sa.category : 'personal';
+      if (!time || !title) return null;
+      return { title: title, time: time, category: cat, type: sa.type === 'daily' ? 'daily' : 'one_time' };
+    }).filter(Boolean).slice(0, 12);
+    return { recommendation: rec, headline: headline, reasoning: reasoning, conflicts: conflicts, actions: actions };
+  }
+
+  function buildAdviceCard(advice, question) {
+    var badgeLabel = { yes: 'מומלץ', maybe: 'שיקול דעת', no: 'לא מומלץ' }[advice.recommendation];
+    var wrap = document.createElement('div');
+    wrap.className = 'advice-card';
+    wrap.innerHTML =
+      '<div class="advice-top-row"><div class="advice-badge ' + advice.recommendation + '">' + badgeLabel + '</div>' +
+      (speechSupported() ? '<button type="button" class="btn-icon advice-speak-btn" aria-label="הקראה">' + icon('speaker') + '</button>' : '') +
+      '</div>' +
+      '<div class="advice-headline">' + escapeAttr(advice.headline) + '</div>' +
+      (advice.reasoning ? '<div class="advice-reason">' + escapeAttr(advice.reasoning) + '</div>' : '') +
+      (advice.conflicts.length ? '<ul class="advice-conflicts">' + advice.conflicts.map(function (c) { return '<li>⚠ ' + escapeAttr(c) + '</li>'; }).join('') + '</ul>' : '');
+
+    var speakBtn = wrap.querySelector('.advice-speak-btn');
+    if (speakBtn) {
+      speakBtn.addEventListener('click', function () {
+        var parts = [advice.headline];
+        if (advice.reasoning) parts.push(advice.reasoning);
+        if (advice.conflicts.length) parts.push(advice.conflicts.join('. '));
+        speakText(parts.join('. '), speakBtn);
+      });
+    }
+
+    if (advice.actions.length) {
+      advice.actions.forEach(function (act) {
+        var box = document.createElement('div');
+        box.className = 'advice-action';
+        box.innerHTML = '<div><div class="at">' + escapeAttr(act.title) + '</div>' +
+          '<div class="am num" dir="ltr">' + act.time + ' · ' + CATS[act.category].label +
+          (act.type === 'daily' ? ' · הצעה לקבע יומי' : '') + '</div></div>';
+        var addBtn = document.createElement('button');
+        addBtn.className = 'btn btn-ghost btn-sm';
+        addBtn.innerHTML = icon('plus') + 'הוסף';
+        addBtn.addEventListener('click', function () {
+          openTaskModal({ title: act.title, time: act.time, category: act.category, notes: '' });
+        });
+        box.appendChild(addBtn);
+        wrap.appendChild(box);
+      });
+
+      var row = document.createElement('div');
+      row.className = 'advice-actions-row';
+      var addAllBtn = document.createElement('button');
+      addAllBtn.className = 'btn btn-primary btn-sm';
+      addAllBtn.innerHTML = icon('plus') + (advice.actions.length > 1 ? 'הוסף הכל להיום' : 'הוסף להיום');
+      addAllBtn.addEventListener('click', function () {
+        var k = dkey(todayDate());
+        var list = todayTasks();
+        advice.actions.forEach(function (act) {
+          list.push({ id: uid(), time: act.time, title: act.title, category: act.category, done: false, notes: '' });
+        });
+        state.tasksByDate[k] = list;
+        saveState();
+        renderSchedule(); renderDashboard();
+        toast(advice.actions.length > 1 ? 'הפעילויות נוספו להיום' : 'נוסף להיום');
+      });
+      row.appendChild(addAllBtn);
+      if (advice.actions.length > 1) {
+        var saveTplBtn = document.createElement('button');
+        saveTplBtn.className = 'btn btn-ghost btn-sm';
+        saveTplBtn.innerHTML = icon('flag') + 'צור כסוג יום חדש';
+        saveTplBtn.addEventListener('click', function () { openSaveAsDayTypeModal(advice.actions); });
+        row.appendChild(saveTplBtn);
+      }
+      wrap.appendChild(row);
+
+      if (advice.actions.some(function (a) { return a.type === 'daily'; })) {
+        var note = document.createElement('p');
+        note.className = 'page-sub';
+        note.style.cssText = 'margin-top:8px;margin-bottom:0;';
+        note.textContent = 'קיבוע ישיר כהרגל יומי קבוע לא נתמך - אפשר להוסיף להיום, או ליצור מזה סוג יום חדש שיהיה זמין גם בעתיד.';
+        wrap.appendChild(note);
+      }
+    }
+
+    var qline = document.createElement('div');
+    qline.className = 'page-sub';
+    qline.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid var(--border);';
+    qline.textContent = 'שאלת: ' + question;
+    wrap.appendChild(qline);
+    return wrap;
+  }
+
+  function renderAdvisorLog(container) {
+    container.innerHTML = '';
+    if (advisorPending) {
+      var think = document.createElement('div');
+      think.className = 'advisor-thinking';
+      think.innerHTML = icon('spark') + '<span>חושב על היום שלך</span><span class="advisor-dots"><span></span><span></span><span></span></span>';
+      container.appendChild(think);
+    }
+    advisorEntries.forEach(function (entry) {
+      if (entry.error) {
+        var d = document.createElement('div');
+        d.className = 'advisor-thinking';
+        d.style.color = 'var(--danger)';
+        d.textContent = entry.error;
+        container.appendChild(d);
+      } else {
+        container.appendChild(buildAdviceCard(entry.advice, entry.question));
+      }
+    });
+  }
+
+  /* --- local rule-based reasoning: reads real app state, no network/account needed --- */
+  function findPendingHabit() {
+    var todayKey = dkey(todayDate());
+    return HABITS.filter(function (h) { return !((state.habitLog[h.id] || {})[todayKey]); })[0] || null;
+  }
+  function findNextGoalStep() {
+    var found = null;
+    state.goals.some(function (g) {
+      var step = g.milestones.filter(function (m) { return !m.done; })[0];
+      if (step) { found = { goal: g, step: step }; return true; }
+      return false;
+    });
+    return found;
+  }
+  function nearestExam() {
+    var exams = (state.learning.exams || []).filter(function (e) { return e.date && examDaysLeft(e.date) >= 0; });
+    exams.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+    return exams[0] || null;
+  }
+  function guessCategory(text) {
+    if (/אימון|כושר|ריצ[הת]|איגרוף|חד"?כ|קרדיו|שריר|ספורט|אתלטיקה|כדורגל|כדורסל|פינגפונג/.test(text)) return 'fitness';
+    if (/למיד[הת]|תכנות|שיעור|לימוד|אתר|קוד|מבחן|שפ[הות]|פסיכולוגיה/.test(text)) return 'learning';
+    if (/אוכל|ארוח[הת]|בריאות|לאכול|מים/.test(text)) return 'health';
+    if (/פסנתר|תחביב|ציור|מוזיק[הת]/.test(text)) return 'hobby';
+    if (/חבר|חברה|מפגש|יציאה/.test(text)) return 'social';
+    return 'personal';
+  }
+  function parseTimeFromText(q) {
+    var m = q.match(/([01]?\d|2[0-3]):([0-5]\d)/);
+    if (!m) return null;
+    var h = m[1].length === 1 ? '0' + m[1] : m[1];
+    return h + ':' + m[2];
+  }
+  function parseDurationMinutes(q) {
+    var mHour = q.match(/(\d+(?:\.\d+)?)\s*שעות?/);
+    if (mHour) return Math.round(parseFloat(mHour[1]) * 60);
+    var mMin = q.match(/(\d+)\s*(דקות|דק['׳]?)/);
+    if (mMin) return parseInt(mMin[1], 10);
+    if (/חצי שעה/.test(q)) return 30;
+    return null;
+  }
+  function extractActivityTitle(q, timeStr) {
+    var t = q;
+    t = t.replace(/^אני\s+(רוצה|צריך|צריכה)\s+ל?הוסיף\s+/, '');
+    t = t.replace(/^(תוסיף|תוסיפי|תקבע|תקבעי)\s+/, '');
+    t = t.replace(/היום/g, '');
+    if (timeStr) t = t.replace(new RegExp('ב-?' + timeStr.replace(':', '[:.]?')), '');
+    t = t.replace(/[?!.]+$/, '').replace(/\s+/g, ' ').trim();
+    return t || 'פעילות חדשה';
+  }
+
+  function generateAdvice(question) {
+    var q = (question || '').trim();
+    var now = new Date();
+    var nowMin = now.getHours() * 60 + now.getMinutes();
+    var list = todayTasks();
+    var next = list.filter(function (t) { return timeToMin(t.time) > nowMin; })[0] || null;
+    var exam = nearestExam();
+    var examNote = exam ? ('יש לך מבחן ב"' + exam.title + '" בעוד ' + examDaysLeft(exam.date) + ' ימים.') : null;
+
+    if (/עייף|עייפה|עייפים|עייפות|אין לי כוח|מותש|מותשת/.test(q)) {
+      var fitLater = list.some(function (t) { return t.category === 'fitness' && timeToMin(t.time) > nowMin; });
+      return {
+        recommendation: fitLater ? 'maybe' : 'yes',
+        headline: 'תקשיב לגוף - עייפות היא אינדיקציה אמיתית',
+        reasoning: fitLater
+          ? 'יש לך עוד אימון מתוכנן היום - אפשר להוריד עצימות, לקצר אותו, או להזיז אותו אם יש גמישות. שינה ומנוחה חשובות לא פחות מהאימון עצמו.'
+          : 'אין לך יותר אימונים מתוכננים היום, אז זה זמן טוב למנוחה קצרה, שתיית מים, ולהקדים ללכת לישון.',
+        conflicts: examNote ? [examNote] : [],
+        suggestedActions: []
+      };
+    }
+
+    if (/עמוס|עמוסה|לחוץ|לחוצה|יותר מדי|מה כדאי להוריד|לבטל/.test(q)) {
+      var counts = {};
+      list.forEach(function (t) { counts[t.category] = (counts[t.category] || 0) + 1; });
+      var droppable = ['social', 'hobby', 'personal'].filter(function (c) { return counts[c] > 1; })[0];
+      return {
+        recommendation: 'maybe',
+        headline: list.length > 14 ? 'היום באמת עמוס - שווה לגזור משהו' : 'זה לא נראה חריג מדי, אבל אפשר לפנות קצת אוויר',
+        reasoning: droppable
+          ? ('יש לך כמה פריטים בקטגוריית "' + CATS[droppable].label + '" - זה המקום הכי בטוח לוותר על פריט אחד או לשלב שניים ביחד, בלי לפגוע בלימודים, כושר או שינה.')
+          : 'רוב מה שיש לך היום נראה חיוני (למידה, כושר, שינה) - קשה למצוא מה להוריד בלי לוותר על משהו חשוב. אולי עדיף לקצר משך זמן של כמה פריטים במקום למחוק לגמרי.',
+        conflicts: examNote ? [examNote] : [],
+        suggestedActions: []
+      };
+    }
+
+    if (/(תבנה|בנה לי|תיצור|צור לי).*יום/.test(q)) {
+      var lastYom = q.lastIndexOf('יום');
+      var theme = lastYom >= 0 ? q.slice(lastYom + 3).replace(/[?!.]+$/, '').trim() : '';
+      if (!theme) theme = 'מותאם אישית';
+      var themedFitness = guessCategory(theme) === 'fitness';
+      var base = themedFitness ? TEMPLATES.school : TEMPLATES.normal;
+      var picked = base.items.filter(function (it) { return it.category !== 'personal' || /פסנתר|למידה/.test(it.title); });
+      var actions = picked.slice(0, 12).map(function (it) {
+        var title = (themedFitness && it.category === 'fitness') ? ('אימון ' + theme) : it.title;
+        return { title: title, time: it.time, category: it.category, type: 'one_time' };
+      });
+      return {
+        recommendation: 'yes',
+        headline: 'הצעה ליום "' + theme + '"',
+        reasoning: 'בניתי הצעה על בסיס מבנה יום שכבר עובד לך, עם דגש על ' + theme + '. אפשר להוסיף הכל להיום או לשמור כסוג יום חדש לשימוש עתידי.',
+        conflicts: examNote ? [examNote] : [],
+        suggestedActions: actions
+      };
+    }
+
+    var timeStr = parseTimeFromText(q);
+    if (timeStr && /(תוסיף|רוצה להוסיף|תקבע|לקבוע|להוסיף)/.test(q)) {
+      var title = extractActivityTitle(q, timeStr);
+      var cat = guessCategory(q);
+      var conflict = list.filter(function (t) { return t.time === timeStr; })[0];
+      return {
+        recommendation: conflict ? 'maybe' : 'yes',
+        headline: conflict ? 'יש התנגשות בשעה הזו' : ('"' + title + '" ב-' + timeStr + ' נראה סביר'),
+        reasoning: conflict
+          ? 'בזמן הזה כבר יש לך "' + conflict.title + '" - כדאי לבחור שעה סמוכה פנויה במקום.'
+          : 'זה לא מתנגש עם שום דבר אחר היום. אם זה אימון, כדאי לוודא שיש מספיק זמן התאוששות לפני שינה.',
+        conflicts: examNote ? [examNote] : [],
+        suggestedActions: [{ title: title, time: timeStr, category: cat, type: 'one_time' }]
+      };
+    }
+
+    var duration = parseDurationMinutes(q);
+    if (/פנוי|מה כדאי לעשות|משעמם/.test(q) || duration) {
+      var minutes = duration || 60;
+      var gaps = findFreeGaps(Math.min(minutes, 240));
+      var slot = gaps[0] || null;
+      var habit = findPendingHabit();
+      var goalStep = findNextGoalStep();
+      var pickTitle, pickCat;
+      if (goalStep) { pickTitle = goalStep.step.title; pickCat = 'personal'; }
+      else if (habit) { pickTitle = habit.name; pickCat = 'health'; }
+      else { pickTitle = 'זמן פנוי - קריאה, מתיחות או תחביב'; pickCat = 'personal'; }
+      var startTime = slot ? minToTime(slot.start) : minToTime(nowMin);
+      return {
+        recommendation: slot ? 'yes' : 'maybe',
+        headline: slot ? ('יש לך ' + minutes + ' דקות פנויות מ-' + startTime) : 'הלוח היום צפוף לחלון כזה',
+        reasoning: goalStep
+          ? ('זה זמן טוב לקדם את היעד "' + goalStep.goal.title + '" - השלב הבא הוא "' + goalStep.step.title + '".')
+          : habit
+          ? ('"' + habit.name + '" עוד לא סומן היום - זה זמן טוב בשבילו.')
+          : 'אין הרגל דחוף או שלב יעד ממתין כרגע, אז זה זמן פנוי גמיש - תחביב, מנוחה או קריאה.',
+        conflicts: (slot ? [] : ['לא מצאתי חלון פנוי של ' + minutes + ' דקות היום ברצף.']).concat(examNote ? [examNote] : []),
+        suggestedActions: slot ? [{ title: pickTitle, time: startTime, category: pickCat, type: 'one_time' }] : []
+      };
+    }
+
+    var todayKey = dkey(todayDate());
+    var habitsDone = HABITS.filter(function (h) { return (state.habitLog[h.id] || {})[todayKey]; }).length;
+    var goalStep2 = findNextGoalStep();
+    var extra = goalStep2
+      ? ('כשיהיה לך רגע פנוי, השלב הבא ביעד "' + goalStep2.goal.title + '" הוא "' + goalStep2.step.title + '".')
+      : 'אפשר לשאול אותי משהו יותר ספציפי - זמן פנוי, עייפות, או הוספת פעילות בשעה מסוימת - ותקבל המלצה מדויקת יותר.';
+    return {
+      recommendation: 'maybe',
+      headline: next ? ('הדבר הבא בלוח שלך: "' + next.title + '" ב-' + next.time) : 'אין עוד פריטים מתוכננים היום',
+      reasoning: 'סימנת ' + habitsDone + ' מתוך ' + HABITS.length + ' הרגלים היום. ' + extra,
+      conflicts: examNote ? [examNote] : [],
+      suggestedActions: []
+    };
+  }
+
+  function askAdvisor(question) {
+    if (advisorPending) return;
+    advisorPending = true;
+    if (activePanel === 'advisor') renderAdvisor();
+    setTimeout(function () {
+      var raw;
+      try { raw = generateAdvice(question); } catch (e) { raw = null; }
+      advisorPending = false;
+      advisorEntries.unshift({ question: question, advice: normalizeAdvice(raw) });
+      if (advisorEntries.length > 30) advisorEntries.length = 30;
+      saveState();
+      if (activePanel === 'advisor') renderAdvisor();
+    }, 450);
+  }
+
+  function renderAdvisor() {
+    var el = document.getElementById('panel-advisor');
+    var examples = [
+      'יש לי שעה פנויה, מה כדאי לעשות?',
+      'אני רוצה להוסיף היום אימון איגרוף ב-20:00',
+      'תבנה לי סוג יום חדש ליום איגרוף',
+      'היום עמוס מדי, מה כדאי להוריד?',
+      'אני עייף היום'
+    ];
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">יועץ</h2><p class="page-sub">שואלים בשפה חופשית, מקבלים המלצה לפי סדר היום האמיתי שלך</p></div></div>' +
+      '<div class="advisor-intro"><div class="advisor-avatar">' + icon('spark') + '</div><div class="page-sub">מתייחס ללוח היומי הנוכחי שלך - עומס, התנגשויות, שינה והתאוששות - ונותן המלצה, לא פסיקה. ההחלטה תמיד שלך. פועל כולו בדפדפן שלך, בלי חיבור לאינטרנט או תלות בחשבון.</div></div>' +
+      '<div class="advisor-examples">' + examples.map(function (e) { return '<button type="button" class="advisor-ex" data-ex="' + escapeAttr(e) + '">' + e + '</button>'; }).join('') + '</div>' +
+      '<form class="advisor-form" id="advisor-form">' +
+        '<textarea id="advisor-input" placeholder="למשל: יש לי שעה פנויה, מה כדאי לעשות?"></textarea>' +
+        (speechRecognitionSupported() ? '<button type="button" class="btn btn-ghost advisor-mic-btn" id="advisor-mic" aria-label="דבר עם היועץ">' + icon('mic') + '</button>' : '') +
+        '<button type="submit" class="btn btn-primary" id="advisor-send" aria-label="שלח">' + icon('send') + '</button>' +
+      '</form>' +
+      '<div id="advisor-log"></div>';
+
+    renderAdvisorLog(document.getElementById('advisor-log'));
+
+    Array.prototype.forEach.call(el.querySelectorAll('[data-ex]'), function (b) {
+      b.addEventListener('click', function () {
+        var ta = document.getElementById('advisor-input');
+        if (ta) { ta.value = b.dataset.ex; ta.focus(); }
+      });
+    });
+    var form = document.getElementById('advisor-form');
+    if (form) form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var ta = document.getElementById('advisor-input');
+      var q = ta.value.trim();
+      if (!q) return;
+      ta.value = '';
+      askAdvisor(q);
+    });
+    var micBtn = document.getElementById('advisor-mic');
+    if (micBtn) micBtn.addEventListener('click', function () {
+      var ta = document.getElementById('advisor-input');
+      if (ta) toggleVoiceInput(ta, micBtn);
+    });
+  }
+
+  /* ================= focus ================= */
+  var focusState = { total: 25 * 60, remaining: 25 * 60, running: false, timer: null };
+  function renderFocus() {
+    var el = document.getElementById('panel-focus');
+    var r = 100, c = 2 * Math.PI * r;
+    var doneToday = (state.focusLog[dkey(todayDate())] || 0);
+    el.innerHTML = '<div class="page-head"><div><h2 class="page-title">פוקוס</h2><p class="page-sub">טיימר פומודורו למקטעי עבודה מרוכזת</p></div></div>' +
+      '<div class="card"><div class="focus-wrap">' +
+        '<div class="focus-ring"><svg width="240" height="240" viewBox="0 0 240 240">' +
+          '<circle class="ring-track" cx="120" cy="120" r="' + r + '" stroke-width="10" fill="none"/>' +
+          '<circle class="ring-fill" id="focus-ring-fill" cx="120" cy="120" r="' + r + '" stroke-width="10" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="0"/>' +
+        '</svg><div class="focus-time num" id="focus-time">25:00</div></div>' +
+        '<div class="focus-controls">' +
+          '<button class="btn btn-primary" id="focus-toggle">' + icon('play') + 'התחל' + '</button>' +
+          '<button class="btn btn-ghost" id="focus-reset">' + icon('reset') + '</button>' +
+        '</div>' +
+        '<div class="focus-presets">' +
+          '<button class="preset-btn active" data-min="25">25 דק׳</button>' +
+          '<button class="preset-btn" data-min="50">50 דק׳</button>' +
+          '<button class="preset-btn" data-min="10">10 דק׳</button>' +
+        '</div>' +
+        '<p class="focus-task">הושלמו היום: <b class="num">' + doneToday + '</b> מקטעים</p>' +
+      '</div></div>';
+
+    var ring = document.getElementById('focus-ring-fill');
+    var timeEl = document.getElementById('focus-time');
+    var toggleBtn = document.getElementById('focus-toggle');
+
+    function paint() {
+      var m = Math.floor(focusState.remaining / 60), s = focusState.remaining % 60;
+      timeEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      var frac = focusState.remaining / focusState.total;
+      ring.setAttribute('stroke-dashoffset', c - frac * c);
+      toggleBtn.innerHTML = icon(focusState.running ? 'pause' : 'play') + (focusState.running ? 'השהה' : 'התחל');
+    }
+    paint();
+
+    toggleBtn.addEventListener('click', function () {
+      focusState.running = !focusState.running;
+      if (focusState.running) {
+        focusState.timer = setInterval(function () {
+          focusState.remaining--;
+          if (focusState.remaining <= 0) {
+            clearInterval(focusState.timer);
+            focusState.running = false;
+            focusState.remaining = 0;
+            var k = dkey(todayDate());
+            state.focusLog[k] = (state.focusLog[k] || 0) + 1;
+            saveState();
+            toast('מקטע פוקוס הושלם ✓');
+            focusState.remaining = focusState.total;
+          }
+          paint();
+        }, 1000);
+      } else {
+        clearInterval(focusState.timer);
+      }
+      paint();
+    });
+    document.getElementById('focus-reset').addEventListener('click', function () {
+      clearInterval(focusState.timer);
+      focusState.running = false;
+      focusState.remaining = focusState.total;
+      paint();
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('.preset-btn'), function (b) {
+      b.addEventListener('click', function () {
+        clearInterval(focusState.timer);
+        focusState.running = false;
+        focusState.total = (+b.dataset.min) * 60;
+        focusState.remaining = focusState.total;
+        Array.prototype.forEach.call(el.querySelectorAll('.preset-btn'), function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        paint();
+      });
+    });
+  }
+
+  /* ================= fitness ================= */
+  function renderFitness() {
+    var el = document.getElementById('panel-fitness');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">כושר</h2><p class="page-sub">חלוקת אימונים, מאגר תרגילים וטיפים</p></div></div>' +
+      '<a href="' + EXTERNAL_FITNESS_APP + '" target="_blank" rel="noopener" class="card card-tight" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;text-decoration:none;color:inherit;">' +
+        '<div><div style="font-weight:700;font-size:14.5px;">אפליקציית כושר חיצונית</div><div class="page-sub" style="margin-top:2px;">קישור שמור - נפתח בכרטיסייה חדשה</div></div>' +
+        '<span class="btn btn-ghost btn-sm" style="pointer-events:none;">פתיחה ↗</span>' +
+      '</a>' +
+      '<div class="split-grid">' + SPLIT.map(function (s) {
+        return '<div class="split-card"><div class="k">' + s[0] + '</div><div class="v">' + s[1] + '</div></div>';
+      }).join('') + '</div>' +
+      '<p class="page-sub" style="margin:-6px 0 18px;">קליסטניקס: <bdi dir="ltr">2</bdi> סטים של <bdi dir="ltr">6-8</bdi> חזרות עד כישלון, <bdi dir="ltr">2-2.5</bdi> דק׳ מנוחה. אימון ביתי משלים: קליסטניקס / צוואר / תרגילים ביתיים.</p>' +
+      '<div class="grid-2" style="margin-bottom:18px;">' + EX_LIBRARY.map(function (g) {
+        return '<div class="card card-tight"><h3 style="margin-bottom:8px;">' + g.group + '</h3><ul class="ex-list">' +
+          g.items.map(function (it) {
+            return '<li><span class="lb">' + it[0] + '</span>' + (it[1] ? '<a href="' + it[1] + '" target="_blank" rel="noopener">צפייה ↗</a>' : '<span class="plain">קישור חסר במקור</span>') + '</li>';
+          }).join('') + '</ul></div>';
+      }).join('') + '</div>' +
+      '<div class="card card-tight" style="margin-bottom:12px;"><h3 style="margin-bottom:10px;">הכי טוב לכל שריר - מדע / אלופי עולם</h3><div class="tip-row">' +
+        SCIENCE_LINKS.map(function (l) { return '<a class="tip-chip" href="' + l[1] + '" target="_blank" rel="noopener">' + l[0] + ' ↗</a>'; }).join('') +
+      '</div></div>' +
+      '<div class="card card-tight"><h3 style="margin-bottom:10px;">טיפים לאימון ולשריפת שומן</h3><div class="tip-row">' +
+        TIP_LINKS.map(function (l) { return '<a class="tip-chip" href="' + l[1] + '" target="_blank" rel="noopener">' + l[0] + ' ↗</a>'; }).join('') +
+      '</div><p class="page-sub" style="margin-top:12px;margin-bottom:0;">מקורות אלו נשמרו כפי שסופקו, לא כהמלצה רפואית. שריפת שומן בשינה - חדר קר, כ-65°F. מיקוד עיקרי: בטן וחזה. יעד חלבון מקובל לגילי <bdi dir="ltr">12-18</bdi>: כ-<bdi dir="ltr">1.3-1.8</bdi> גרם לק״ג ליום, מפוזר לאורך היום.</p></div>';
+  }
+
+  /* ================= goals ================= */
+  function goalProgress(g) {
+    if (g.milestones.length) {
+      var done = g.milestones.filter(function (m) { return m.done; }).length;
+      return Math.round(done / g.milestones.length * 100);
+    }
+    return g.manualProgress || 0;
+  }
+
+  function goalCardHtml(g) {
+    var pct = goalProgress(g);
+    var msHtml = g.milestones.map(function (m) {
+      return '<li class="ms-item' + (m.done ? ' done' : '') + '">' +
+        '<button class="ms-check' + (m.done ? ' done' : '') + '" data-ms-toggle="' + g.id + '|' + m.id + '">' + (m.done ? icon('check') : '') + '</button>' +
+        '<span class="ms-title">' + escapeAttr(m.title) + '</span>' +
+        '<button class="ms-del" data-ms-del="' + g.id + '|' + m.id + '" aria-label="מחק שלב">' + icon('x') + '</button>' +
+      '</li>';
+    }).join('');
+    return '<div class="card goal-card">' +
+      '<div class="goal-head"><h3>' + escapeAttr(g.title) + '</h3><button class="btn-icon" data-goal-del="' + g.id + '" aria-label="מחק יעד">' + icon('trash') + '</button></div>' +
+      (g.targetDate ? '<div class="page-sub" style="margin-bottom:10px;">יעד ל-<span dir="ltr">' + g.targetDate + '</span></div>' : '') +
+      '<div class="goal-progress-row"><div class="balance-track" style="flex:1;"><div class="balance-fill" style="width:' + pct + '%;background:var(--accent);"></div></div><span class="num" style="font-weight:700;min-width:38px;">' + pct + '%</span></div>' +
+      (g.milestones.length ? '<ul class="ms-list">' + msHtml + '</ul>' : '') +
+      '<div class="ms-add-row"><input type="text" class="ms-input" data-ms-input="' + g.id + '" maxlength="60" placeholder="הוסף שלב..."><button class="btn btn-ghost btn-sm" data-ms-add="' + g.id + '" aria-label="הוסף שלב">' + icon('plus') + '</button></div>' +
+      (!g.milestones.length ? '<div class="goal-manual-row" style="margin-top:10px;"><span>התקדמות ידנית</span><input type="range" min="0" max="100" value="' + (g.manualProgress || 0) + '" data-manual-progress="' + g.id + '"></div>' : '') +
+    '</div>';
+  }
+
+  function renderGoals() {
+    var el = document.getElementById('panel-goals');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">יעדים</h2><p class="page-sub">יעדים ארוכי טווח, מפורקים לשלבים קטנים</p></div>' +
+        '<button class="btn btn-primary" id="add-goal-btn">' + icon('plus') + 'יעד' + '</button></div>' +
+      (state.goals.length ? state.goals.map(goalCardHtml).join('') : '<p class="empty-msg">אין עדיין יעדים. תתחיל מאחד.</p>');
+
+    document.getElementById('add-goal-btn').addEventListener('click', openNewGoalModal);
+    Array.prototype.forEach.call(el.querySelectorAll('[data-goal-del]'), function (b) {
+      b.addEventListener('click', function () {
+        openConfirmModal('למחוק את היעד הזה?', function () {
+          state.goals = state.goals.filter(function (g) { return g.id !== b.dataset.goalDel; });
+          saveState(); renderGoals();
+        });
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-ms-toggle]'), function (b) {
+      b.addEventListener('click', function () {
+        var parts = b.dataset.msToggle.split('|');
+        var g = state.goals.find(function (x) { return x.id === parts[0]; });
+        var m = g && g.milestones.find(function (x) { return x.id === parts[1]; });
+        if (m) m.done = !m.done;
+        saveState(); renderGoals();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-ms-del]'), function (b) {
+      b.addEventListener('click', function () {
+        var parts = b.dataset.msDel.split('|');
+        var g = state.goals.find(function (x) { return x.id === parts[0]; });
+        if (g) g.milestones = g.milestones.filter(function (x) { return x.id !== parts[1]; });
+        saveState(); renderGoals();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-ms-add]'), function (b) {
+      var addFn = function () {
+        var input = el.querySelector('[data-ms-input="' + b.dataset.msAdd + '"]');
+        var title = input.value.trim();
+        if (!title) return;
+        var g = state.goals.find(function (x) { return x.id === b.dataset.msAdd; });
+        if (g) g.milestones.push({ id: uid(), title: title, done: false });
+        saveState(); renderGoals();
+      };
+      b.addEventListener('click', addFn);
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-ms-input]'), function (inp) {
+      inp.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        el.querySelector('[data-ms-add="' + inp.dataset.msInput + '"]').click();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-manual-progress]'), function (rng) {
+      rng.addEventListener('input', function () {
+        var g = state.goals.find(function (x) { return x.id === rng.dataset.manualProgress; });
+        if (g) g.manualProgress = +rng.value;
+        var row = rng.closest('.goal-card');
+        row.querySelector('.balance-fill').style.width = rng.value + '%';
+        row.querySelector('.goal-progress-row .num').textContent = rng.value + '%';
+      });
+      rng.addEventListener('change', function () { saveState(); });
+    });
+  }
+
+  function openNewGoalModal() {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>יעד חדש</h3>' +
+        '<div class="field" style="margin-bottom:12px;"><label>מה היעד?</label><input type="text" id="new-goal-title" maxlength="60" placeholder="למשל: ללמוד Python"></div>' +
+        '<div class="field" style="margin-bottom:16px;"><label>תאריך יעד (אופציונלי)</label><input type="date" id="new-goal-date"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="new-goal-save">' + icon('check') + 'צור' + '</button>' +
+          '<button class="btn btn-ghost" id="new-goal-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('new-goal-cancel').addEventListener('click', closeModal);
+    document.getElementById('new-goal-title').focus();
+    document.getElementById('new-goal-save').addEventListener('click', function () {
+      var titleInput = document.getElementById('new-goal-title');
+      var title = titleInput.value.trim();
+      if (!title) { titleInput.focus(); return; }
+      var date = document.getElementById('new-goal-date').value || null;
+      state.goals.push({ id: uid(), title: title, targetDate: date, milestones: [], manualProgress: 0 });
+      saveState();
+      closeModal();
+      renderGoals();
+      toast('היעד נוסף');
+    });
+  }
+
+  /* ================= money ================= */
+  function moneyBalance() {
+    return state.money.entries.reduce(function (sum, e) { return sum + (e.type === 'income' ? e.amount : -e.amount); }, 0);
+  }
+  function moneyMonthlyNet() {
+    var ym = dkey(todayDate()).slice(0, 7);
+    return state.money.entries.filter(function (e) { return e.date.slice(0, 7) === ym; })
+      .reduce(function (sum, e) { return sum + (e.type === 'income' ? e.amount : -e.amount); }, 0);
+  }
+  function moneyEntryHtml(e) {
+    var catList = e.type === 'income' ? INCOME_CATS : MONEY_CATS;
+    var cat = catList.filter(function (c) { return c.id === e.category; })[0];
+    var label = e.note || (cat ? cat.label : (e.type === 'income' ? 'הכנסה' : 'הוצאה'));
+    return '<li class="money-entry">' +
+      '<span class="em">' + (cat ? cat.emoji : (e.type === 'income' ? '💰' : '📦')) + '</span>' +
+      '<div class="mt"><div>' + escapeAttr(label) + '</div><div class="cat" dir="ltr">' + e.date + (cat && e.note ? ' · ' + cat.label : '') + '</div></div>' +
+      '<span class="amt num ' + e.type + '" dir="ltr">' + (e.type === 'income' ? '+' : '-') + '₪' + e.amount.toLocaleString('he-IL') + '</span>' +
+      '<button class="m-del" data-money-del="' + e.id + '" aria-label="מחק">' + icon('x') + '</button>' +
+    '</li>';
+  }
+
+  function renderMoney() {
+    var el = document.getElementById('panel-money');
+    var balance = moneyBalance();
+    var monthNet = moneyMonthlyNet();
+    var recent = state.money.entries.slice().sort(function (a, b) { return b.date.localeCompare(a.date); }).slice(0, 12);
+    var sgs = state.money.savingsGoals;
+
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">כסף</h2><p class="page-sub">מעקב פשוט אחר הכנסות והוצאות</p></div></div>' +
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<div class="money-summary"><span class="page-sub">יתרה כוללת</span></div>' +
+        '<div class="money-balance num" dir="ltr">' + (balance < 0 ? '-' : '') + '₪' + Math.abs(balance).toLocaleString('he-IL') + '</div>' +
+        '<div class="money-sub"><span>החודש: <b class="num" dir="ltr">' + (monthNet < 0 ? '-' : '+') + '₪' + Math.abs(monthNet).toLocaleString('he-IL') + '</b></span></div>' +
+        '<div class="money-add-row">' +
+          '<button class="btn btn-primary btn-block" id="add-income-btn">' + icon('plus') + 'הכנסה' + '</button>' +
+          '<button class="btn btn-ghost btn-block" id="add-expense-btn">' + icon('plus') + 'הוצאה' + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<div class="goal-head" style="margin-bottom:' + (sgs.length ? '12' : '0') + 'px;"><h3 style="margin:0;">יעדי חיסכון</h3><button class="btn btn-ghost btn-sm" id="new-savings-btn">' + icon('plus') + 'יעד חדש' + '</button></div>' +
+        (sgs.length ? sgs.map(function (sg, i) {
+          var last = i === sgs.length - 1;
+          return '<div style="' + (last ? '' : 'margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);') + '">' +
+            '<div class="goal-head" style="margin-bottom:6px;"><div style="font-weight:600;">' + escapeAttr(sg.title) + '</div><button class="btn-icon" data-del-savings="' + sg.id + '" aria-label="מחק יעד חיסכון">' + icon('trash') + '</button></div>' +
+            '<div class="goal-progress-row"><div class="balance-track" style="flex:1;"><div class="balance-fill" style="width:' + Math.min(100, Math.round(sg.current / sg.target * 100)) + '%;background:var(--accent-2);"></div></div><span class="num" style="font-weight:700;" dir="ltr">₪' + sg.current.toLocaleString('he-IL') + ' / ₪' + sg.target.toLocaleString('he-IL') + '</span></div>' +
+            '<button class="btn btn-ghost btn-sm" data-add-to-savings="' + sg.id + '">' + icon('plus') + 'הוסף לחיסכון' + '</button>' +
+          '</div>';
+        }).join('')
+        : '<p class="page-sub" style="margin:0;">עדיין אין יעד חיסכון - אפשר להוסיף כמה שרוצים.</p>') +
+      '</div>' +
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:10px;">💡 רעיונות עסק</h3>' +
+        (state.money.ideas.length ? '<ul class="ms-list">' + state.money.ideas.map(function (idea) {
+          return '<li class="ms-item"><span class="ms-title">' + escapeAttr(idea.title) + '</span><button class="ms-del" data-idea-del="' + idea.id + '" aria-label="מחק רעיון">' + icon('x') + '</button></li>';
+        }).join('') + '</ul>' : '<p class="page-sub" style="margin-bottom:10px;">עדיין אין רעיונות - תוסיף את הראשון.</p>') +
+        '<div class="ms-add-row"><input type="text" class="ms-input" id="idea-input" maxlength="80" placeholder="למשל: חנות אונליין לנעליים"><button class="btn btn-ghost btn-sm" id="idea-add-btn">' + icon('plus') + '</button></div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<h3 style="margin-bottom:10px;">תנועות אחרונות</h3>' +
+        (recent.length ? '<ul class="money-entries">' + recent.map(moneyEntryHtml).join('') + '</ul>' : '<p class="empty-msg" style="padding:14px 0;">אין עדיין תנועות.</p>') +
+      '</div>';
+
+    var ideaAddBtn = document.getElementById('idea-add-btn');
+    var ideaInput = document.getElementById('idea-input');
+    var addIdea = function () {
+      var title = ideaInput.value.trim();
+      if (!title) return;
+      state.money.ideas.push({ id: uid(), title: title });
+      saveState();
+      renderMoney();
+    };
+    ideaAddBtn.addEventListener('click', addIdea);
+    ideaInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addIdea(); } });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-idea-del]'), function (b) {
+      b.addEventListener('click', function () {
+        state.money.ideas = state.money.ideas.filter(function (i) { return i.id !== b.dataset.ideaDel; });
+        saveState(); renderMoney();
+      });
+    });
+
+    document.getElementById('add-income-btn').addEventListener('click', function () { openMoneyEntryModal('income'); });
+    document.getElementById('add-expense-btn').addEventListener('click', function () { openMoneyEntryModal('expense'); });
+    document.getElementById('new-savings-btn').addEventListener('click', openNewSavingsModal);
+    Array.prototype.forEach.call(el.querySelectorAll('[data-del-savings]'), function (b) {
+      b.addEventListener('click', function () {
+        openConfirmModal('למחוק את יעד החיסכון הזה?', function () {
+          state.money.savingsGoals = state.money.savingsGoals.filter(function (g) { return g.id !== b.dataset.delSavings; });
+          saveState(); renderMoney();
+        });
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-add-to-savings]'), function (b) {
+      b.addEventListener('click', function () { openAddToSavingsModal(b.dataset.addToSavings); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-money-del]'), function (b) {
+      b.addEventListener('click', function () {
+        state.money.entries = state.money.entries.filter(function (e) { return e.id !== b.dataset.moneyDel; });
+        saveState(); renderMoney();
+      });
+    });
+  }
+
+  function openMoneyEntryModal(type) {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    var catList = type === 'income' ? INCOME_CATS : MONEY_CATS;
+    var catOptions = catList.map(function (c, i) {
+      return '<button type="button" class="cat-opt' + (i === 0 ? ' active' : '') + '" data-cat="' + c.id + '">' + c.emoji + ' ' + c.label + '</button>';
+    }).join('');
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (type === 'income' ? 'הכנסה חדשה' : 'הוצאה חדשה') + '</h3>' +
+        '<div class="field" style="margin-bottom:12px;"><label>סכום (₪)</label><input type="number" id="m-amount" min="0" step="0.1" inputmode="decimal" placeholder="0"></div>' +
+        '<div class="field" style="margin-bottom:4px;"><label>מקור / קטגוריה</label></div><div class="cat-grid">' + catOptions + '</div>' +
+        '<div class="field" style="margin-bottom:16px;"><label>תיאור חופשי (אופציונלי - כותבים מה שרוצים)</label><input type="text" id="m-note" maxlength="80" placeholder="' + (type === 'income' ? 'למשל: תשלום מלקוח באתר, מכירת פריט, כל דבר' : 'למשל: ארוחת צהריים, כל דבר') + '"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="m-save">' + icon('check') + 'שמור' + '</button>' +
+          '<button class="btn btn-ghost" id="m-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    var selectedCat = catList[0].id;
+    Array.prototype.forEach.call(wrap.querySelectorAll('[data-cat]'), function (b) {
+      b.addEventListener('click', function () {
+        selectedCat = b.dataset.cat;
+        Array.prototype.forEach.call(wrap.querySelectorAll('[data-cat]'), function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+      });
+    });
+    document.getElementById('m-cancel').addEventListener('click', closeModal);
+    document.getElementById('m-amount').focus();
+    document.getElementById('m-save').addEventListener('click', function () {
+      var amountInput = document.getElementById('m-amount');
+      var amount = parseFloat(amountInput.value);
+      if (!amount || amount <= 0) { amountInput.focus(); return; }
+      var note = document.getElementById('m-note').value.trim();
+      state.money.entries.push({ id: uid(), type: type, amount: amount, category: selectedCat, note: note, date: dkey(todayDate()) });
+      saveState();
+      closeModal();
+      renderMoney();
+      toast(type === 'income' ? 'הכנסה נוספה' : 'הוצאה נוספה');
+    });
+  }
+
+  function openNewSavingsModal() {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>יעד חיסכון</h3>' +
+        '<div class="field" style="margin-bottom:12px;"><label>על מה חוסכים?</label><input type="text" id="sg-title" maxlength="40" placeholder="למשל: מחשב חדש"></div>' +
+        '<div class="field" style="margin-bottom:16px;"><label>סכום יעד (₪)</label><input type="number" id="sg-target" min="1" step="1" placeholder="0"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="sg-save">' + icon('check') + 'צור' + '</button>' +
+          '<button class="btn btn-ghost" id="sg-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('sg-cancel').addEventListener('click', closeModal);
+    document.getElementById('sg-title').focus();
+    document.getElementById('sg-save').addEventListener('click', function () {
+      var titleInput = document.getElementById('sg-title');
+      var title = titleInput.value.trim();
+      var target = parseFloat(document.getElementById('sg-target').value);
+      if (!title) { titleInput.focus(); return; }
+      if (!target || target <= 0) { document.getElementById('sg-target').focus(); return; }
+      state.money.savingsGoals.push({ id: uid(), title: title, target: target, current: 0 });
+      saveState();
+      closeModal();
+      renderMoney();
+      toast('יעד החיסכון נוצר');
+    });
+  }
+
+  function openAddToSavingsModal(goalId) {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>הוספה לחיסכון</h3>' +
+        '<div class="field" style="margin-bottom:16px;"><label>כמה להוסיף (₪)</label><input type="number" id="sg-add-amount" min="0" step="0.1" placeholder="0"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="sg-add-save">' + icon('check') + 'הוסף' + '</button>' +
+          '<button class="btn btn-ghost" id="sg-add-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('sg-add-cancel').addEventListener('click', closeModal);
+    document.getElementById('sg-add-amount').focus();
+    document.getElementById('sg-add-save').addEventListener('click', function () {
+      var input = document.getElementById('sg-add-amount');
+      var amount = parseFloat(input.value);
+      if (!amount || amount <= 0) { input.focus(); return; }
+      var goal = state.money.savingsGoals.find(function (g) { return g.id === goalId; });
+      if (goal) goal.current += amount;
+      saveState();
+      closeModal();
+      renderMoney();
+      toast('נוסף לחיסכון');
+    });
+  }
+
+  /* ================= learning ================= */
+  function simpleListCardHtml(title, emojiLabel, items, idPrefix, placeholder) {
+    return '<div class="card" style="margin-bottom:16px;">' +
+      '<h3 style="margin-bottom:10px;">' + emojiLabel + ' ' + title + '</h3>' +
+      (items.length ? '<ul class="ms-list">' + items.map(function (it) {
+        return '<li class="ms-item"><span class="ms-title">' + escapeAttr(it.title) + '</span><button class="ms-del" data-' + idPrefix + '-del="' + it.id + '" aria-label="מחק">' + icon('x') + '</button></li>';
+      }).join('') + '</ul>' : '<p class="page-sub" style="margin-bottom:10px;">עדיין ריק - תוסיף את הראשון.</p>') +
+      '<div class="ms-add-row"><input type="text" class="ms-input" id="' + idPrefix + '-input" maxlength="80" placeholder="' + escapeAttr(placeholder) + '"><button class="btn btn-ghost btn-sm" id="' + idPrefix + '-add-btn">' + icon('plus') + '</button></div>' +
+    '</div>';
+  }
+  function wireSimpleListSection(el, idPrefix, parentObj, key) {
+    var addBtn = document.getElementById(idPrefix + '-add-btn');
+    var input = document.getElementById(idPrefix + '-input');
+    var add = function () {
+      var title = input.value.trim();
+      if (!title) return;
+      parentObj[key].push({ id: uid(), title: title });
+      saveState();
+      renderLearning();
+    };
+    addBtn.addEventListener('click', add);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-' + idPrefix + '-del]'), function (b) {
+      b.addEventListener('click', function () {
+        var delId = b.dataset[idPrefix + 'Del'];
+        parentObj[key] = parentObj[key].filter(function (i) { return i.id !== delId; });
+        saveState();
+        renderLearning();
+      });
+    });
+  }
+  function examDaysLeft(dateStr) {
+    if (!dateStr) return null;
+    var parts = dateStr.split('-');
+    var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    d.setHours(0, 0, 0, 0);
+    return Math.round((d - todayDate()) / 86400000);
+  }
+  function examMetaHtml(dateStr) {
+    var days = examDaysLeft(dateStr);
+    if (days === null) return '<span class="exam-meta">ללא תאריך</span>';
+    var cls = days <= 2 ? 'urgent' : (days <= 7 ? 'soon' : '');
+    var label = days < 0 ? 'עבר' : days === 0 ? 'היום' : days === 1 ? 'מחר' : 'עוד <bdi dir="ltr">' + days + '</bdi> ימים';
+    return '<span class="exam-meta' + (cls ? ' ' + cls : '') + '">' + label + '</span>';
+  }
+  function examCardHtml(exams) {
+    var sorted = exams.slice().sort(function (a, b) {
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+    });
+    return '<div class="card" style="margin-bottom:16px;">' +
+      '<h3 style="margin-bottom:10px;">📅 לוח מבחנים</h3>' +
+      (sorted.length ? '<ul class="ms-list">' + sorted.map(function (it) {
+        return '<li class="ms-item"><span class="ms-title">' + escapeAttr(it.title) +
+          (it.date ? ' <span dir="ltr" style="color:var(--text-faint);font-size:12px;">' + it.date + '</span>' : '') + '</span>' +
+          examMetaHtml(it.date) +
+          '<button class="ms-del" data-exam-del="' + it.id + '" aria-label="מחק">' + icon('x') + '</button></li>';
+      }).join('') + '</ul>' : '<p class="page-sub" style="margin-bottom:10px;">אין מבחנים קרובים - תוסיף אחד.</p>') +
+      '<div class="exam-add-row">' +
+        '<input type="text" class="ms-input" id="exam-input" maxlength="60" placeholder="למשל: מבחן במתמטיקה">' +
+        '<input type="date" id="exam-date-input">' +
+        '<button class="btn btn-ghost btn-sm" id="exam-add-btn">' + icon('plus') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+  function wireExamSection(el) {
+    var addBtn = document.getElementById('exam-add-btn');
+    var input = document.getElementById('exam-input');
+    var dateInput = document.getElementById('exam-date-input');
+    var add = function () {
+      var title = input.value.trim();
+      if (!title) return;
+      state.learning.exams.push({ id: uid(), title: title, date: dateInput.value || null });
+      saveState();
+      renderLearning();
+    };
+    addBtn.addEventListener('click', add);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-exam-del]'), function (b) {
+      b.addEventListener('click', function () {
+        state.learning.exams = state.learning.exams.filter(function (i) { return i.id !== b.dataset.examDel; });
+        saveState();
+        renderLearning();
+      });
+    });
+  }
+  function renderLearning() {
+    var el = document.getElementById('panel-learning');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">למידה</h2><p class="page-sub">שיעורי בית, שיטות למידה ולוח מבחנים</p></div></div>' +
+      examCardHtml(state.learning.exams) +
+      simpleListCardHtml('שיעורי בית', '📚', state.learning.homework, 'hw', 'למשל: תרגילים במתמטיקה עמ׳ 12') +
+      simpleListCardHtml('שיטות למידה', '🧠', state.learning.methods, 'method', 'למשל: כרטיסיות זיכרון, פומודורו 25 דק׳');
+    wireExamSection(el);
+    wireSimpleListSection(el, 'hw', state.learning, 'homework');
+    wireSimpleListSection(el, 'method', state.learning, 'methods');
+  }
+
+  /* ================= settings ================= */
+  function renderSettings() {
+    var el = document.getElementById('panel-settings');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">הגדרות</h2></div></div>' +
+      '<div class="card">' +
+        '<div class="settings-row"><div><div class="lbl">שם</div><div class="desc">יופיע בברכת הבית</div></div>' +
+          '<input type="text" id="set-name" value="' + escapeAttr(state.userName) + '" placeholder="השם שלך" style="max-width:160px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);"></div>' +
+        '<div class="settings-row"><div><div class="lbl">ערכת נושא</div><div class="desc">בהיר, כהה או לפי המערכת</div></div>' +
+          '<div class="seg">' +
+            '<button data-theme-opt="system" class="' + (state.theme === 'system' ? 'active' : '') + '">מערכת</button>' +
+            '<button data-theme-opt="light" class="' + (state.theme === 'light' ? 'active' : '') + '">בהיר</button>' +
+            '<button data-theme-opt="dark" class="' + (state.theme === 'dark' ? 'active' : '') + '">כהה</button>' +
+          '</div></div>' +
+        '<div class="settings-row"><div><div class="lbl">ייצוא נתונים</div><div class="desc">כל המידע השמור, לגיבוי או להעברה</div></div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">' +
+            '<button class="btn btn-ghost btn-sm" id="export-text-btn">' + icon('edit') + 'הצג טקסט להעתקה' + '</button>' +
+          '</div></div>' +
+        '<div class="settings-row"><div><div class="lbl">איפוס נתונים</div><div class="desc">מוחק את כל המשימות וההרגלים השמורים</div></div>' +
+          '<button class="btn btn-danger btn-sm" id="reset-data">' + icon('trash') + 'איפוס' + '</button></div>' +
+      '</div>';
+    document.getElementById('set-name').addEventListener('change', function (e) { state.userName = e.target.value.trim(); saveState(); renderDashboard(); });
+    document.getElementById('export-text-btn').addEventListener('click', openExportTextModal);
+    Array.prototype.forEach.call(el.querySelectorAll('[data-theme-opt]'), function (b) {
+      b.addEventListener('click', function () {
+        state.theme = b.dataset.themeOpt; saveState(); applyTheme(); renderSettings();
+      });
+    });
+    document.getElementById('reset-data').addEventListener('click', function () {
+      openConfirmModal('לאפס את כל הנתונים השמורים? הפעולה בלתי הפיכה.', function () {
+        localStorage.removeItem(STORE_KEY);
+        state = loadState();
+        applyTheme();
+        showPanel('dashboard');
+        toast('הנתונים אופסו');
+      }, { title: 'איפוס נתונים', confirmLabel: 'איפוס' });
+    });
+  }
+
+  /* ================= keyboard shortcuts ================= */
+  document.addEventListener('keydown', function (e) {
+    var tag = (e.target && e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var map = { t: 'schedule', f: 'focus', h: 'habits', g: 'fitness' };
+    if (e.key === 'n') { e.preventDefault(); showPanel('schedule'); openTaskModal(null); }
+    else if (map[e.key]) { showPanel(map[e.key]); }
+    else if (e.key === 'Escape') { closeModal(); }
+  });
+
+  /* ================= init ================= */
+  applyTheme();
+  renderNav();
+  showPanel('dashboard');
+
+  var splashEl = document.getElementById('splash');
+  if (splashEl) {
+    splashEl.addEventListener('click', function () {
+      splashEl.style.animation = 'none';
+      splashEl.style.opacity = '0';
+      splashEl.style.visibility = 'hidden';
+      splashEl.style.pointerEvents = 'none';
+    });
+  }
+})();
+</script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); }); }</script>
+</html>
