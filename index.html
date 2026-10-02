@@ -612,7 +612,7 @@
   .gc-date { font-size: 12px; color: var(--text-faint); white-space: nowrap; }
   .gc-xp-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-soft); margin-bottom: 6px; position: relative; z-index: 1; }
   .gc-bar-track { height: 10px; border-radius: 999px; background: var(--surface-3); overflow: hidden; position: relative; z-index: 1; }
-  .gc-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0%; transition: width 0.9s var(--ease-out); }
+  .gc-bar-fill { height: 100%; width: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transform: scaleX(0); transform-origin: right; transition: transform 0.9s var(--ease-out); }
   .gc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; position: relative; z-index: 1; }
   .gc-stat { text-align: center; }
   .gc-stat b { display: block; font-family: "JetBrains Mono", monospace; font-size: 15px; }
@@ -622,8 +622,9 @@
   .xp-toast-layer { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
   .xp-toast { position: absolute; display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--accent); color: var(--accent); font-weight: 800; font-family: "JetBrains Mono", monospace; font-size: 15px; padding: 6px 12px; border-radius: 999px; box-shadow: 0 6px 20px var(--shadow); animation: xp-float 1.4s var(--ease-out) forwards; }
   @keyframes xp-float { 0% { opacity: 0; transform: translateY(0) scale(0.8); } 15% { opacity: 1; transform: translateY(-6px) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-46px) scale(0.95); } }
-  .task-xp-glow { animation: task-glow 0.9s var(--ease-out); }
-  @keyframes task-glow { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+  .task-xp-glow { position: relative; }
+  .task-xp-glow::after { content: ''; position: absolute; inset: -3px; border-radius: inherit; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent); opacity: 0; pointer-events: none; animation: task-glow 0.7s var(--ease-out); }
+  @keyframes task-glow { 0% { opacity: 1; } 100% { opacity: 0; } }
   .combo-flash { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 9001; background: var(--accent-2); color: var(--accent-2-ink); font-weight: 800; padding: 7px 16px; border-radius: 999px; font-size: 13px; animation: combo-pop 1.5s var(--ease-out) forwards; }
   @keyframes combo-pop { 0% { opacity: 0; transform: translateX(-50%) scale(0.7); } 15% { opacity: 1; transform: translateX(-50%) scale(1.05); } 20% { transform: translateX(-50%) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
 
@@ -644,11 +645,21 @@
   .levelup-stack { position: relative; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
   .levelup-stack span { background: var(--surface-3); border-radius: 999px; padding: 3px 10px; font-size: 11px; font-family: "JetBrains Mono", monospace; }
 
-  .ach-toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 9400; background: var(--surface-2); border: 1px solid var(--accent-2); border-radius: var(--radius-m); padding: 12px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px var(--shadow); animation: ach-in-out 3.6s ease forwards; max-width: 90vw; }
-  @keyframes ach-in-out { 0% { opacity: 0; transform: translateX(-50%) translateY(14px); } 10% { opacity: 1; transform: translateX(-50%) translateY(0); } 88% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(14px); } }
-  .ach-toast .ach-ic { width: 34px; height: 34px; border-radius: 10px; background: color-mix(in srgb, var(--accent-2) 20%, transparent); display: flex; align-items: center; justify-content: center; color: var(--accent-2); flex-shrink: 0; }
+  .ach-toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 9400; background: var(--surface-2); border: 1px solid var(--accent-2); border-radius: var(--radius-m); padding: 12px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px var(--shadow); animation: ach-in-out 3.6s var(--ease-in-out) forwards; max-width: 90vw; }
+  @keyframes ach-in-out { 0% { opacity: 0; transform: translateX(-50%) translateY(14px); } 8% { opacity: 1; transform: translateX(-50%) translateY(0); } 90% { opacity: 1; transform: translateX(-50%) translateY(0); } 100% { opacity: 0; transform: translateX(-50%) translateY(14px); } }
+  .ach-toast .ach-ic { width: 34px; height: 34px; border-radius: 10px; background: color-mix(in srgb, var(--accent-2) 20%, transparent); display: flex; align-items: center; justify-content: center; color: var(--accent-2); flex-shrink: 0; animation: ach-icon-pop 0.45s var(--ease-out) 0.18s both; }
+  @keyframes ach-icon-pop { from { opacity: 0; transform: scale(0.4) rotate(-20deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
   .ach-toast .ach-tt { font-weight: 700; font-size: 13.5px; }
   .ach-toast .ach-ds { font-size: 11.5px; color: var(--text-soft); }
+
+  .bonus-toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 9300; background: var(--surface-2); border: 1px solid var(--accent); border-radius: var(--radius-m); padding: 10px 16px; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 26px var(--shadow); animation: ach-in-out 2.8s var(--ease-in-out) forwards; max-width: 90vw; }
+  .bonus-toast.perfect { bottom: 140px; border-color: var(--accent-2); background: linear-gradient(135deg, var(--surface-2), color-mix(in srgb, var(--accent-2) 14%, var(--surface-2))); animation: ach-in-out 4.2s var(--ease-in-out) forwards; }
+  .bonus-toast .bt-ic { color: var(--accent); flex-shrink: 0; }
+  .bonus-toast.perfect .bt-ic { color: var(--accent-2); animation: ach-icon-pop 0.5s var(--ease-out) 0.18s both; }
+  .bonus-toast .bt-label { font-weight: 700; font-size: 13.5px; }
+  .bonus-toast .bt-xp { font-size: 11.5px; color: var(--text-soft); font-family: "JetBrains Mono", monospace; }
+
+  .gam-particle { position: absolute; top: 50%; left: 50%; border-radius: 50%; pointer-events: none; will-change: transform, opacity; }
 
   .prog-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
   .prog-tabs button { white-space: nowrap; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft); font-size: 13px; cursor: pointer; }
@@ -666,7 +677,7 @@
   .cat-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12.5px; }
   .cat-bar-row .cb-label { width: 90px; flex-shrink: 0; color: var(--text-soft); }
   .cat-bar-track { flex: 1; height: 8px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
-  .cat-bar-fill { height: 100%; border-radius: 999px; }
+  .cat-bar-fill { height: 100%; width: 100%; border-radius: 999px; transform: scaleX(0); transform-origin: right; transition: transform 0.6s var(--ease-out); }
   .cat-bar-row .cb-num { width: 32px; text-align: left; font-family: "JetBrains Mono", monospace; color: var(--text-faint); }
 
   .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
@@ -685,7 +696,7 @@
   .chal-top .ct-xp { font-size: 11.5px; color: var(--accent); font-family: "JetBrains Mono", monospace; flex-shrink: 0; }
   .chal-card.done { border-color: color-mix(in srgb, var(--success) 45%, var(--border)); }
   .chal-bar-track { height: 7px; border-radius: 999px; background: var(--surface-3); overflow: hidden; margin-bottom: 6px; }
-  .chal-bar-fill { height: 100%; border-radius: 999px; background: var(--success); transition: width 0.6s var(--ease-out); }
+  .chal-bar-fill { height: 100%; width: 100%; border-radius: 999px; background: var(--success); transform: scaleX(0); transform-origin: right; transition: transform 0.6s var(--ease-out); }
   .chal-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-faint); }
 
   .cosm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
@@ -710,7 +721,7 @@
   .switch input:checked + span::before { transform: translateX(18px); }
 
   @media (prefers-reduced-motion: reduce) {
-    .xp-toast, .task-xp-glow, .combo-flash, .levelup-overlay, .levelup-card, .levelup-glow, .ach-toast, .gc-bar-fill, .chal-bar-fill { animation: none !important; transition: none !important; }
+    .xp-toast, .task-xp-glow, .task-xp-glow::after, .combo-flash, .levelup-overlay, .levelup-card, .levelup-glow, .ach-toast, .ach-toast .ach-ic, .gam-particle, .gc-bar-fill, .chal-bar-fill, .cat-bar-fill, .bonus-toast { animation: none !important; transition: none !important; }
   }
 </style>
 
@@ -1139,6 +1150,49 @@
   function prefersReducedMotion() {
     try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   }
+  function gamAnimateFillBars(root) {
+    var bars = (root || document).querySelectorAll('[data-fill-pct]');
+    if (!bars.length) return;
+    var apply = function () {
+      Array.prototype.forEach.call(bars, function (bar) { bar.style.transform = 'scaleX(' + (+bar.dataset.fillPct / 100) + ')'; });
+    };
+    if (prefersReducedMotion()) apply();
+    else requestAnimationFrame(function () { requestAnimationFrame(apply); });
+  }
+  function gamSpawnParticles(container, count) {
+    if (prefersReducedMotion()) return;
+    for (var i = 0; i < count; i++) {
+      (function () {
+        var p = document.createElement('div');
+        p.className = 'gam-particle';
+        var size = 4 + Math.random() * 4;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.background = Math.random() < 0.5 ? 'var(--accent)' : 'var(--accent-2)';
+        container.appendChild(p);
+        var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.5 - 0.25);
+        var dist = 70 + Math.random() * 90;
+        var dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist;
+        var anim = p.animate([
+          { transform: 'translate(-50%, -50%) translate(0px, 0px) scale(1)', opacity: 1 },
+          { transform: 'translate(-50%, -50%) translate(' + dx + 'px, ' + dy + 'px) scale(0.3)', opacity: 0 }
+        ], { duration: 650 + Math.random() * 350, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' });
+        anim.onfinish = function () { p.remove(); };
+      })();
+    }
+  }
+  function gamAnimateCountUp(el, from, to, duration) {
+    if (!el) return;
+    if (prefersReducedMotion() || from === to) { el.textContent = to; return; }
+    var start = performance.now();
+    function tick(now) {
+      var t = Math.min(1, (now - start) / duration);
+      var eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(from + (to - from) * eased);
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
 
   function grantXPOnce(eventId, amount, kind, meta) {
     if (!eventId || !(amount > 0)) return null;
@@ -1194,24 +1248,36 @@
 
     var morningSet = snap.filter(function (s) { return timeToMin(s.time) < 12 * 60; });
     if (morningSet.length && !bonuses.morning && doneOf(morningSet) === morningSet.length) {
-      if (grantXPOnce('bonus:morning:' + dateKey, xp.morningBonus, 'bonus', { label: 'כל משימות הבוקר' })) bonuses.morning = true;
+      if (grantXPOnce('bonus:morning:' + dateKey, xp.morningBonus, 'bonus', { label: 'כל משימות הבוקר' })) {
+        bonuses.morning = true;
+        gamQueueEvent({ type: 'bonus', label: 'כל משימות הבוקר הושלמו', amount: xp.morningBonus });
+      }
     }
 
     var times = snap.map(function (s) { return timeToMin(s.time); });
     var midT = (Math.min.apply(null, times) + Math.max.apply(null, times)) / 2;
     var halfSet = snap.filter(function (s) { return timeToMin(s.time) <= midT; });
     if (halfSet.length && !bonuses.half && doneOf(halfSet) / halfSet.length >= 0.8) {
-      if (grantXPOnce('bonus:half:' + dateKey, xp.halfDayBonus, 'bonus', { label: 'חצי יום מוצלח' })) bonuses.half = true;
+      if (grantXPOnce('bonus:half:' + dateKey, xp.halfDayBonus, 'bonus', { label: 'חצי יום מוצלח' })) {
+        bonuses.half = true;
+        gamQueueEvent({ type: 'bonus', label: 'חצי יום מוצלח', amount: xp.halfDayBonus });
+      }
     }
 
     if (!bonuses.full && doneOf(snap) / snap.length >= 0.8) {
-      if (grantXPOnce('bonus:full:' + dateKey, xp.fullDayBonus, 'bonus', { label: 'יום מוצלח' })) bonuses.full = true;
+      if (grantXPOnce('bonus:full:' + dateKey, xp.fullDayBonus, 'bonus', { label: 'יום מוצלח' })) {
+        bonuses.full = true;
+        gamQueueEvent({ type: 'bonus', label: 'יום מוצלח!', amount: xp.fullDayBonus });
+      }
     }
 
     if (!bonuses.perfect) {
       var required = snap.filter(function (s) { return !s.optional; });
       if (required.length && doneOf(required) === required.length) {
-        if (grantXPOnce('bonus:perfect:' + dateKey, xp.perfectDayBonus, 'bonus', { label: 'Perfect Day' })) bonuses.perfect = true;
+        if (grantXPOnce('bonus:perfect:' + dateKey, xp.perfectDayBonus, 'bonus', { label: 'Perfect Day' })) {
+          bonuses.perfect = true;
+          gamQueueEvent({ type: 'bonus', label: 'Perfect Day!', amount: xp.perfectDayBonus, perfect: true });
+        }
       }
     }
 
@@ -1448,7 +1514,18 @@
     setTimeout(function () { el.remove(); }, 3700);
     if (state.gam.settings.sound) gamPlayTone(880, 0.12);
   }
-  function gamShowLevelUpOverlay(fromLevel, toLevel, allLevels, totalXP) {
+  function gamShowBonusToast(ev) {
+    var el = document.createElement('div');
+    el.className = 'bonus-toast' + (ev.perfect ? ' perfect' : '');
+    el.innerHTML = '<span class="bt-ic">' + icon(ev.perfect ? 'trophy' : 'zap') + '</span><div><div class="bt-label">' + escapeAttr(ev.label) + '</div><div class="bt-xp num" dir="ltr">+' + ev.amount + ' XP</div></div>';
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, ev.perfect ? 4200 : 2800);
+    if (ev.perfect) {
+      gamSpawnParticles(document.body, 16);
+      if (state.gam.settings.sound) gamPlayTone(784, 0.16);
+    }
+  }
+  function gamShowLevelUpOverlay(fromLevel, toLevel, allLevels, totalXP, xpGained) {
     var wrap = document.createElement('div');
     wrap.className = 'levelup-overlay';
     var title = levelTitleFor(toLevel);
@@ -1463,12 +1540,16 @@
         '<div class="levelup-title" style="color:' + title.color + ';">' + title.label + '</div>' +
         '<div class="levelup-msg">' + msg + '</div>' +
         stack +
-        '<div class="levelup-xp num" dir="ltr">סה״כ ' + totalXP + ' XP</div>' +
+        '<div class="levelup-xp num" dir="ltr">סה״כ <span id="levelup-xp-num">' + totalXP + '</span> XP</div>' +
         '<button class="btn btn-primary btn-block" id="levelup-continue">' + icon('check') + 'המשך' + '</button>' +
       '</div>';
     wrap.addEventListener('click', function (e) { if (e.target === wrap) wrap.remove(); });
     document.body.appendChild(wrap);
     wrap.querySelector('#levelup-continue').addEventListener('click', function () { wrap.remove(); });
+    gamSpawnParticles(wrap, 18);
+    var xpNumEl = wrap.querySelector('#levelup-xp-num');
+    var startXP = Math.max(0, totalXP - (xpGained || 0));
+    gamAnimateCountUp(xpNumEl, startXP, totalXP, 900);
     if (state.gam.settings.sound) gamPlayTone(523, 0.18);
   }
   function gamFlushEventQueue(anchorEl) {
@@ -1481,6 +1562,7 @@
     queue.forEach(function (e) {
       if (e.type === 'combo') gamShowComboFlash(e.count);
       else if (e.type === 'achievement') gamShowAchievementToast(e.achievement);
+      else if (e.type === 'bonus') gamShowBonusToast(e);
       else if (e.type === 'challenge') toast('אתגר הושלם: ' + e.title);
     });
     var levelupEvents = queue.filter(function (e) { return e.type === 'levelup'; });
@@ -1488,7 +1570,7 @@
       var allLevels = [];
       levelupEvents.forEach(function (e) { allLevels = allLevels.concat(e.levels); });
       var last = levelupEvents[levelupEvents.length - 1];
-      gamShowLevelUpOverlay(levelupEvents[0].from, last.to, allLevels, last.totalXP);
+      gamShowLevelUpOverlay(levelupEvents[0].from, last.to, allLevels, last.totalXP, totalXPGained);
     }
   }
 
@@ -1608,7 +1690,7 @@
     var catRows = Object.keys(CATS).map(function (k) {
       var n = stats.catCount[k] || 0;
       var pct = Math.round(n / catMax * 100);
-      return '<div class="cat-bar-row"><span class="cb-label">' + CATS[k].label + '</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + pct + '%;background:' + CATS[k].color + ';"></div></div><span class="cb-num num">' + n + '</span></div>';
+      return '<div class="cat-bar-row"><span class="cb-label">' + CATS[k].label + '</span><div class="cat-bar-track"><div class="cat-bar-fill" data-fill-pct="' + pct + '" style="background:' + CATS[k].color + ';"></div></div><span class="cb-num num">' + n + '</span></div>';
     }).join('');
     return '<div class="range-tabs">' + ranges.map(function (r) { return '<button data-prange="' + r.k + '" class="' + (progressRange === r.k ? 'active' : '') + '">' + r.l + '</button>'; }).join('') + '</div>' +
       '<div class="stat-tile-grid">' +
@@ -1644,7 +1726,7 @@
         var pct = c.target ? Math.min(100, Math.round((c.progress || 0) / c.target * 100)) : 0;
         return '<div class="chal-card' + (c.claimed ? ' done' : '') + '">' +
           '<div class="chal-top"><span class="ct-title">' + escapeAttr(c.title) + '</span><span class="ct-xp num">+' + c.xp + ' XP</span></div>' +
-          '<div class="chal-bar-track"><div class="chal-bar-fill" style="width:' + pct + '%;"></div></div>' +
+          '<div class="chal-bar-track"><div class="chal-bar-fill" data-fill-pct="' + pct + '"></div></div>' +
           '<div class="chal-meta"><span class="num" dir="ltr">' + (c.progress || 0) + ' / ' + c.target + '</span><span>' + (c.claimed ? 'הושלם ✓' : pct + '%') + '</span></div>' +
         '</div>';
       }).join('') : '<p class="page-sub" style="margin-bottom:16px;">אין אתגרים כרגע.</p>');
@@ -1676,12 +1758,7 @@
     wireProgressBody();
   }
   function wireProgressBody() {
-    var gcBar = document.getElementById('gc-bar-fill');
-    if (gcBar) {
-      var gcPct = levelInfoFromXP(state.gam.totalXP).pct;
-      if (prefersReducedMotion()) gcBar.style.width = gcPct + '%';
-      else requestAnimationFrame(function () { requestAnimationFrame(function () { gcBar.style.width = gcPct + '%'; }); });
-    }
+    gamAnimateFillBars(document.getElementById('progress-body'));
     Array.prototype.forEach.call(document.querySelectorAll('[data-card-style]'), function (b) {
       b.addEventListener('click', function () { state.gam.cosmetics.equipped.cardStyle = b.dataset.cardStyle; saveState(); renderProgressBody(); });
     });
@@ -1993,7 +2070,7 @@
         '<div class="gc-date">' + new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'short' }) + '</div>' +
       '</div>' +
       '<div class="gc-xp-row"><span>התקדמות לרמה ' + (info.level + 1) + '</span><span class="num">' + info.pct + '%</span></div>' +
-      '<div class="gc-bar-track"><div class="gc-bar-fill" id="gc-bar-fill" style="width:0%;background:' + barColorObj.css + ';"></div></div>' +
+      '<div class="gc-bar-track"><div class="gc-bar-fill" id="gc-bar-fill" data-fill-pct="' + info.pct + '" style="background:' + barColorObj.css + ';"></div></div>' +
       '<div class="gc-stats">' +
         '<div class="gc-stat"><b class="num">' + state.gam.streak.current + ' 🔥</b><span>רצף ימים</span></div>' +
         '<div class="gc-stat"><b class="num" dir="ltr">' + doneToday + '/' + list.length + '</b><span>משימות היום</span></div>' +
@@ -2069,12 +2146,7 @@
     document.getElementById('free-time-btn').addEventListener('click', function () { openFreeTimeModal(); });
     var gcOpenBtn = document.getElementById('gc-open-progress');
     if (gcOpenBtn) gcOpenBtn.addEventListener('click', function () { showPanel('progress'); });
-    var gcBar = document.getElementById('gc-bar-fill');
-    if (gcBar) {
-      var gcPct = levelInfoFromXP(state.gam.totalXP).pct;
-      if (prefersReducedMotion()) { gcBar.style.width = gcPct + '%'; }
-      else { requestAnimationFrame(function () { requestAnimationFrame(function () { gcBar.style.width = gcPct + '%'; }); }); }
-    }
+    gamAnimateFillBars(el);
     wireNowCard(el, nnl);
     tickClock();
   }
