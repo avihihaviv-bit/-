@@ -592,6 +592,126 @@
   @media (prefers-reduced-motion: reduce) {
     #splash { display: none; }
   }
+
+  /* ================= gamification ================= */
+  .gamer-card { position: relative; overflow: hidden; border-radius: var(--radius-l); padding: 20px; margin-bottom: 16px; border: 1px solid var(--border-strong); }
+  .gamer-card.style-premium { background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); }
+  .gamer-card.style-premium::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 15% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%); pointer-events: none; }
+  .gamer-card.style-neon { background: #0a0e18; border-color: color-mix(in srgb, var(--accent) 45%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 0 32px -8px color-mix(in srgb, var(--accent) 65%, transparent); }
+  .gamer-card.style-neon .gc-level-num { text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 80%, transparent); }
+  .gamer-card.style-minimal { background: var(--surface); border-color: var(--border); box-shadow: none; }
+  .gamer-card.style-cyberpunk { background: linear-gradient(120deg, #1a0e2e, #0e1e2e); border-color: color-mix(in srgb, var(--accent-2) 50%, transparent); }
+  .gamer-card.style-cyberpunk::before { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--accent-2) 14%, transparent) 50%, transparent 60%); pointer-events: none; }
+  .gc-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; position: relative; z-index: 1; }
+  .gc-level-badge { display: flex; align-items: center; gap: 12px; }
+  .gc-level-ring { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: conic-gradient(var(--accent) calc(var(--gc-pct, 0) * 1%), var(--surface-3) 0); position: relative; }
+  .gc-level-ring::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: var(--bg); }
+  .gc-level-num { position: relative; z-index: 1; font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 18px; }
+  .gc-title-col .gc-title { font-weight: 700; font-size: 15px; }
+  .gc-title-col .gc-sub { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+  .gc-date { font-size: 12px; color: var(--text-faint); white-space: nowrap; }
+  .gc-xp-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-soft); margin-bottom: 6px; position: relative; z-index: 1; }
+  .gc-bar-track { height: 10px; border-radius: 999px; background: var(--surface-3); overflow: hidden; position: relative; z-index: 1; }
+  .gc-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0%; transition: width 0.9s var(--ease-out); }
+  .gc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; position: relative; z-index: 1; }
+  .gc-stat { text-align: center; }
+  .gc-stat b { display: block; font-family: "JetBrains Mono", monospace; font-size: 15px; }
+  .gc-stat span { font-size: 10.5px; color: var(--text-faint); }
+  .gc-more-btn { margin-top: 14px; width: 100%; position: relative; z-index: 1; }
+
+  .xp-toast-layer { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
+  .xp-toast { position: absolute; display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--accent); color: var(--accent); font-weight: 800; font-family: "JetBrains Mono", monospace; font-size: 15px; padding: 6px 12px; border-radius: 999px; box-shadow: 0 6px 20px var(--shadow); animation: xp-float 1.4s var(--ease-out) forwards; }
+  @keyframes xp-float { 0% { opacity: 0; transform: translateY(0) scale(0.8); } 15% { opacity: 1; transform: translateY(-6px) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-46px) scale(0.95); } }
+  .task-xp-glow { animation: task-glow 0.9s var(--ease-out); }
+  @keyframes task-glow { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+  .combo-flash { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 9001; background: var(--accent-2); color: var(--accent-2-ink); font-weight: 800; padding: 7px 16px; border-radius: 999px; font-size: 13px; animation: combo-pop 1.5s var(--ease-out) forwards; }
+  @keyframes combo-pop { 0% { opacity: 0; transform: translateX(-50%) scale(0.7); } 15% { opacity: 1; transform: translateX(-50%) scale(1.05); } 20% { transform: translateX(-50%) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
+
+  .levelup-overlay { position: fixed; inset: 0; background: rgba(5,8,14,0.78); backdrop-filter: blur(3px); z-index: 9500; display: flex; align-items: center; justify-content: center; padding: 20px; animation: lv-bg-in 0.3s var(--ease-out); }
+  @keyframes lv-bg-in { from { opacity: 0; } to { opacity: 1; } }
+  .levelup-card { position: relative; max-width: 380px; width: 100%; background: linear-gradient(160deg, var(--surface-2), var(--surface-3)); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border-strong)); border-radius: var(--radius-l); padding: 32px 24px; text-align: center; box-shadow: 0 0 60px -10px color-mix(in srgb, var(--accent) 55%, transparent); animation: lv-card-in 0.45s var(--ease-out); overflow: hidden; }
+  @keyframes lv-card-in { from { opacity: 0; transform: scale(0.85) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .levelup-glow { position: absolute; inset: -40%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent), transparent 60%); animation: lv-glow-spin 4s linear infinite; pointer-events: none; z-index: 0; }
+  @keyframes lv-glow-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .levelup-tag { position: relative; font-size: 12px; letter-spacing: 2px; color: var(--accent); font-weight: 700; margin-bottom: 10px; }
+  .levelup-levels { position: relative; display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 10px; }
+  .levelup-old { font-size: 22px; color: var(--text-faint); font-family: "JetBrains Mono", monospace; }
+  .levelup-arrow { color: var(--text-faint); }
+  .levelup-new { font-size: 44px; font-weight: 800; font-family: "JetBrains Mono", monospace; color: var(--text); text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 70%, transparent); }
+  .levelup-title { position: relative; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .levelup-msg { position: relative; font-size: 13px; color: var(--text-soft); margin-bottom: 18px; }
+  .levelup-xp { position: relative; font-size: 12px; color: var(--text-faint); margin-bottom: 18px; font-family: "JetBrains Mono", monospace; }
+  .levelup-stack { position: relative; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
+  .levelup-stack span { background: var(--surface-3); border-radius: 999px; padding: 3px 10px; font-size: 11px; font-family: "JetBrains Mono", monospace; }
+
+  .ach-toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 9400; background: var(--surface-2); border: 1px solid var(--accent-2); border-radius: var(--radius-m); padding: 12px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px var(--shadow); animation: ach-in-out 3.6s ease forwards; max-width: 90vw; }
+  @keyframes ach-in-out { 0% { opacity: 0; transform: translateX(-50%) translateY(14px); } 10% { opacity: 1; transform: translateX(-50%) translateY(0); } 88% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(14px); } }
+  .ach-toast .ach-ic { width: 34px; height: 34px; border-radius: 10px; background: color-mix(in srgb, var(--accent-2) 20%, transparent); display: flex; align-items: center; justify-content: center; color: var(--accent-2); flex-shrink: 0; }
+  .ach-toast .ach-tt { font-weight: 700; font-size: 13.5px; }
+  .ach-toast .ach-ds { font-size: 11.5px; color: var(--text-soft); }
+
+  .prog-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
+  .prog-tabs button { white-space: nowrap; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft); font-size: 13px; cursor: pointer; }
+  .prog-tabs button.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+  .range-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .range-tabs button { padding: 5px 11px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--text-soft); font-size: 12px; cursor: pointer; }
+  .range-tabs button.active { background: var(--surface-3); color: var(--text); border-color: var(--border-strong); }
+  .stat-tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  @media (min-width: 640px) { .stat-tile-grid { grid-template-columns: repeat(4, 1fr); } }
+  .stat-tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 14px; }
+  .stat-tile .st-val { font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 19px; }
+  .stat-tile .st-lbl { font-size: 11.5px; color: var(--text-soft); margin-top: 2px; }
+  .xp-chart-wrap { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 16px; margin-bottom: 16px; }
+  .xp-chart-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .cat-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12.5px; }
+  .cat-bar-row .cb-label { width: 90px; flex-shrink: 0; color: var(--text-soft); }
+  .cat-bar-track { flex: 1; height: 8px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+  .cat-bar-fill { height: 100%; border-radius: 999px; }
+  .cat-bar-row .cb-num { width: 32px; text-align: left; font-family: "JetBrains Mono", monospace; color: var(--text-faint); }
+
+  .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .ach-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 14px; text-align: center; position: relative; }
+  .ach-card.unlocked { border-color: color-mix(in srgb, var(--accent-2) 45%, var(--border)); }
+  .ach-card.locked { opacity: 0.55; }
+  .ach-card .ach-icn { width: 46px; height: 46px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: var(--surface-3); }
+  .ach-card.unlocked .ach-icn { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
+  .ach-card .ach-name { font-weight: 700; font-size: 12.5px; margin-bottom: 3px; }
+  .ach-card .ach-desc { font-size: 10.5px; color: var(--text-faint); line-height: 1.4; }
+  .ach-card .ach-date { font-size: 9.5px; color: var(--text-faint); margin-top: 6px; font-family: "JetBrains Mono", monospace; }
+
+  .chal-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 14px; margin-bottom: 10px; }
+  .chal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
+  .chal-top .ct-title { font-weight: 600; font-size: 13.5px; }
+  .chal-top .ct-xp { font-size: 11.5px; color: var(--accent); font-family: "JetBrains Mono", monospace; flex-shrink: 0; }
+  .chal-card.done { border-color: color-mix(in srgb, var(--success) 45%, var(--border)); }
+  .chal-bar-track { height: 7px; border-radius: 999px; background: var(--surface-3); overflow: hidden; margin-bottom: 6px; }
+  .chal-bar-fill { height: 100%; border-radius: 999px; background: var(--success); transition: width 0.6s var(--ease-out); }
+  .chal-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-faint); }
+
+  .cosm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .cosm-opt { border: 1px solid var(--border); border-radius: var(--radius-s); padding: 10px; text-align: center; cursor: pointer; background: var(--surface-2); font-size: 11.5px; }
+  .cosm-opt.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface-2)); color: var(--accent); font-weight: 700; }
+  .cosm-opt:disabled, .cosm-opt.locked { opacity: 0.4; cursor: not-allowed; }
+  .streak-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .streak-day { aspect-ratio: 1; border-radius: 5px; background: var(--surface-3); font-size: 9.5px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
+  .streak-day.success { background: color-mix(in srgb, var(--success) 55%, var(--surface-3)); color: var(--accent-ink); }
+  .streak-day.perfect { background: var(--accent-2); color: var(--accent-2-ink); font-weight: 800; }
+  .streak-day.partial { background: color-mix(in srgb, var(--warning) 45%, var(--surface-3)); }
+
+  .xpval-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 560px) { .xpval-grid { grid-template-columns: repeat(3, 1fr); } }
+  .xpval-field label { display: block; font-size: 11.5px; color: var(--text-soft); margin-bottom: 4px; }
+  .xpval-field input { width: 100%; padding: 7px 9px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-family: "JetBrains Mono", monospace; font-size: 13px; }
+  .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch span { position: absolute; inset: 0; background: var(--surface-3); border-radius: 999px; transition: background 0.2s; cursor: pointer; }
+  .switch span::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+  .switch input:checked + span { background: var(--accent); }
+  .switch input:checked + span::before { transform: translateX(18px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .xp-toast, .task-xp-glow, .combo-flash, .levelup-overlay, .levelup-card, .levelup-glow, .ach-toast, .gc-bar-fill, .chal-bar-fill { animation: none !important; transition: none !important; }
+  }
 </style>
 
 <script>
@@ -650,11 +770,13 @@
     <section class="panel" id="panel-money" hidden></section>
     <section class="panel" id="panel-learning" hidden></section>
     <section class="panel" id="panel-settings" hidden></section>
+    <section class="panel" id="panel-progress" hidden></section>
   </main>
 
   <nav class="bottom-nav" id="nav-mobile"></nav>
 </div>
 <div id="modal-root"></div>
+<div id="xp-toast-layer" class="xp-toast-layer"></div>
 <div id="toast-root"></div>
 
 <script>
@@ -690,7 +812,13 @@
     flag: '<path d="M6 3v18"/><path d="M6 4h11l-2.5 4L17 12H6"/>',
     wallet: '<path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-4"/><path d="M15 13h4v3h-4a1.5 1.5 0 0 1 0-3z"/>',
     book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15.5"/><path d="M20 18.5H6.5a2.5 2.5 0 0 0 0 5H20"/>',
-    more: '<circle cx="6" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.4" fill="currentColor" stroke="none"/>'
+    more: '<circle cx="6" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
+    trophy: '<path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/><path d="M12 14v3M9 21h6M9.5 21c0-2.5.7-3 2.5-4 1.8 1 2.5 1.5 2.5 4"/>',
+    star: '<path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17l-5.6 3.1 1.4-6.3L3 9.5l6.4-.6z"/>',
+    zap: '<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
+    crown: '<path d="M3 8l4 3 5-6 5 6 4-3-2 10H5z"/><path d="M5 18h14"/>',
+    lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'
   };
   function icon(name, cls) { return '<svg class="icon ' + (cls || '') + '" viewBox="0 0 24 24">' + (ICONS[name] || '') + '</svg>'; }
 
@@ -899,6 +1027,28 @@
         merged.money.savingsGoals.push(Object.assign({ id: uid() }, merged.money.savingsGoal));
       }
       delete merged.money.savingsGoal;
+
+      merged.gam = merged.gam && typeof merged.gam === 'object' ? merged.gam : {};
+      var g = merged.gam;
+      g.totalXP = (typeof g.totalXP === 'number' && g.totalXP >= 0) ? g.totalXP : 0;
+      g.xpEvents = g.xpEvents && typeof g.xpEvents === 'object' ? g.xpEvents : {};
+      g.levelUps = Array.isArray(g.levelUps) ? g.levelUps : [];
+      g.dailyBonuses = g.dailyBonuses && typeof g.dailyBonuses === 'object' ? g.dailyBonuses : {};
+      g.daySnapshots = g.daySnapshots && typeof g.daySnapshots === 'object' ? g.daySnapshots : {};
+      g.achievements = g.achievements && typeof g.achievements === 'object' ? g.achievements : {};
+      g.streak = Object.assign({ current: 0, longest: 0, lastDate: null, log: {} }, g.streak || {});
+      if (!g.streak.log || typeof g.streak.log !== 'object') g.streak.log = {};
+      g.combo = Object.assign({ count: 0, dateKey: null }, g.combo || {});
+      g.challenges = Object.assign({ dayKey: null, weekKey: null, daily: [], weekly: [] }, g.challenges || {});
+      if (!Array.isArray(g.challenges.daily)) g.challenges.daily = [];
+      if (!Array.isArray(g.challenges.weekly)) g.challenges.weekly = [];
+      g.cosmetics = Object.assign({ unlocked: [], equipped: { cardStyle: 'premium', barColor: 'default', frame: 'default', title: null } }, g.cosmetics || {});
+      if (!Array.isArray(g.cosmetics.unlocked)) g.cosmetics.unlocked = [];
+      g.cosmetics.equipped = Object.assign({ cardStyle: 'premium', barColor: 'default', frame: 'default', title: null }, g.cosmetics.equipped || {});
+      g.settings = Object.assign({ xp: defaultXPValues(), sound: false }, g.settings || {});
+      g.settings.xp = Object.assign(defaultXPValues(), g.settings.xp || {});
+      merged.gam = g;
+
       return merged;
     } catch (e) { return def; }
   }
@@ -920,13 +1070,628 @@
       var tplKey = templateKeyForToday();
       var tpl = allTemplates()[tplKey] || TEMPLATES[autoTemplateFor(todayDate())];
       state.tasksByDate[k] = tpl.items.map(function (it) {
-        return { id: uid(), time: it.time, title: it.title, category: it.category, done: false, notes: '' };
+        return { id: uid(), time: it.time, title: it.title, category: it.category, done: false, notes: '', importance: null, optional: false };
+      });
+      saveState();
+    }
+    if (!state.gam.daySnapshots[k]) {
+      state.gam.daySnapshots[k] = state.tasksByDate[k].map(function (t) {
+        return { id: t.id, time: t.time, category: t.category, optional: !!t.optional };
       });
       saveState();
     }
     return state.tasksByDate[k];
   }
   function todayTasks() { return ensureTodayTasks().sort(function (a, b) { return a.time.localeCompare(b.time); }); }
+
+  /* ================= gamification: core engine =================
+     Design notes (anti-abuse):
+     - grantXPOnce() is the ONLY place totalXP is ever incremented. Every
+       grant is keyed by a unique, stable eventId recorded in state.gam.xpEvents;
+       a repeated eventId is a silent no-op. Unchecking a task never removes
+       already-granted XP, and re-checking the same task never grants it again,
+       because the ledger key is the task's own id - which is permanent.
+     - Each day's bonus eligibility (half/full/perfect) is computed against a
+       SNAPSHOT of that day's task list (id/time/category/optional), frozen the
+       first time the day is ever instantiated (see ensureTodayTasks). Deleting
+       or shrinking today's task list later cannot shrink the bonus denominator.
+     - Every bonus/achievement/challenge grant is itself keyed by date (and, for
+       achievements, by a permanent id), so each can fire at most once per
+       date/id no matter how many times evaluation runs. */
+
+  function defaultXPValues() {
+    return { small: 10, regular: 20, important: 35, challenging: 50, gym: 40, focusBlock: 25, morningBonus: 30, halfDayBonus: 50, fullDayBonus: 100, perfectDayBonus: 150 };
+  }
+  var XP_FIELD_LABELS = {
+    small: 'משימה קטנה', regular: 'משימה רגילה', important: 'משימה חשובה', challenging: 'משימה מאתגרת',
+    gym: 'אימון כושר', focusBlock: 'בלוק למידה/פוקוס', morningBonus: 'בונוס בוקר שלם',
+    halfDayBonus: 'בונוס חצי יום', fullDayBonus: 'בונוס יום מוצלח', perfectDayBonus: 'בונוס Perfect Day'
+  };
+  var LEVEL_TITLES = [
+    { min: 1, max: 4, label: 'Beginner', color: 'var(--text-soft)' },
+    { min: 5, max: 9, label: 'Apprentice', color: 'var(--cat-social)' },
+    { min: 10, max: 19, label: 'Disciplined', color: 'var(--success)' },
+    { min: 20, max: 34, label: 'Elite', color: 'var(--accent)' },
+    { min: 35, max: 49, label: 'Master', color: 'var(--accent-2)' },
+    { min: 50, max: 74, label: 'Grandmaster', color: '#c77dff' },
+    { min: 75, max: 99, label: 'Legend', color: '#ff6b9d' },
+    { min: 100, max: Infinity, label: 'Mythic', color: '#ffd166' }
+  ];
+  function levelTitleFor(level) {
+    for (var i = 0; i < LEVEL_TITLES.length; i++) { if (level >= LEVEL_TITLES[i].min && level <= LEVEL_TITLES[i].max) return LEVEL_TITLES[i]; }
+    return LEVEL_TITLES[LEVEL_TITLES.length - 1];
+  }
+  function xpRequiredForLevel(level) { return Math.round(100 * Math.pow(level, 1.6)); }
+  function levelInfoFromXP(totalXP) {
+    var level = 1, remaining = Math.max(0, totalXP || 0), guard = 0;
+    while (guard++ < 2000) {
+      var need = xpRequiredForLevel(level);
+      if (remaining < need) break;
+      remaining -= need;
+      level++;
+    }
+    var needNext = xpRequiredForLevel(level);
+    return { level: level, xpIntoLevel: remaining, xpForNext: needNext, pct: needNext ? Math.min(100, Math.round(remaining / needNext * 100)) : 0 };
+  }
+
+  var gamEventQueue = [];
+  function gamQueueEvent(ev) { gamEventQueue.push(ev); }
+  function prefersReducedMotion() {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+  }
+
+  function grantXPOnce(eventId, amount, kind, meta) {
+    if (!eventId || !(amount > 0)) return null;
+    if (state.gam.xpEvents[eventId]) return null;
+    var beforeLevel = levelInfoFromXP(state.gam.totalXP).level;
+    state.gam.xpEvents[eventId] = { xp: amount, kind: kind, at: Date.now(), meta: meta || null };
+    state.gam.totalXP += amount;
+    var afterInfo = levelInfoFromXP(state.gam.totalXP);
+    var leveledUp = [];
+    if (afterInfo.level > beforeLevel) {
+      for (var lv = beforeLevel + 1; lv <= afterInfo.level; lv++) {
+        state.gam.levelUps.push({ level: lv, at: Date.now(), totalXP: state.gam.totalXP });
+        leveledUp.push(lv);
+      }
+    }
+    gamQueueEvent({ type: 'xp', amount: amount, kind: kind });
+    if (leveledUp.length) gamQueueEvent({ type: 'levelup', from: beforeLevel, to: afterInfo.level, levels: leveledUp, totalXP: state.gam.totalXP });
+    return { granted: true, amount: amount, newTotal: state.gam.totalXP, leveledUp: leveledUp };
+  }
+
+  function gamTaskDurationMin(task, sortedList) {
+    var idx = -1;
+    for (var i = 0; i < sortedList.length; i++) { if (sortedList[i].id === task.id) { idx = i; break; } }
+    var startMin = timeToMin(task.time);
+    var nextMin = (idx >= 0 && idx < sortedList.length - 1) ? timeToMin(sortedList[idx + 1].time) : startMin + 30;
+    return Math.max(5, nextMin - startMin);
+  }
+  function gamTaskXP(task, sortedList) {
+    var xp = state.gam.settings.xp;
+    if (task.importance === 'small') return xp.small;
+    if (task.importance === 'important') return xp.important;
+    if (task.importance === 'challenging') return xp.challenging;
+    if (task.importance === 'regular') return xp.regular;
+    if (task.category === 'fitness') return xp.gym;
+    if (task.category === 'learning') return xp.focusBlock;
+    var dur = gamTaskDurationMin(task, sortedList);
+    if (dur <= 10) return xp.small;
+    if (dur <= 50) return xp.regular;
+    if (dur <= 90) return xp.important;
+    return xp.challenging;
+  }
+
+  function gamSnapshotFor(dateKey) { return state.gam.daySnapshots[dateKey] || []; }
+  function gamEvaluateDailyBonuses(dateKey) {
+    var xp = state.gam.settings.xp;
+    var snap = gamSnapshotFor(dateKey);
+    if (!snap.length) return;
+    var liveList = state.tasksByDate[dateKey] || [];
+    var liveById = {};
+    liveList.forEach(function (t) { liveById[t.id] = t; });
+    var doneOf = function (list) { return list.filter(function (s) { var t = liveById[s.id]; return t && t.done; }).length; };
+    var bonuses = state.gam.dailyBonuses[dateKey] = state.gam.dailyBonuses[dateKey] || {};
+
+    var morningSet = snap.filter(function (s) { return timeToMin(s.time) < 12 * 60; });
+    if (morningSet.length && !bonuses.morning && doneOf(morningSet) === morningSet.length) {
+      if (grantXPOnce('bonus:morning:' + dateKey, xp.morningBonus, 'bonus', { label: 'כל משימות הבוקר' })) bonuses.morning = true;
+    }
+
+    var times = snap.map(function (s) { return timeToMin(s.time); });
+    var midT = (Math.min.apply(null, times) + Math.max.apply(null, times)) / 2;
+    var halfSet = snap.filter(function (s) { return timeToMin(s.time) <= midT; });
+    if (halfSet.length && !bonuses.half && doneOf(halfSet) / halfSet.length >= 0.8) {
+      if (grantXPOnce('bonus:half:' + dateKey, xp.halfDayBonus, 'bonus', { label: 'חצי יום מוצלח' })) bonuses.half = true;
+    }
+
+    if (!bonuses.full && doneOf(snap) / snap.length >= 0.8) {
+      if (grantXPOnce('bonus:full:' + dateKey, xp.fullDayBonus, 'bonus', { label: 'יום מוצלח' })) bonuses.full = true;
+    }
+
+    if (!bonuses.perfect) {
+      var required = snap.filter(function (s) { return !s.optional; });
+      if (required.length && doneOf(required) === required.length) {
+        if (grantXPOnce('bonus:perfect:' + dateKey, xp.perfectDayBonus, 'bonus', { label: 'Perfect Day' })) bonuses.perfect = true;
+      }
+    }
+
+    saveState();
+    gamUpdateStreakForDate(dateKey, bonuses);
+  }
+
+  function gamUpdateStreakForDate(dateKey, bonuses) {
+    var level = bonuses.perfect ? 'perfect' : (bonuses.full ? 'success' : (bonuses.half ? 'partial' : null));
+    if (!level) return;
+    var rank = { partial: 1, success: 2, perfect: 3 };
+    var prevLevel = state.gam.streak.log[dateKey];
+    if (prevLevel && rank[prevLevel] >= rank[level]) return;
+    state.gam.streak.log[dateKey] = level;
+    gamRecomputeStreak();
+    saveState();
+  }
+  function gamRecomputeStreak() {
+    var log = state.gam.streak.log;
+    var todayKey = dkey(todayDate());
+    var startD = todayDate();
+    if (!(log[todayKey] === 'success' || log[todayKey] === 'perfect')) startD.setDate(startD.getDate() - 1);
+    var current = 0, walk = new Date(startD), guard = 0;
+    while (guard++ < 3650) {
+      var lv = log[dkey(walk)];
+      if (lv === 'success' || lv === 'perfect') { current++; walk.setDate(walk.getDate() - 1); } else break;
+    }
+    state.gam.streak.current = current;
+    if (current > state.gam.streak.longest) state.gam.streak.longest = current;
+    state.gam.streak.lastDate = todayKey;
+  }
+
+  function gamRegisterCombo() {
+    var todayKey = dkey(todayDate());
+    var combo = state.gam.combo;
+    if (combo.dateKey !== todayKey) { combo.dateKey = todayKey; combo.count = 0; }
+    combo.count++;
+    var milestones = { 3: 15, 5: 30, 10: 60 };
+    if (milestones[combo.count] && grantXPOnce('combo:' + todayKey + ':' + combo.count, milestones[combo.count], 'combo', { count: combo.count })) {
+      gamQueueEvent({ type: 'combo', count: combo.count });
+    }
+    saveState();
+  }
+
+  function gamMorningStreak() {
+    var d = todayDate(), count = 0, guard = 0;
+    while (guard++ < 400) {
+      var b = state.gam.dailyBonuses[dkey(d)];
+      if (b && b.morning) { count++; d.setDate(d.getDate() - 1); } else break;
+    }
+    return count;
+  }
+  function gamAchievementContext() {
+    var totalTasksDone = 0, catDone = {};
+    Object.keys(state.tasksByDate).forEach(function (dk) {
+      state.tasksByDate[dk].forEach(function (t) {
+        if (t.done) { totalTasksDone++; catDone[t.category] = (catDone[t.category] || 0) + 1; }
+      });
+    });
+    var perfectDays = Object.keys(state.gam.dailyBonuses).filter(function (dk) { return state.gam.dailyBonuses[dk].perfect; }).length;
+    var levelInfo = levelInfoFromXP(state.gam.totalXP);
+    return { totalTasksDone: totalTasksDone, catDone: catDone, perfectDays: perfectDays, longestStreak: state.gam.streak.longest, level: levelInfo.level, totalXP: state.gam.totalXP, morningStreak: gamMorningStreak() };
+  }
+  var ACHIEVEMENTS = [
+    { id: 'first_step', name: 'First Step', desc: 'השלמת המשימה הראשונה', xp: 10, icon: 'star', check: function (c) { return c.totalTasksDone >= 1; } },
+    { id: 'getting_started', name: 'Getting Started', desc: 'השלמת 10 משימות', xp: 20, icon: 'star', check: function (c) { return c.totalTasksDone >= 10; } },
+    { id: 'consistent', name: 'Consistent', desc: 'השלמת 50 משימות', xp: 40, icon: 'star', check: function (c) { return c.totalTasksDone >= 50; } },
+    { id: 'productivity_machine', name: 'Productivity Machine', desc: 'השלמת 100 משימות', xp: 80, icon: 'star', check: function (c) { return c.totalTasksDone >= 100; } },
+    { id: 'early_bird', name: 'Early Bird', desc: 'כל משימות הבוקר - 7 ימים ברצף', xp: 70, icon: 'sun', check: function (c) { return c.morningStreak >= 7; } },
+    { id: 'gym_warrior', name: 'Gym Warrior', desc: '10 אימונים הושלמו', xp: 50, icon: 'dumbbell', check: function (c) { return (c.catDone.fitness || 0) >= 10; } },
+    { id: 'scholar', name: 'Scholar', desc: '20 בלוקי למידה הושלמו', xp: 50, icon: 'book', check: function (c) { return (c.catDone.learning || 0) >= 20; } },
+    { id: 'perfect_day_1', name: 'Perfect Day', desc: 'יום מושלם ראשון', xp: 60, icon: 'trophy', check: function (c) { return c.perfectDays >= 1; } },
+    { id: 'streak_3', name: 'Warming Up', desc: '3 ימים רצופים', xp: 15, icon: 'flame', check: function (c) { return c.longestStreak >= 3; } },
+    { id: 'streak_7', name: 'Weekly Champion', desc: '7 ימים רצופים', xp: 40, icon: 'flame', check: function (c) { return c.longestStreak >= 7; } },
+    { id: 'streak_14', name: 'Two Weeks Strong', desc: '14 ימים רצופים', xp: 80, icon: 'flame', check: function (c) { return c.longestStreak >= 14; } },
+    { id: 'streak_30', name: 'Unstoppable', desc: '30 ימים רצופים', xp: 200, icon: 'flame', check: function (c) { return c.longestStreak >= 30; } },
+    { id: 'streak_60', name: 'Iron Will', desc: '60 ימים רצופים', xp: 400, icon: 'flame', check: function (c) { return c.longestStreak >= 60; } },
+    { id: 'streak_100', name: 'Centurion', desc: '100 ימים רצופים', xp: 700, icon: 'flame', check: function (c) { return c.longestStreak >= 100; } },
+    { id: 'level_10', name: 'Level 10', desc: 'הגעת לרמה 10', xp: 50, icon: 'crown', check: function (c) { return c.level >= 10; } },
+    { id: 'level_25', name: 'Level 25', desc: 'הגעת לרמה 25', xp: 120, icon: 'crown', check: function (c) { return c.level >= 25; } },
+    { id: 'level_50', name: 'Level 50', desc: 'הגעת לרמה 50', xp: 300, icon: 'crown', check: function (c) { return c.level >= 50; } },
+    { id: 'xp_1000', name: 'XP Collector I', desc: 'צבירת 1,000 XP', xp: 0, icon: 'zap', check: function (c) { return c.totalXP >= 1000; } },
+    { id: 'xp_5000', name: 'XP Collector II', desc: 'צבירת 5,000 XP', xp: 0, icon: 'zap', check: function (c) { return c.totalXP >= 5000; } },
+    { id: 'xp_10000', name: 'XP Collector III', desc: 'צבירת 10,000 XP', xp: 0, icon: 'zap', check: function (c) { return c.totalXP >= 10000; } }
+  ];
+  var BAR_COLORS = [
+    { id: 'default', label: 'ברירת מחדל', unlockLevel: 1, css: 'linear-gradient(90deg, var(--accent), var(--accent-2))' },
+    { id: 'emerald', label: 'אמרלד', unlockLevel: 5, css: 'linear-gradient(90deg, #34d399, #10b981)' },
+    { id: 'violet', label: 'סגול', unlockLevel: 10, css: 'linear-gradient(90deg, #a78bfa, #7c3aed)' },
+    { id: 'gold', label: 'זהב', unlockLevel: 20, css: 'linear-gradient(90deg, #fbbf24, #f59e0b)' },
+    { id: 'inferno', label: 'אינפרנו', unlockLevel: 35, css: 'linear-gradient(90deg, #fb923c, #ef4444)' }
+  ];
+  function gamCheckAchievements() {
+    var ctx = gamAchievementContext();
+    var newlyUnlocked = [];
+    ACHIEVEMENTS.forEach(function (a) {
+      if (state.gam.achievements[a.id]) return;
+      if (a.check(ctx)) {
+        state.gam.achievements[a.id] = { at: Date.now() };
+        if (a.xp > 0) grantXPOnce('ach:' + a.id, a.xp, 'achievement', { name: a.name });
+        newlyUnlocked.push(a);
+        gamQueueEvent({ type: 'achievement', achievement: a });
+      }
+    });
+    if (newlyUnlocked.length) saveState();
+    return newlyUnlocked;
+  }
+
+  function isoWeekKey(d) {
+    var date = new Date(d); date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+    var week1 = new Date(date.getFullYear(), 0, 4);
+    var weekNo = 1 + Math.round(((date - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+    return date.getFullYear() + '-W' + String(weekNo).padStart(2, '0');
+  }
+  function gamCurrentWeekDates() {
+    var d = todayDate(), dow = d.getDay();
+    var sunday = new Date(d); sunday.setDate(d.getDate() - dow);
+    var out = [];
+    for (var i = 0; i < 7; i++) { var x = new Date(sunday); x.setDate(sunday.getDate() + i); out.push(dkey(x)); }
+    return out;
+  }
+  function gamSumCategoryDone(cat, dateList) {
+    var n = 0;
+    dateList.forEach(function (k) { (state.tasksByDate[k] || []).forEach(function (t) { if (t.done && t.category === cat) n++; }); });
+    return n;
+  }
+  function gamSumAllDone(dateList) {
+    var n = 0;
+    dateList.forEach(function (k) { (state.tasksByDate[k] || []).forEach(function (t) { if (t.done) n++; }); });
+    return n;
+  }
+  function gamMetricValue(metric) {
+    var todayKey = dkey(todayDate());
+    if (metric === 'tasksToday') return (state.tasksByDate[todayKey] || []).filter(function (t) { return t.done; }).length;
+    if (metric === 'morningDoneToday') { var b = state.gam.dailyBonuses[todayKey]; return b && b.morning ? 1 : 0; }
+    var weekDates = gamCurrentWeekDates();
+    if (metric === 'fitnessThisWeek') return gamSumCategoryDone('fitness', weekDates);
+    if (metric === 'learningThisWeek') return gamSumCategoryDone('learning', weekDates);
+    if (metric === 'tasksThisWeek') return gamSumAllDone(weekDates);
+    if (metric === 'successDaysThisWeek') return weekDates.filter(function (k) { var lv = state.gam.streak.log[k]; return lv === 'success' || lv === 'perfect'; }).length;
+    return 0;
+  }
+  var CHALLENGE_TEMPLATES = {
+    daily: [
+      { id: 'd_complete5', title: 'השלם 5 משימות היום', xp: 20, target: 5, metric: 'tasksToday' },
+      { id: 'd_morning', title: 'השלם את שגרת הבוקר', xp: 25, target: 1, metric: 'morningDoneToday' }
+    ],
+    weekly: [
+      { id: 'w_workout1', title: 'השלם אימון אחד השבוע', xp: 30, target: 1, metric: 'fitnessThisWeek' },
+      { id: 'w_study5', title: 'בצע 5 בלוקי לימוד השבוע', xp: 40, target: 5, metric: 'learningThisWeek' },
+      { id: 'w_streak5', title: 'עמוד ביעד היומי 5 ימים השבוע', xp: 50, target: 5, metric: 'successDaysThisWeek' },
+      { id: 'w_complete20', title: 'השלם 20 משימות השבוע', xp: 45, target: 20, metric: 'tasksThisWeek' }
+    ]
+  };
+  function gamEnsureChallenges() {
+    var todayKey = dkey(todayDate());
+    var weekKey = isoWeekKey(todayDate());
+    var ch = state.gam.challenges;
+    if (ch.dayKey !== todayKey) {
+      ch.dayKey = todayKey;
+      ch.daily = CHALLENGE_TEMPLATES.daily.map(function (t) { return { tplId: t.id, instanceId: t.id + ':' + todayKey, title: t.title, xp: t.xp, target: t.target, metric: t.metric, progress: 0, claimed: false }; });
+    }
+    if (ch.weekKey !== weekKey) {
+      ch.weekKey = weekKey;
+      ch.weekly = CHALLENGE_TEMPLATES.weekly.map(function (t) { return { tplId: t.id, instanceId: t.id + ':' + weekKey, title: t.title, xp: t.xp, target: t.target, metric: t.metric, progress: 0, claimed: false }; });
+    }
+  }
+  function gamEvaluateChallenges() {
+    gamEnsureChallenges();
+    var ch = state.gam.challenges;
+    [].concat(ch.daily, ch.weekly).forEach(function (c) {
+      var val = gamMetricValue(c.metric);
+      c.progress = Math.min(val, c.target);
+      if (!c.claimed && val >= c.target) {
+        if (grantXPOnce('challenge:' + c.instanceId, c.xp, 'challenge', { title: c.title })) {
+          c.claimed = true;
+          gamQueueEvent({ type: 'challenge', title: c.title });
+        }
+      }
+    });
+    saveState();
+  }
+
+  function gamOnTaskCompleted(task) {
+    var todayKey = dkey(todayDate());
+    var sortedToday = todayTasks();
+    var xpAmount = gamTaskXP(task, sortedToday);
+    grantXPOnce('task:' + task.id, xpAmount, 'task', { title: task.title, category: task.category });
+    gamRegisterCombo();
+    gamEvaluateDailyBonuses(todayKey);
+    gamEvaluateChallenges();
+    gamCheckAchievements();
+    saveState();
+  }
+
+  function gamPlayTone(freq, dur) {
+    try {
+      var ctx = window.__gamAudioCtx || (window.__gamAudioCtx = new (window.AudioContext || window.webkitAudioContext)());
+      var osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.frequency.value = freq; osc.type = 'sine';
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + dur + 0.02);
+    } catch (e) {}
+  }
+  function gamShowXPToast(amount, anchorEl) {
+    var layer = document.getElementById('xp-toast-layer');
+    if (!layer) return;
+    var el = document.createElement('div');
+    el.className = 'xp-toast';
+    el.textContent = '+' + amount + ' XP';
+    var rect = anchorEl ? anchorEl.getBoundingClientRect() : { left: window.innerWidth / 2 - 30, top: window.innerHeight / 2 };
+    el.style.left = Math.max(8, rect.left) + 'px';
+    el.style.top = Math.max(8, rect.top - 10) + 'px';
+    layer.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1500);
+    if (state.gam.settings.sound) gamPlayTone(660, 0.08);
+  }
+  function gamShowComboFlash(count) {
+    var el = document.createElement('div');
+    el.className = 'combo-flash';
+    el.textContent = (count >= 10 ? '🔥' : count >= 5 ? '⚡' : '✨') + ' קומבו x' + count;
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1600);
+  }
+  function gamShowAchievementToast(ach) {
+    var el = document.createElement('div');
+    el.className = 'ach-toast';
+    el.innerHTML = '<div class="ach-ic">' + icon(ach.icon || 'trophy') + '</div><div><div class="ach-tt">הישג חדש: ' + escapeAttr(ach.name) + '</div><div class="ach-ds">' + escapeAttr(ach.desc) + '</div></div>';
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, 3700);
+    if (state.gam.settings.sound) gamPlayTone(880, 0.12);
+  }
+  function gamShowLevelUpOverlay(fromLevel, toLevel, allLevels, totalXP) {
+    var wrap = document.createElement('div');
+    wrap.className = 'levelup-overlay';
+    var title = levelTitleFor(toLevel);
+    var msgs = ['כל הכבוד, אתה ממשיך להתקדם!', 'התמדה משתלמת - תמשיך ככה!', 'עוד צעד קדימה, יפה מאוד!', 'הרמה הבאה מחכה לך!'];
+    var msg = msgs[Math.floor(Math.random() * msgs.length)];
+    var stack = allLevels.length > 1 ? '<div class="levelup-stack">' + allLevels.map(function (l) { return '<span>Lv.' + l + '</span>'; }).join('') + '</div>' : '';
+    wrap.innerHTML =
+      '<div class="levelup-card">' +
+        '<div class="levelup-glow"></div>' +
+        '<div class="levelup-tag">LEVEL UP' + (allLevels.length > 1 ? ' ×' + allLevels.length : '') + '</div>' +
+        '<div class="levelup-levels"><span class="levelup-old num">Lv.' + fromLevel + '</span><span class="levelup-arrow">←</span><span class="levelup-new">Lv.' + toLevel + '</span></div>' +
+        '<div class="levelup-title" style="color:' + title.color + ';">' + title.label + '</div>' +
+        '<div class="levelup-msg">' + msg + '</div>' +
+        stack +
+        '<div class="levelup-xp num" dir="ltr">סה״כ ' + totalXP + ' XP</div>' +
+        '<button class="btn btn-primary btn-block" id="levelup-continue">' + icon('check') + 'המשך' + '</button>' +
+      '</div>';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) wrap.remove(); });
+    document.body.appendChild(wrap);
+    wrap.querySelector('#levelup-continue').addEventListener('click', function () { wrap.remove(); });
+    if (state.gam.settings.sound) gamPlayTone(523, 0.18);
+  }
+  function gamFlushEventQueue(anchorEl) {
+    if (!gamEventQueue.length) return;
+    var queue = gamEventQueue; gamEventQueue = [];
+    var totalXPGained = 0;
+    queue.forEach(function (e) { if (e.type === 'xp') totalXPGained += e.amount; });
+    if (totalXPGained > 0) gamShowXPToast(totalXPGained, anchorEl);
+    if (anchorEl) { anchorEl.classList.add('task-xp-glow'); setTimeout(function () { anchorEl.classList.remove('task-xp-glow'); }, 950); }
+    queue.forEach(function (e) {
+      if (e.type === 'combo') gamShowComboFlash(e.count);
+      else if (e.type === 'achievement') gamShowAchievementToast(e.achievement);
+      else if (e.type === 'challenge') toast('אתגר הושלם: ' + e.title);
+    });
+    var levelupEvents = queue.filter(function (e) { return e.type === 'levelup'; });
+    if (levelupEvents.length) {
+      var allLevels = [];
+      levelupEvents.forEach(function (e) { allLevels = allLevels.concat(e.levels); });
+      var last = levelupEvents[levelupEvents.length - 1];
+      gamShowLevelUpOverlay(levelupEvents[0].from, last.to, allLevels, last.totalXP);
+    }
+  }
+
+  /* ================= progress page (achievements / stats / challenges) ================= */
+  function gamDailyXPSeries(days) {
+    var byDate = {};
+    Object.keys(state.gam.xpEvents).forEach(function (id) {
+      var ev = state.gam.xpEvents[id];
+      var dk = dkey(new Date(ev.at));
+      byDate[dk] = (byDate[dk] || 0) + ev.xp;
+    });
+    var out = [];
+    var d = todayDate();
+    for (var i = days - 1; i >= 0; i--) {
+      var x = new Date(d); x.setDate(d.getDate() - i);
+      var k = dkey(x);
+      out.push({ date: k, xp: byDate[k] || 0 });
+    }
+    return out;
+  }
+  function gamSparklineSVG(series) {
+    if (!series.length || !series.some(function (s) { return s.xp > 0; })) return '<p class="page-sub">אין עדיין נתונים בטווח הזה.</p>';
+    var w = 600, h = 140, pad = 8;
+    var max = Math.max(1, Math.max.apply(null, series.map(function (s) { return s.xp; })));
+    var stepX = series.length > 1 ? (w - pad * 2) / (series.length - 1) : 0;
+    var points = series.map(function (s, i) {
+      var x = pad + i * stepX, y = h - pad - (s.xp / max) * (h - pad * 2);
+      return x + ',' + y;
+    }).join(' ');
+    var bars = series.map(function (s, i) {
+      var x = pad + i * stepX, barH = (s.xp / max) * (h - pad * 2);
+      return '<rect x="' + (x - 2) + '" y="' + (h - pad - barH) + '" width="4" height="' + barH + '" rx="2" fill="var(--accent)" opacity="0.5"></rect>';
+    }).join('');
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' + bars +
+      '<polyline points="' + points + '" fill="none" stroke="var(--accent-2)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+    '</svg>';
+  }
+  function gamStatsForRange(rangeDays) {
+    var cutoff = null;
+    if (rangeDays !== 'all') { cutoff = todayDate(); cutoff.setDate(cutoff.getDate() - (rangeDays - 1)); }
+    var inRange = function (dk) { if (!cutoff) return true; return new Date(dk + 'T00:00:00') >= cutoff; };
+    var tasksCompleted = 0, catCount = {};
+    Object.keys(state.tasksByDate).forEach(function (dk) {
+      if (!inRange(dk)) return;
+      state.tasksByDate[dk].forEach(function (t) { if (t.done) { tasksCompleted++; catCount[t.category] = (catCount[t.category] || 0) + 1; } });
+    });
+    var xpInRange = 0;
+    Object.keys(state.gam.xpEvents).forEach(function (id) {
+      var ev = state.gam.xpEvents[id];
+      if (inRange(dkey(new Date(ev.at)))) xpInRange += ev.xp;
+    });
+    var successDays = 0, perfectDays = 0, totalLoggedDays = 0;
+    Object.keys(state.gam.streak.log).forEach(function (dk) {
+      if (!inRange(dk)) return;
+      totalLoggedDays++;
+      var lv = state.gam.streak.log[dk];
+      if (lv === 'success' || lv === 'perfect') successDays++;
+      if (lv === 'perfect') perfectDays++;
+    });
+    return { tasksCompleted: tasksCompleted, catCount: catCount, xpInRange: xpInRange, successDays: successDays, perfectDays: perfectDays, totalLoggedDays: totalLoggedDays };
+  }
+  function gamCountThisMonth(level) {
+    var now = new Date();
+    var prefix = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    return Object.keys(state.gam.streak.log).filter(function (k) {
+      if (k.indexOf(prefix) !== 0) return false;
+      var lv = state.gam.streak.log[k];
+      return level === 'success' ? (lv === 'success' || lv === 'perfect') : lv === level;
+    }).length;
+  }
+  function streakCalendarHtml() {
+    var days = [];
+    var d = todayDate();
+    for (var i = 34; i >= 0; i--) { var x = new Date(d); x.setDate(d.getDate() - i); days.push(x); }
+    return '<div class="streak-cal">' + days.map(function (x) {
+      var k = dkey(x);
+      var lv = state.gam.streak.log[k];
+      var cls = lv === 'perfect' ? 'perfect' : lv === 'success' ? 'success' : lv === 'partial' ? 'partial' : '';
+      return '<div class="streak-day ' + cls + '" title="' + k + '">' + x.getDate() + '</div>';
+    }).join('') + '</div>';
+  }
+
+  var progressTab = 'overview';
+  var progressRange = 7;
+  function progressOverviewHtml() {
+    var info = levelInfoFromXP(state.gam.totalXP);
+    return gamerCardHtml() +
+      '<div class="card" style="margin-bottom:16px;"><h3 style="margin-bottom:10px;">רצף ימים</h3>' +
+        '<div class="stat-tile-grid" style="margin-bottom:14px;">' +
+          '<div class="stat-tile"><div class="st-val num">' + state.gam.streak.current + '</div><div class="st-lbl">רצף נוכחי</div></div>' +
+          '<div class="stat-tile"><div class="st-val num">' + state.gam.streak.longest + '</div><div class="st-lbl">שיא רצף</div></div>' +
+          '<div class="stat-tile"><div class="st-val num">' + gamCountThisMonth('success') + '</div><div class="st-lbl">ימים מוצלחים החודש</div></div>' +
+          '<div class="stat-tile"><div class="st-val num">' + gamCountThisMonth('perfect') + '</div><div class="st-lbl">Perfect Days החודש</div></div>' +
+        '</div>' +
+        streakCalendarHtml() +
+      '</div>' +
+      '<div class="card" style="margin-bottom:16px;"><h3 style="margin-bottom:10px;">עיצוב הכרטיס</h3><div class="cosm-grid">' +
+        [['premium', 'Dark Premium'], ['neon', 'Neon Gaming'], ['minimal', 'Minimal Clean'], ['cyberpunk', 'Cyberpunk']].map(function (p) {
+          var active = state.gam.cosmetics.equipped.cardStyle === p[0];
+          return '<button class="cosm-opt' + (active ? ' active' : '') + '" data-card-style="' + p[0] + '">' + p[1] + '</button>';
+        }).join('') +
+      '</div></div>' +
+      '<div class="card"><h3 style="margin-bottom:10px;">צבע פס ההתקדמות</h3><div class="cosm-grid">' +
+        BAR_COLORS.map(function (b) {
+          var unlocked = info.level >= b.unlockLevel;
+          var active = (state.gam.cosmetics.equipped.barColor || 'default') === b.id;
+          return '<button class="cosm-opt' + (active ? ' active' : '') + (unlocked ? '' : ' locked') + '"' + (unlocked ? ' data-bar-color="' + b.id + '"' : ' disabled') + '>' + b.label + (unlocked ? '' : ' 🔒 Lv.' + b.unlockLevel) + '</button>';
+        }).join('') +
+      '</div></div>';
+  }
+  function progressStatsHtml() {
+    var ranges = [{ k: 7, l: '7 ימים' }, { k: 30, l: '30 ימים' }, { k: 90, l: '90 ימים' }, { k: 'all', l: 'כל הזמנים' }];
+    var stats = gamStatsForRange(progressRange);
+    var series = gamDailyXPSeries(progressRange === 'all' ? 90 : progressRange);
+    var avgSuccessPct = stats.totalLoggedDays ? Math.round(stats.successDays / stats.totalLoggedDays * 100) : 0;
+    var catMax = Math.max(1, Math.max.apply(null, Object.keys(CATS).map(function (kk) { return stats.catCount[kk] || 0; })));
+    var catRows = Object.keys(CATS).map(function (k) {
+      var n = stats.catCount[k] || 0;
+      var pct = Math.round(n / catMax * 100);
+      return '<div class="cat-bar-row"><span class="cb-label">' + CATS[k].label + '</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + pct + '%;background:' + CATS[k].color + ';"></div></div><span class="cb-num num">' + n + '</span></div>';
+    }).join('');
+    return '<div class="range-tabs">' + ranges.map(function (r) { return '<button data-prange="' + r.k + '" class="' + (progressRange === r.k ? 'active' : '') + '">' + r.l + '</button>'; }).join('') + '</div>' +
+      '<div class="stat-tile-grid">' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + stats.xpInRange + '</div><div class="st-lbl">XP בטווח</div></div>' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + state.gam.totalXP + '</div><div class="st-lbl">XP בכל הזמנים</div></div>' +
+        '<div class="stat-tile"><div class="st-val num">' + levelInfoFromXP(state.gam.totalXP).level + '</div><div class="st-lbl">רמה נוכחית</div></div>' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + stats.tasksCompleted + '</div><div class="st-lbl">משימות שהושלמו</div></div>' +
+        '<div class="stat-tile"><div class="st-val num">' + avgSuccessPct + '%</div><div class="st-lbl">הצלחה יומית ממוצעת</div></div>' +
+        '<div class="stat-tile"><div class="st-val num">' + stats.perfectDays + '</div><div class="st-lbl">Perfect Days</div></div>' +
+        '<div class="stat-tile"><div class="st-val num">' + state.gam.streak.current + '</div><div class="st-lbl">רצף נוכחי</div></div>' +
+        '<div class="stat-tile"><div class="st-val num">' + state.gam.streak.longest + '</div><div class="st-lbl">שיא רצף</div></div>' +
+      '</div>' +
+      '<div class="xp-chart-wrap"><h3 style="margin-bottom:10px;">XP יומי</h3>' + gamSparklineSVG(series) + '</div>' +
+      '<div class="card"><h3 style="margin-bottom:10px;">משימות שהושלמו לפי קטגוריה</h3>' + catRows + '</div>';
+  }
+  function progressAchievementsHtml() {
+    return '<div class="ach-grid">' + ACHIEVEMENTS.map(function (a) {
+      var unlocked = state.gam.achievements[a.id];
+      var dateStr = unlocked ? new Date(unlocked.at).toLocaleDateString('he-IL') : '';
+      return '<div class="ach-card ' + (unlocked ? 'unlocked' : 'locked') + '">' +
+        '<div class="ach-icn">' + icon(unlocked ? a.icon : 'lock') + '</div>' +
+        '<div class="ach-name">' + escapeAttr(a.name) + '</div>' +
+        '<div class="ach-desc">' + escapeAttr(a.desc) + '</div>' +
+        (unlocked ? '<div class="ach-date num">' + dateStr + '</div>' : '') +
+      '</div>';
+    }).join('') + '</div>';
+  }
+  function progressChallengesHtml() {
+    gamEnsureChallenges();
+    var ch = state.gam.challenges;
+    var renderList = function (list, label) {
+      return '<h3 style="margin-bottom:10px;">' + label + '</h3>' + (list.length ? list.map(function (c) {
+        var pct = c.target ? Math.min(100, Math.round((c.progress || 0) / c.target * 100)) : 0;
+        return '<div class="chal-card' + (c.claimed ? ' done' : '') + '">' +
+          '<div class="chal-top"><span class="ct-title">' + escapeAttr(c.title) + '</span><span class="ct-xp num">+' + c.xp + ' XP</span></div>' +
+          '<div class="chal-bar-track"><div class="chal-bar-fill" style="width:' + pct + '%;"></div></div>' +
+          '<div class="chal-meta"><span class="num" dir="ltr">' + (c.progress || 0) + ' / ' + c.target + '</span><span>' + (c.claimed ? 'הושלם ✓' : pct + '%') + '</span></div>' +
+        '</div>';
+      }).join('') : '<p class="page-sub" style="margin-bottom:16px;">אין אתגרים כרגע.</p>');
+    };
+    return renderList(ch.daily, 'אתגרי היום') + renderList(ch.weekly, 'אתגרי השבוע');
+  }
+  function renderProgress() {
+    var el = document.getElementById('panel-progress');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">התקדמות</h2><p class="page-sub">הרמה, ההישגים והסטטיסטיקות שלך</p></div></div>' +
+      '<div class="prog-tabs">' +
+        '<button data-ptab="overview" class="' + (progressTab === 'overview' ? 'active' : '') + '">סקירה</button>' +
+        '<button data-ptab="stats" class="' + (progressTab === 'stats' ? 'active' : '') + '">סטטיסטיקות</button>' +
+        '<button data-ptab="achievements" class="' + (progressTab === 'achievements' ? 'active' : '') + '">הישגים</button>' +
+        '<button data-ptab="challenges" class="' + (progressTab === 'challenges' ? 'active' : '') + '">אתגרים</button>' +
+      '</div>' +
+      '<div id="progress-body"></div>';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-ptab]'), function (b) {
+      b.addEventListener('click', function () { progressTab = b.dataset.ptab; renderProgress(); });
+    });
+    renderProgressBody();
+  }
+  function renderProgressBody() {
+    var body = document.getElementById('progress-body');
+    if (progressTab === 'overview') body.innerHTML = progressOverviewHtml();
+    else if (progressTab === 'stats') body.innerHTML = progressStatsHtml();
+    else if (progressTab === 'achievements') body.innerHTML = progressAchievementsHtml();
+    else if (progressTab === 'challenges') body.innerHTML = progressChallengesHtml();
+    wireProgressBody();
+  }
+  function wireProgressBody() {
+    var gcBar = document.getElementById('gc-bar-fill');
+    if (gcBar) {
+      var gcPct = levelInfoFromXP(state.gam.totalXP).pct;
+      if (prefersReducedMotion()) gcBar.style.width = gcPct + '%';
+      else requestAnimationFrame(function () { requestAnimationFrame(function () { gcBar.style.width = gcPct + '%'; }); });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-card-style]'), function (b) {
+      b.addEventListener('click', function () { state.gam.cosmetics.equipped.cardStyle = b.dataset.cardStyle; saveState(); renderProgressBody(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-bar-color]'), function (b) {
+      b.addEventListener('click', function () { state.gam.cosmetics.equipped.barColor = b.dataset.barColor; saveState(); renderProgressBody(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-prange]'), function (b) {
+      b.addEventListener('click', function () { var v = b.dataset.prange; progressRange = v === 'all' ? 'all' : +v; renderProgressBody(); });
+    });
+  }
 
   /* ================= theme ================= */
   function applyTheme() {
@@ -979,6 +1744,10 @@
     var catOptions = Object.keys(CATS).map(function (k) {
       return '<option value="' + k + '"' + (existing && existing.category === k ? ' selected' : '') + '>' + CATS[k].label + '</option>';
     }).join('');
+    var IMPORTANCE_OPTS = [['', 'אוטומטי (לפי קטגוריה/משך)'], ['small', 'קטנה · ' + state.gam.settings.xp.small + ' XP'], ['regular', 'רגילה · ' + state.gam.settings.xp.regular + ' XP'], ['important', 'חשובה · ' + state.gam.settings.xp.important + ' XP'], ['challenging', 'מאתגרת · ' + state.gam.settings.xp.challenging + ' XP']];
+    var importanceOptions = IMPORTANCE_OPTS.map(function (p) {
+      return '<option value="' + p[0] + '"' + (existing && (existing.importance || '') === p[0] ? ' selected' : '') + '>' + p[1] + '</option>';
+    }).join('');
 
     wrap.innerHTML =
       '<div class="modal" role="dialog" aria-modal="true">' +
@@ -988,6 +1757,8 @@
           '<div class="field"><label>שעה</label><input type="time" id="f-time" value="' + (existing ? existing.time : '') + '"></div>' +
           '<div class="field"><label>קטגוריה</label><select id="f-cat">' + catOptions + '</select></div>' +
         '</div>' +
+        '<div class="field" style="margin-bottom:12px;"><label>חשיבות (XP)</label><select id="f-importance">' + importanceOptions + '</select></div>' +
+        '<label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:var(--text-soft);"><input type="checkbox" id="f-optional"' + (existing && existing.optional ? ' checked' : '') + '> אופציונלית (לא תעצור Perfect Day אם לא הושלמה)</label>' +
         '<div class="field"><label>הערות</label><textarea id="f-notes" placeholder="אופציונלי">' + (existing ? escapeAttr(existing.notes || '') : '') + '</textarea></div>' +
         '<div class="modal-actions">' +
           '<button class="btn btn-primary btn-block" id="f-save">' + icon('check') + (isEdit ? 'שמור' : 'הוסף') + '</button>' +
@@ -1011,12 +1782,14 @@
       var time = document.getElementById('f-time').value || '00:00';
       var cat = document.getElementById('f-cat').value;
       var notes = document.getElementById('f-notes').value.trim();
+      var importance = document.getElementById('f-importance').value || null;
+      var optional = document.getElementById('f-optional').checked;
       var k = dkey(todayDate());
       if (isEdit) {
         var item = state.tasksByDate[k].find(function (t) { return t.id === existing.id; });
-        item.title = title; item.time = time; item.category = cat; item.notes = notes;
+        item.title = title; item.time = time; item.category = cat; item.notes = notes; item.importance = importance; item.optional = optional;
       } else {
-        state.tasksByDate[k].push({ id: uid(), time: time, title: title, category: cat, done: false, notes: notes });
+        state.tasksByDate[k].push({ id: uid(), time: time, title: title, category: cat, done: false, notes: notes, importance: importance, optional: optional });
       }
       saveState(); closeModal(); renderSchedule(); renderDashboard();
       toast(isEdit ? 'עודכן' : 'נוסף ללוח');
@@ -1102,6 +1875,7 @@
     { id: 'schedule', label: 'לוח יומי', icon: 'calendar', primary: true },
     { id: 'habits', label: 'הרגלים', icon: 'flame', primary: true },
     { id: 'advisor', label: 'יועץ', icon: 'spark', primary: true },
+    { id: 'progress', label: 'התקדמות', icon: 'trophy' },
     { id: 'focus', label: 'פוקוס', icon: 'target' },
     { id: 'fitness', label: 'כושר', icon: 'dumbbell' },
     { id: 'goals', label: 'יעדים', icon: 'flag' },
@@ -1172,6 +1946,7 @@
     if (id === 'money') renderMoney();
     if (id === 'learning') renderLearning();
     if (id === 'settings') renderSettings();
+    if (id === 'progress') renderProgress();
     window.scrollTo(0, 0);
     var activeEl = document.getElementById('panel-' + id);
     activeEl.classList.remove('panel-enter');
@@ -1200,6 +1975,34 @@
 
   function catColor(cat) { return CATS[cat] ? CATS[cat].color : 'var(--accent)'; }
 
+  function gamerCardHtml() {
+    var info = levelInfoFromXP(state.gam.totalXP);
+    var title = levelTitleFor(info.level);
+    var style = state.gam.cosmetics.equipped.cardStyle || 'premium';
+    var barColorId = state.gam.cosmetics.equipped.barColor || 'default';
+    var barColorObj = BAR_COLORS.filter(function (b) { return b.id === barColorId; })[0] || BAR_COLORS[0];
+    var list = todayTasks();
+    var doneToday = list.filter(function (t) { return t.done; }).length;
+    var pctToday = list.length ? Math.round(doneToday / list.length * 100) : 0;
+    return '<div class="gamer-card style-' + style + '" style="--gc-pct:' + info.pct + ';">' +
+      '<div class="gc-top">' +
+        '<div class="gc-level-badge">' +
+          '<div class="gc-level-ring"><div class="gc-level-num">' + info.level + '</div></div>' +
+          '<div class="gc-title-col"><div class="gc-title" style="color:' + title.color + ';">' + title.label + '</div><div class="gc-sub num" dir="ltr">' + info.xpIntoLevel + ' / ' + info.xpForNext + ' XP</div></div>' +
+        '</div>' +
+        '<div class="gc-date">' + new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'short' }) + '</div>' +
+      '</div>' +
+      '<div class="gc-xp-row"><span>התקדמות לרמה ' + (info.level + 1) + '</span><span class="num">' + info.pct + '%</span></div>' +
+      '<div class="gc-bar-track"><div class="gc-bar-fill" id="gc-bar-fill" style="width:0%;background:' + barColorObj.css + ';"></div></div>' +
+      '<div class="gc-stats">' +
+        '<div class="gc-stat"><b class="num">' + state.gam.streak.current + ' 🔥</b><span>רצף ימים</span></div>' +
+        '<div class="gc-stat"><b class="num" dir="ltr">' + doneToday + '/' + list.length + '</b><span>משימות היום</span></div>' +
+        '<div class="gc-stat"><b class="num">' + pctToday + '%</b><span>השלמת היום</span></div>' +
+        '<div class="gc-stat"><b class="num" dir="ltr">' + state.gam.totalXP + '</b><span>סה״כ XP</span></div>' +
+      '</div>' +
+      '<button class="btn btn-ghost btn-sm gc-more-btn" id="gc-open-progress">' + icon('chart') + 'התקדמות מלאה' + '</button>' +
+    '</div>';
+  }
   function renderDashboard() {
     var el = document.getElementById('panel-dashboard');
     var list = todayTasks();
@@ -1223,6 +2026,8 @@
           '<div class="date-line">' + d.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + (allTemplates()[templateKeyForToday()] || {}).label + '</div></div>' +
         '<div class="clock-chip"><div class="time num" id="live-clock">--:--</div><div class="zone">שעון מקומי</div></div>' +
       '</div>' +
+
+      gamerCardHtml() +
 
       '<button class="btn btn-ghost btn-sm" id="free-time-btn" style="margin-bottom:16px;">' + icon('target') + 'מצא זמן פנוי' + '</button>' +
 
@@ -1262,6 +2067,14 @@
       b.addEventListener('click', function () { toggleHabit(b.dataset.habitToggle); renderDashboard(); });
     });
     document.getElementById('free-time-btn').addEventListener('click', function () { openFreeTimeModal(); });
+    var gcOpenBtn = document.getElementById('gc-open-progress');
+    if (gcOpenBtn) gcOpenBtn.addEventListener('click', function () { showPanel('progress'); });
+    var gcBar = document.getElementById('gc-bar-fill');
+    if (gcBar) {
+      var gcPct = levelInfoFromXP(state.gam.totalXP).pct;
+      if (prefersReducedMotion()) { gcBar.style.width = gcPct + '%'; }
+      else { requestAnimationFrame(function () { requestAnimationFrame(function () { gcBar.style.width = gcPct + '%'; }); }); }
+    }
     wireNowCard(el, nnl);
     tickClock();
   }
@@ -1391,7 +2204,7 @@
   function wireNowCard(el, nnl) {
     if (!nnl.now) return;
     var c = el.querySelector('[data-now-complete]');
-    if (c) c.addEventListener('click', function () { setTaskDone(nnl.now.id, true); renderDashboard(); toast('בוצע ✓'); });
+    if (c) c.addEventListener('click', function () { setTaskDone(nnl.now.id, true); gamFlushEventQueue(c); renderDashboard(); toast('בוצע ✓'); });
     var ed = el.querySelector('[data-now-edit]');
     if (ed) ed.addEventListener('click', function () { openTaskModal(nnl.now); });
   }
@@ -1413,8 +2226,12 @@
   function setTaskDone(id, val) {
     var k = dkey(todayDate());
     var t = state.tasksByDate[k].find(function (x) { return x.id === id; });
-    if (t) t.done = val !== undefined ? val : !t.done;
+    if (!t) return;
+    var newVal = val !== undefined ? val : !t.done;
+    var wasAlreadyDone = t.done;
+    t.done = newVal;
     saveState();
+    if (newVal && !wasAlreadyDone) gamOnTaskCompleted(t);
   }
   function renderSchedule() {
     var el = document.getElementById('panel-schedule');
@@ -1491,7 +2308,7 @@
       });
     });
     Array.prototype.forEach.call(el.querySelectorAll('[data-check]'), function (b) {
-      b.addEventListener('click', function (e) { e.stopPropagation(); setTaskDone(b.dataset.check); renderSchedule(); renderDashboard(); });
+      b.addEventListener('click', function (e) { e.stopPropagation(); setTaskDone(b.dataset.check); gamFlushEventQueue(b); renderSchedule(); renderDashboard(); });
     });
     Array.prototype.forEach.call(el.querySelectorAll('[data-open]'), function (row) {
       row.addEventListener('click', function () {
@@ -2715,6 +3532,20 @@
           '</div></div>' +
         '<div class="settings-row"><div><div class="lbl">איפוס נתונים</div><div class="desc">מוחק את כל המשימות וההרגלים השמורים</div></div>' +
           '<button class="btn btn-danger btn-sm" id="reset-data">' + icon('trash') + 'איפוס' + '</button></div>' +
+      '</div>' +
+      '<div class="card" style="margin-top:16px;">' +
+        '<h3 style="margin-bottom:4px;">מערכת הרמות</h3>' +
+        '<p class="page-sub" style="margin-bottom:14px;">כמה XP כל סוג משימה או בונוס נותן. שינוי כאן לא משפיע על XP שכבר ניתן.</p>' +
+        '<div class="xpval-grid">' +
+          Object.keys(state.gam.settings.xp).map(function (k) {
+            return '<div class="xpval-field"><label>' + XP_FIELD_LABELS[k] + '</label><input type="number" min="0" max="2000" step="1" data-xpval="' + k + '" value="' + state.gam.settings.xp[k] + '"></div>';
+          }).join('') +
+        '</div>' +
+        '<button class="btn btn-ghost btn-sm" id="xpval-reset" style="margin-top:12px;">איפוס לערכי ברירת מחדל</button>' +
+      '</div>' +
+      '<div class="card" style="margin-top:16px;">' +
+        '<div class="settings-row" style="border:none;padding:0;"><div><div class="lbl">צליל בעת XP / הישג</div><div class="desc">צליל עדין קצר, כבוי כברירת מחדל</div></div>' +
+          '<label class="switch"><input type="checkbox" id="set-sound"' + (state.gam.settings.sound ? ' checked' : '') + '><span></span></label></div>' +
       '</div>';
     document.getElementById('set-name').addEventListener('change', function (e) { state.userName = e.target.value.trim(); saveState(); renderDashboard(); });
     document.getElementById('export-text-btn').addEventListener('click', openExportTextModal);
@@ -2731,6 +3562,23 @@
         showPanel('dashboard');
         toast('הנתונים אופסו');
       }, { title: 'איפוס נתונים', confirmLabel: 'איפוס' });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-xpval]'), function (inp) {
+      inp.addEventListener('change', function () {
+        var v = Math.max(0, Math.min(2000, Math.round(+inp.value) || 0));
+        state.gam.settings.xp[inp.dataset.xpval] = v;
+        saveState();
+        renderDashboard();
+      });
+    });
+    document.getElementById('xpval-reset').addEventListener('click', function () {
+      state.gam.settings.xp = defaultXPValues();
+      saveState(); renderSettings(); renderDashboard();
+      toast('ערכי ה-XP אופסו');
+    });
+    document.getElementById('set-sound').addEventListener('change', function (e) {
+      state.gam.settings.sound = e.target.checked;
+      saveState();
     });
   }
 
