@@ -460,7 +460,7 @@
   .gu-cat-manage-name { font-weight: 700; font-size: 13.5px; }
   .gu-cat-manage-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .gu-cat-reorder { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .gu-cat-reorder button { width: 26px; height: 19px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); color: var(--text-faint); font-size: 11px; line-height: 1; }
+  .gu-cat-reorder button { width: 32px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); color: var(--text-faint); font-size: 11px; line-height: 1; }
   .gu-cat-reorder button:first-child { border-bottom: 1px solid var(--border); }
   .gu-cat-reorder button:disabled { opacity: 0.3; }
   .gu-cat-main-actions { display: flex; gap: 2px; }
@@ -523,6 +523,7 @@
   .t-row:active { transform: scale(0.99); }
   .t-row.now { border-color: var(--cat, var(--accent)); box-shadow: 0 0 0 1px var(--cat, var(--accent)) inset; }
   .t-check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border-strong); flex-shrink: 0; cursor: pointer; background: transparent; position: relative; }
+  .t-check::before { content: ''; position: absolute; inset: -12px; }
   .t-check.done { background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); }
   .t-check.done::after { content: ""; position: absolute; inset: 0; margin: auto; width: 5px; height: 9px; border-bottom: 2px solid var(--accent-ink); border-inline-end: 2px solid var(--accent-ink); transform: rotate(35deg) translate(-1px,-2px); }
   .t-time { font-size: 12px; color: var(--text-soft); flex: 0 0 42px; }
@@ -6379,7 +6380,7 @@
       '<div class="page-head"><div><h2 class="page-title">הגדרות</h2></div></div>' +
       '<div class="card">' +
         '<div class="settings-row"><div><div class="lbl">שם</div><div class="desc">יופיע בברכת הבית</div></div>' +
-          '<input type="text" id="set-name" value="' + escapeAttr(state.userName) + '" placeholder="השם שלך" style="max-width:160px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);"></div>' +
+          '<input type="text" id="set-name" value="' + escapeAttr(state.userName) + '" placeholder="השם שלך" style="flex:1;min-width:0;max-width:200px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);"></div>' +
         '<div class="settings-row"><div><div class="lbl">ערכת נושא</div><div class="desc">בהיר, כהה או לפי המערכת</div></div>' +
           '<div class="seg">' +
             '<button data-theme-opt="system" class="' + (state.theme === 'system' ? 'active' : '') + '">מערכת</button>' +
