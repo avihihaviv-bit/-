@@ -862,6 +862,12 @@
   .cosm-opt { border: 1px solid var(--border); border-radius: var(--radius-s); padding: 10px; text-align: center; cursor: pointer; background: var(--surface-2); font-size: 11.5px; }
   .cosm-opt.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface-2)); color: var(--accent); font-weight: 700; }
   .cosm-opt:disabled, .cosm-opt.locked { opacity: 0.4; cursor: not-allowed; }
+  .lvl-reward-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+  .lvl-reward-chip { border: 1px solid var(--border); border-radius: var(--radius-s); padding: 9px 8px; text-align: center; background: var(--surface-2); opacity: 0.55; }
+  .lvl-reward-chip.unlocked { opacity: 1; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface-2)); }
+  .lvl-reward-lv { font-size: 11px; color: var(--text-soft); font-weight: 700; margin-bottom: 2px; }
+  .lvl-reward-xp { font-size: 12px; font-weight: 700; }
+  .lvl-reward-chip.unlocked .lvl-reward-xp { color: var(--accent); }
   .streak-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .streak-day { aspect-ratio: 1; border-radius: 5px; background: var(--surface-3); font-size: 9.5px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
   .streak-day.success { background: color-mix(in srgb, var(--success) 55%, var(--surface-3)); color: var(--accent-ink); }
@@ -1424,7 +1430,29 @@
     }
     gamQueueEvent({ type: 'xp', amount: amount, kind: kind });
     if (leveledUp.length) gamQueueEvent({ type: 'levelup', from: beforeLevel, to: afterInfo.level, levels: leveledUp, totalXP: state.gam.totalXP });
+    if (leveledUp.length && kind !== 'levelreward') gamCheckLevelRewards();
     return { granted: true, amount: amount, newTotal: state.gam.totalXP, leveledUp: leveledUp };
+  }
+
+  /* ================= level rewards: locked XP prizes unlocked by reaching a level ================= */
+  var LEVEL_REWARDS = { 5: 100, 10: 200, 15: 300, 20: 450, 25: 600, 30: 750, 35: 900, 40: 1100, 45: 1300, 50: 1600, 60: 2000, 70: 2500, 80: 3000, 90: 3800, 100: 5000 };
+  function levelRewardEventId(level) { return 'levelreward:' + level; }
+  function gamLevelRewardUnlocked(level) { return !!state.gam.xpEvents[levelRewardEventId(level)]; }
+  function gamCheckLevelRewards() {
+    var changed = true;
+    while (changed) {
+      changed = false;
+      var curLevel = levelInfoFromXP(state.gam.totalXP).level;
+      Object.keys(LEVEL_REWARDS).map(Number).sort(function (a, b) { return a - b; }).forEach(function (lv) {
+        if (curLevel < lv || gamLevelRewardUnlocked(lv)) return;
+        var amount = LEVEL_REWARDS[lv];
+        var res = grantXPOnce(levelRewardEventId(lv), amount, 'levelreward', { level: lv });
+        if (res) {
+          changed = true;
+          gamQueueEvent({ type: 'bonus', label: '🔓 פרס רמה ' + lv + ' נפתח!', amount: amount, perfect: lv % 25 === 0 });
+        }
+      });
+    }
   }
 
   function gamTaskDurationMin(task, sortedList) {
@@ -1956,6 +1984,20 @@
           '<div class="stat-tile"><div class="st-val num">' + gamCountThisMonth('perfect') + '</div><div class="st-lbl">Perfect Days החודש</div></div>' +
         '</div>' +
         streakCalendarHtml() +
+      '</div>' +
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:4px;">פרסי רמות</h3>' +
+        '<p class="page-sub" style="margin-bottom:12px;">בונוס XP חד-פעמי שנפתח כשמגיעים לרמה - נעול לגמרי עד אז.</p>' +
+        '<div class="lvl-reward-grid">' +
+          Object.keys(LEVEL_REWARDS).map(Number).sort(function (a, b) { return a - b; }).map(function (lv) {
+            var unlocked = gamLevelRewardUnlocked(lv);
+            var reached = info.level >= lv;
+            return '<div class="lvl-reward-chip' + (unlocked ? ' unlocked' : '') + '">' +
+              '<div class="lvl-reward-lv">Lv.' + lv + '</div>' +
+              '<div class="lvl-reward-xp num" dir="ltr">' + (unlocked ? '✓ +' : (reached ? '⏳ +' : '🔒 +')) + LEVEL_REWARDS[lv] + ' XP</div>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
       '</div>' +
       '<div class="card" style="margin-bottom:16px;"><h3 style="margin-bottom:10px;">עיצוב הכרטיס</h3><div class="cosm-grid">' +
         [['premium', 'Dark Premium'], ['neon', 'Neon Gaming'], ['minimal', 'Minimal Clean'], ['cyberpunk', 'Cyberpunk']].map(function (p) {
@@ -5709,7 +5751,10 @@
   /* ================= init ================= */
   applyTheme();
   renderNav();
+  gamCheckLevelRewards();
+  saveState();
   showPanel('dashboard');
+  gamFlushEventQueue(null);
   guCheckReminders();
   setInterval(guCheckReminders, 60000);
 
