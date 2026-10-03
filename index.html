@@ -41,6 +41,9 @@
     --cat-personal: #a98bd0;
     --cat-hobby: #d3ab5f;
     --cat-social: #63b4bb;
+    --cat-glowup: #e6a1c7;
+    --glow-1: #e6a1c7;
+    --glow-2: #f5a94e;
     --radius-s: 8px;
     --radius-m: 14px;
     --radius-l: 20px;
@@ -74,6 +77,9 @@
       --cat-personal: #82609e;
       --cat-hobby: #a97c1f;
       --cat-social: #2f8b92;
+      --cat-glowup: #b84e8c;
+      --glow-1: #b84e8c;
+      --glow-2: #b3771c;
     }
   }
   :root[data-theme="light"] {
@@ -101,6 +107,9 @@
     --cat-personal: #82609e;
     --cat-hobby: #a97c1f;
     --cat-social: #2f8b92;
+    --cat-glowup: #b84e8c;
+    --glow-1: #b84e8c;
+    --glow-2: #b3771c;
   }
 
   * { box-sizing: border-box; }
@@ -263,7 +272,7 @@
 
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field label { font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
-  .field input[type="text"], .field input[type="time"], .field select, .field textarea, .field input[type="number"] {
+  .field input[type="text"], .field input[type="time"], .field input[type="date"], .field input[type="color"], .field select, .field textarea, .field input[type="number"] {
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-s);
@@ -345,6 +354,113 @@
   .ds-dot-done { background: #34d399; }
   .ds-dot-pending { background: var(--text-soft); opacity: .5; }
   .ds-dot-overdue { background: #f87171; }
+
+  /* ================= Glow Up ================= */
+  .gu-title { display: flex; align-items: center; gap: 8px; }
+  .gu-title .icon { color: var(--glow-1); }
+  .gu-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
+  .gu-tabs::-webkit-scrollbar { display: none; }
+  .gu-tabs button { flex-shrink: 0; }
+  .gu-hero-card { background: linear-gradient(135deg, color-mix(in srgb, var(--glow-1) 16%, var(--surface-2)), color-mix(in srgb, var(--glow-2) 10%, var(--surface-2))); margin-bottom: 14px; }
+  .gu-hero-quote { font-size: 14px; font-weight: 600; font-style: italic; color: var(--text); margin-bottom: 14px; }
+  .gu-hero-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 640px) { .gu-hero-stats { grid-template-columns: repeat(3, 1fr); } }
+  .gu-hero-stat { background: var(--surface); border-radius: var(--radius-s); padding: 10px; text-align: center; }
+  .gu-hero-stat .v { font-size: 17px; font-weight: 800; }
+  .gu-hero-stat .l { font-size: 10.5px; color: var(--text-soft); margin-top: 2px; }
+  .gu-quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .gu-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+  .gu-card-head h3 { font-size: 15px; }
+  .gu-plan-list { display: flex; flex-direction: column; gap: 8px; }
+  .gu-plan-item { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border-radius: var(--radius-s); padding: 9px 11px; transition: opacity 0.2s var(--ease-out); }
+  .gu-plan-item.done { opacity: 0.55; }
+  .gu-plan-text { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+  .gu-plan-title { font-size: 13.5px; font-weight: 600; }
+  .gu-plan-item.done .gu-plan-title { text-decoration: line-through; }
+  .gu-plan-sub { font-size: 11px; color: var(--text-soft); }
+  .gu-add-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .gu-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+  .gu-toolbar .ach-search { flex: 1; min-width: 160px; }
+  .gu-sort-select { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-s); padding: 7px 9px; color: var(--text); font-size: 12.5px; }
+  .gu-ex-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 640px) { .gu-ex-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .gu-ex-grid { grid-template-columns: repeat(3, 1fr); } }
+  .gu-ex-card { position: relative; cursor: pointer; transition: transform 0.18s var(--ease-out), border-color 0.18s var(--ease-out); }
+  .gu-ex-card:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+  .gu-ex-name { font-weight: 700; font-size: 14.5px; margin-bottom: 4px; padding-inline-end: 30px; }
+  .gu-ex-cats { font-size: 11px; color: var(--text-soft); margin-bottom: 6px; }
+  .gu-ex-desc { font-size: 12.5px; color: var(--text-soft); margin-bottom: 8px; }
+  .gu-ex-meta { display: flex; gap: 10px; font-size: 11px; color: var(--text-faint); margin-bottom: 10px; }
+  .gu-ex-actions { display: flex; gap: 6px; align-items: center; }
+  .gu-ex-actions .btn-primary.done { background: var(--success); }
+  .gu-ex-list { display: flex; flex-direction: column; gap: 8px; }
+  .gu-ex-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 10px 12px; cursor: pointer; }
+  .gu-ex-row-name { font-weight: 600; font-size: 13.5px; flex: 1; }
+  .gu-ex-row-cats { font-size: 11px; color: var(--text-soft); }
+  .gu-fav-btn { position: absolute; top: 10px; left: 10px; background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 2px; display: flex; }
+  .gu-fav-btn .icon { width: 17px; height: 17px; }
+  .gu-fav-btn.active { color: var(--glow-2); }
+  .gu-fav-btn.active .icon { fill: var(--glow-2); }
+  .gu-cat-check-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .gu-cat-check { display: flex; align-items: center; gap: 5px; font-size: 11.5px; padding: 6px 9px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft); cursor: pointer; }
+  .gu-cat-check input { accent-color: var(--accent); }
+  .gu-cat-check.active { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 14%, var(--surface-2)); }
+  .gu-tip-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 640px) { .gu-tip-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .gu-tip-grid { grid-template-columns: repeat(3, 1fr); } }
+  .gu-tip-card { position: relative; cursor: pointer; transition: transform 0.18s var(--ease-out); }
+  .gu-tip-card:hover { transform: translateY(-2px); }
+  .gu-tip-status { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--surface-3); color: var(--text-soft); margin-bottom: 8px; }
+  .gu-tip-status-useful, .gu-watch-applied { background: color-mix(in srgb, var(--success) 22%, transparent); color: var(--success); }
+  .gu-tip-status-tried, .gu-watch-watched_saved_tips { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); }
+  .gu-watch-watched { background: color-mix(in srgb, var(--warning) 20%, transparent); color: var(--warning); }
+  .gu-tip-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; padding-inline-end: 26px; }
+  .gu-tip-content { font-size: 12.5px; color: var(--text-soft); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .gu-tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .gu-tag { font-size: 10.5px; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 2px 7px; border-radius: 999px; }
+  .gu-video-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 640px) { .gu-video-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .gu-video-grid { grid-template-columns: repeat(3, 1fr); } }
+  .gu-video-card { position: relative; }
+  .gu-video-thumb { background: var(--surface-3); border-radius: var(--radius-s); height: 90px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 8px; position: relative; }
+  .gu-video-play-ic { width: 26px; height: 26px; color: var(--text-soft); }
+  .gu-video-platform { position: absolute; bottom: 6px; inset-inline-end: 8px; font-size: 10px; color: var(--text-faint); background: var(--surface); padding: 2px 7px; border-radius: 999px; }
+  .gu-video-title { font-weight: 700; font-size: 13.5px; cursor: pointer; margin-bottom: 2px; padding-inline-end: 26px; }
+  .gu-video-domain { font-size: 11px; color: var(--text-faint); margin-bottom: 8px; direction: ltr; text-align: right; }
+  .gu-video-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .gu-routine-card { margin-bottom: 14px; }
+  .gu-routine-head-actions { display: flex; gap: 4px; }
+  .gu-paused-tag { font-size: 10.5px; color: var(--warning); font-weight: 600; }
+  .gu-optional-tag { font-size: 10px; color: var(--text-faint); }
+  .gu-routine-items { display: flex; flex-direction: column; gap: 6px; }
+  .gu-focus-card { text-align: center; padding: 32px 20px; }
+  .gu-focus-progress { margin-bottom: 24px; }
+  .gu-focus-progress .page-sub { margin-top: 6px; }
+  .gu-focus-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+  .gu-focus-duration { color: var(--text-soft); font-size: 14px; }
+  .gu-focus-done { text-align: center; padding: 40px 20px; }
+  .gu-focus-done-ic { color: var(--glow-2); margin-bottom: 14px; }
+  .gu-focus-done-ic .icon { width: 44px; height: 44px; }
+  .gu-journal-card { margin-bottom: 14px; }
+  .gu-detail-block { margin-bottom: 12px; }
+  .gu-detail-block b { display: block; font-size: 12px; color: var(--text-soft); margin-bottom: 3px; }
+  .gu-detail-block p { font-size: 13.5px; white-space: pre-wrap; }
+  .gu-detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; font-size: 12.5px; }
+  .gu-detail-grid div { display: flex; flex-direction: column; gap: 2px; background: var(--surface-2); border-radius: var(--radius-s); padding: 7px 9px; }
+  .gu-detail-grid b { font-size: 10.5px; color: var(--text-soft); }
+  .gu-history-list { font-size: 12.5px; color: var(--text-soft); margin-top: 6px; padding-inline-start: 18px; }
+  .gu-cat-manage-list { display: flex; flex-direction: column; gap: 8px; }
+  .gu-cat-manage-row { display: flex; align-items: center; gap: 12px; }
+  .gu-cat-hidden { opacity: 0.5; }
+  .gu-cat-emoji { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .gu-cat-manage-info { flex: 1; min-width: 0; }
+  .gu-cat-manage-name { font-weight: 700; font-size: 13.5px; }
+  .gu-cat-manage-actions { display: flex; gap: 2px; flex-wrap: wrap; }
+  .gu-reminder-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+  .gu-reminder-info { display: flex; flex-direction: column; gap: 2px; }
+  .gu-reminder-actions { display: flex; gap: 4px; }
+  .gu-modal { max-width: 480px; }
+  @media (prefers-reduced-motion: reduce) { .gu-ex-card:hover, .gu-tip-card:hover { transform: none; } }
   .stat-list { display: flex; flex-direction: column; gap: 6px; }
   .stat-list .row { display: flex; justify-content: space-between; gap: 14px; font-size: 13px; color: var(--text-soft); min-width: 150px; }
   .stat-list .row b { color: var(--text); font-weight: 600; }
@@ -825,6 +941,7 @@
     <section class="panel" id="panel-learning" hidden></section>
     <section class="panel" id="panel-settings" hidden></section>
     <section class="panel" id="panel-progress" hidden></section>
+    <section class="panel" id="panel-glowup" hidden></section>
   </main>
 
   <nav class="bottom-nav" id="nav-mobile"></nav>
@@ -859,6 +976,16 @@
     edit: '<path d="M4 20h4L18.5 9.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 15v5z"/>',
     grip: '<circle cx="9" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.2" fill="currentColor" stroke="none"/>',
     spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+    glow: '<path d="M12 3l1.8 5.3L19 10l-5.2 1.7L12 17l-1.8-5.3L5 10l5.2-1.7z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
+    bookmark: '<path d="M6 3h12v18l-6-4-6 4z"/>',
+    note: '<path d="M5 3h14v18H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    bell: '<path d="M6 10a6 6 0 1 1 12 0c0 3 1 4.5 2 6H4c1-1.5 2-3 2-6z"/><path d="M10 19a2 2 0 0 0 4 0"/>',
+    copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+    filter: '<path d="M4 5h16M7 12h10M10 19h4"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/>',
+    camera: '<path d="M4 8h3l1.5-2.5h7L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/>',
+    download: '<path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 20h16"/>',
+    upload: '<path d="M12 21V9M8 13l4-4 4 4"/><path d="M4 20h16"/>',
     send: '<path d="M4 12 20 4l-6 16-2.5-7L4 12z"/>',
     speaker: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>',
     speakerMute: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5 5M21 9l-5 5"/>',
@@ -883,8 +1010,32 @@
     health: { label: 'אוכל ובריאות', color: 'var(--cat-health)' },
     personal: { label: 'אישי ומנוחה', color: 'var(--cat-personal)' },
     hobby: { label: 'תחביבים', color: 'var(--cat-hobby)' },
-    social: { label: 'חברים', color: 'var(--cat-social)' }
+    social: { label: 'חברים', color: 'var(--cat-social)' },
+    glowup: { label: 'Glow Up', color: 'var(--cat-glowup)' }
   };
+
+  function defaultGlowUpCategories() {
+    return [
+      { id: 'face', name: 'פנים', emoji: '🙂', color: '#f5a94e' },
+      { id: 'skin', name: 'עור ופצעונים', emoji: '✨', color: '#45d6c8' },
+      { id: 'skincare', name: 'שגרת טיפוח', emoji: '🧴', color: '#8fbf74' },
+      { id: 'hair', name: 'שיער ותסרוקות', emoji: '💇', color: '#a98bd0' },
+      { id: 'eyes', name: 'עיניים', emoji: '👁️', color: '#63b4bb' },
+      { id: 'eyebrows', name: 'גבות', emoji: '🪄', color: '#d3ab5f' },
+      { id: 'dental', name: 'שיניים והיגיינת הפה', emoji: '🦷', color: '#9fb8e0' },
+      { id: 'lips', name: 'שפתיים', emoji: '💋', color: '#d97b78' },
+      { id: 'posture', name: 'יציבה ושפת גוף', emoji: '🧍', color: '#7f9bdb' },
+      { id: 'fitness_body', name: 'כושר גופני', emoji: '💪', color: '#e08a7d' },
+      { id: 'nutrition', name: 'תזונה', emoji: '🥗', color: '#8fbf74' },
+      { id: 'sleep', name: 'שינה', emoji: '🌙', color: '#7f9bdb' },
+      { id: 'hygiene', name: 'היגיינה אישית', emoji: '🚿', color: '#63b4bb' },
+      { id: 'style', name: 'סטייל ולבוש', emoji: '👕', color: '#a98bd0' },
+      { id: 'fragrance', name: 'ריח ובושם', emoji: '🌸', color: '#d3ab5f' },
+      { id: 'confidence', name: 'ביטחון עצמי', emoji: '🌟', color: '#f5a94e' },
+      { id: 'daily_habits', name: 'הרגלים יומיים', emoji: '🔥', color: '#f08a4b' },
+      { id: 'other', name: 'אחר', emoji: '📌', color: '#8d96b3' }
+    ].map(function (c, i) { return Object.assign({ desc: '', order: i, hidden: false, archived: false }, c); });
+  }
 
   function tpl(list) { return list.map(function (x) { return { time: x[0], title: x[1], category: x[2] }; }); }
 
@@ -1102,6 +1253,24 @@
       g.settings = Object.assign({ xp: defaultXPValues(), sound: false, animations: true, particles: true, showXPOnTasks: true, showStatsOnHome: true }, g.settings || {});
       g.settings.xp = Object.assign(defaultXPValues(), g.settings.xp || {});
       merged.gam = g;
+
+      merged.glowUp = merged.glowUp && typeof merged.glowUp === 'object' ? merged.glowUp : {};
+      var gu = merged.glowUp;
+      gu.schemaVersion = typeof gu.schemaVersion === 'number' ? gu.schemaVersion : 1;
+      gu.categories = Array.isArray(gu.categories) && gu.categories.length ? gu.categories : defaultGlowUpCategories();
+      gu.exercises = Array.isArray(gu.exercises) ? gu.exercises : [];
+      gu.tips = Array.isArray(gu.tips) ? gu.tips : [];
+      gu.videos = Array.isArray(gu.videos) ? gu.videos : [];
+      gu.reminders = Array.isArray(gu.reminders) ? gu.reminders : [];
+      gu.routines = Array.isArray(gu.routines) ? gu.routines : [];
+      gu.journal = Array.isArray(gu.journal) ? gu.journal : [];
+      gu.collections = Array.isArray(gu.collections) ? gu.collections : [];
+      gu.routineLog = gu.routineLog && typeof gu.routineLog === 'object' ? gu.routineLog : {};
+      gu.streakLog = gu.streakLog && typeof gu.streakLog === 'object' ? gu.streakLog : {};
+      gu.streakCurrent = typeof gu.streakCurrent === 'number' ? gu.streakCurrent : 0;
+      gu.streakLongest = typeof gu.streakLongest === 'number' ? gu.streakLongest : 0;
+      gu.settings = Object.assign({ webNotificationsEnabled: false, notifPermissionAsked: false }, gu.settings || {});
+      merged.glowUp = gu;
 
       return merged;
     } catch (e) { return def; }
@@ -1928,6 +2097,1583 @@
     });
   }
 
+  /* ================= Glow Up: data layer & helpers ================= */
+  function guCats() { return state.glowUp.categories.filter(function (c) { return !c.archived; }).sort(function (a, b) { return a.order - b.order; }); }
+  function guCat(id) { return state.glowUp.categories.find(function (c) { return c.id === id; }); }
+  function guCatChip(id) { var c = guCat(id); return c ? (c.emoji + ' ' + c.name) : ''; }
+  function guItemsForCat(catId) {
+    var n = 0;
+    state.glowUp.exercises.forEach(function (x) { if (!x.archived && (x.categoryIds || []).indexOf(catId) !== -1) n++; });
+    state.glowUp.tips.forEach(function (x) { if (!x.archived && (x.categoryIds || []).indexOf(catId) !== -1) n++; });
+    state.glowUp.videos.forEach(function (x) { if (!x.archived && (x.categoryIds || []).indexOf(catId) !== -1) n++; });
+    return n;
+  }
+  function guCatProgress(catId) {
+    var exList = state.glowUp.exercises.filter(function (x) { return !x.archived && (x.categoryIds || []).indexOf(catId) !== -1; });
+    if (!exList.length) return null;
+    var todayK = dkey(todayDate());
+    var doneToday = exList.filter(function (x) { return (x.completionLog || []).some(function (l) { return l.date === todayK; }); }).length;
+    return Math.round(doneToday / exList.length * 100);
+  }
+  function guMatchesSearch(item, q, fields) {
+    if (!q) return true;
+    var ql = q.trim().toLowerCase();
+    if (!ql) return true;
+    return fields.some(function (f) {
+      var v = item[f];
+      if (Array.isArray(v)) return v.join(' ').toLowerCase().indexOf(ql) !== -1;
+      return (v || '').toString().toLowerCase().indexOf(ql) !== -1;
+    });
+  }
+
+  function guCreateExercise(data) {
+    var now = Date.now();
+    var ex = Object.assign({ id: uid(), name: '', categoryIds: [], desc: '', instructions: '', durationMin: null, reps: '', frequency: '', equipment: '', difficulty: 'medium', mediaUrl: '', notes: '', purpose: '', createdAt: now, updatedAt: now, active: true, inDailyRoutine: false, favorite: false, archived: false, completionLog: [] }, data);
+    state.glowUp.exercises.push(ex);
+    saveState();
+    return ex;
+  }
+  function guUpdateExercise(id, patch) {
+    var ex = state.glowUp.exercises.find(function (e) { return e.id === id; });
+    if (!ex) return;
+    Object.assign(ex, patch, { updatedAt: Date.now() });
+    saveState();
+  }
+  function guDeleteExercise(id) {
+    state.glowUp.exercises = state.glowUp.exercises.filter(function (e) { return e.id !== id; });
+    (state.glowUp.routines || []).forEach(function (r) { r.items = r.items.filter(function (it) { return !(it.refType === 'exercise' && it.refId === id); }); });
+    saveState();
+  }
+  function guDuplicateExercise(id) {
+    var ex = state.glowUp.exercises.find(function (e) { return e.id === id; });
+    if (!ex) return;
+    var copy = Object.assign({}, ex, { id: uid(), name: ex.name + ' (עותק)', createdAt: Date.now(), updatedAt: Date.now(), favorite: false, completionLog: [] });
+    state.glowUp.exercises.push(copy);
+    saveState();
+  }
+  function guLinkedTaskToday(refType, refId) {
+    var k = dkey(todayDate());
+    return (state.tasksByDate[k] || []).find(function (t) { return t.glowUpRef && t.glowUpRef.type === refType && t.glowUpRef.id === refId; });
+  }
+  function guMarkExerciseDone(id, anchorEl) {
+    var ex = state.glowUp.exercises.find(function (e) { return e.id === id; });
+    if (!ex) return;
+    var todayK = dkey(todayDate());
+    var already = (ex.completionLog || []).some(function (l) { return l.date === todayK; });
+    if (already) return;
+    var linkedTask = guLinkedTaskToday('exercise', id);
+    if (linkedTask && !linkedTask.done) { setTaskDone(linkedTask.id, true); gamFlushEventQueue(anchorEl || null); }
+    ex.completionLog = ex.completionLog || [];
+    ex.completionLog.push({ date: todayK, at: Date.now() });
+    guUpdateStreakFor(todayK);
+    saveState();
+  }
+  function guAddExerciseAsTask(id, opts) {
+    var ex = state.glowUp.exercises.find(function (e) { return e.id === id; });
+    if (!ex) return null;
+    if (guLinkedTaskToday('exercise', id)) return guLinkedTaskToday('exercise', id);
+    opts = opts || {};
+    var k = dkey(todayDate());
+    var task = { id: uid(), time: opts.time || '20:00', title: ex.name, category: 'glowup', done: false, notes: ex.notes || '', importance: null, optional: !!opts.optional, glowUpRef: { type: 'exercise', id: id } };
+    state.tasksByDate[k] = state.tasksByDate[k] || [];
+    state.tasksByDate[k].push(task);
+    saveState();
+    return task;
+  }
+
+  function guCreateTip(data) {
+    var now = Date.now();
+    var tip = Object.assign({ id: uid(), title: '', content: '', categoryIds: [], source: '', image: '', tags: [], createdAt: now, updatedAt: now, favorite: false, usefulness: 0, notes: '', status: 'new', archived: false, collectionId: null }, data);
+    state.glowUp.tips.push(tip);
+    saveState();
+    return tip;
+  }
+  function guUpdateTip(id, patch) {
+    var t = state.glowUp.tips.find(function (x) { return x.id === id; });
+    if (!t) return;
+    Object.assign(t, patch, { updatedAt: Date.now() });
+    saveState();
+  }
+  function guDeleteTip(id) {
+    state.glowUp.tips = state.glowUp.tips.filter(function (t) { return t.id !== id; });
+    saveState();
+  }
+
+  var GU_PLATFORMS = [
+    { id: 'tiktok', label: 'TikTok', match: /tiktok\.com/i },
+    { id: 'youtube', label: 'YouTube', match: /youtube\.com|youtu\.be/i },
+    { id: 'instagram', label: 'Instagram', match: /instagram\.com/i },
+    { id: 'other', label: 'אחר', match: null }
+  ];
+  function guDetectPlatform(url) {
+    for (var i = 0; i < GU_PLATFORMS.length; i++) {
+      if (GU_PLATFORMS[i].match && GU_PLATFORMS[i].match.test(url)) return GU_PLATFORMS[i].id;
+    }
+    return 'other';
+  }
+  function guUrlDomain(url) {
+    try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return url; }
+  }
+  function guCreateVideo(data) {
+    var now = Date.now();
+    var v = Object.assign({ id: uid(), title: '', url: '', platform: 'other', categoryIds: [], desc: '', whySaved: '', wantToLearn: '', tipsExtracted: '', tags: [], savedAt: now, favorite: false, watchStatus: 'not_watched', rating: 0, notes: '', reminderId: null, collectionId: null, archived: false }, data);
+    state.glowUp.videos.push(v);
+    saveState();
+    return v;
+  }
+  function guUpdateVideo(id, patch) {
+    var v = state.glowUp.videos.find(function (x) { return x.id === id; });
+    if (!v) return;
+    Object.assign(v, patch, { updatedAt: Date.now() });
+    saveState();
+  }
+  function guDeleteVideo(id) {
+    state.glowUp.videos = state.glowUp.videos.filter(function (v) { return v.id !== id; });
+    saveState();
+  }
+  function guConvertVideoToTip(id) {
+    var v = state.glowUp.videos.find(function (x) { return x.id === id; });
+    if (!v) return null;
+    var tip = guCreateTip({ title: v.title, content: v.tipsExtracted || v.wantToLearn || '', categoryIds: v.categoryIds.slice(), source: v.url, tags: v.tags.slice() });
+    return tip;
+  }
+
+  /* ================= Glow Up: streak ================= */
+  function guDayHasCompletion(k) {
+    var routineDone = Object.keys(state.glowUp.routineLog).some(function (rid) {
+      var day = state.glowUp.routineLog[rid][k];
+      return day && Object.keys(day).some(function (id) { return day[id]; });
+    });
+    if (routineDone) return true;
+    return state.glowUp.exercises.some(function (e) { return (e.completionLog || []).some(function (l) { return l.date === k; }); });
+  }
+  function guRecomputeStreak() {
+    var cur = 0;
+    var d = todayDate();
+    while (true) {
+      var k = dkey(d);
+      if (state.glowUp.streakLog[k]) { cur++; d.setDate(d.getDate() - 1); } else break;
+    }
+    state.glowUp.streakCurrent = cur;
+    state.glowUp.streakLongest = Math.max(state.glowUp.streakLongest || 0, cur);
+  }
+  function guUpdateStreakFor(k) {
+    state.glowUp.streakLog[k] = guDayHasCompletion(k);
+    guRecomputeStreak();
+  }
+
+  /* ================= Glow Up: routines ================= */
+  function guCreateRoutine(name) {
+    var r = { id: uid(), name: name, items: [], paused: false, createdAt: Date.now(), updatedAt: Date.now() };
+    state.glowUp.routines.push(r);
+    saveState();
+    return r;
+  }
+  function guUpdateRoutine(id, patch) {
+    var r = state.glowUp.routines.find(function (x) { return x.id === id; });
+    if (!r) return;
+    Object.assign(r, patch, { updatedAt: Date.now() });
+    saveState();
+  }
+  function guDeleteRoutine(id) {
+    state.glowUp.routines = state.glowUp.routines.filter(function (r) { return r.id !== id; });
+    delete state.glowUp.routineLog[id];
+    saveState();
+  }
+  function guDuplicateRoutine(id) {
+    var r = state.glowUp.routines.find(function (x) { return x.id === id; });
+    if (!r) return;
+    var copy = Object.assign({}, r, { id: uid(), name: r.name + ' (עותק)', items: r.items.map(function (it) { return Object.assign({}, it, { id: uid() }); }), createdAt: Date.now(), updatedAt: Date.now() });
+    state.glowUp.routines.push(copy);
+    saveState();
+  }
+  function guAddRoutineItem(routineId, item) {
+    var r = state.glowUp.routines.find(function (x) { return x.id === routineId; });
+    if (!r) return;
+    var order = r.items.length;
+    r.items.push(Object.assign({ id: uid(), refType: 'custom', refId: null, title: '', categoryId: null, time: null, durationMin: null, order: order, required: true, frequency: 'daily', reminderId: null }, item));
+    r.updatedAt = Date.now();
+    saveState();
+  }
+  function guUpdateRoutineItem(routineId, itemId, patch) {
+    var r = state.glowUp.routines.find(function (x) { return x.id === routineId; });
+    if (!r) return;
+    var it = r.items.find(function (x) { return x.id === itemId; });
+    if (!it) return;
+    Object.assign(it, patch);
+    r.updatedAt = Date.now();
+    saveState();
+  }
+  function guDeleteRoutineItem(routineId, itemId) {
+    var r = state.glowUp.routines.find(function (x) { return x.id === routineId; });
+    if (!r) return;
+    r.items = r.items.filter(function (x) { return x.id !== itemId; });
+    r.updatedAt = Date.now();
+    saveState();
+  }
+  function guReorderRoutineItems(routineId, orderedIds) {
+    var r = state.glowUp.routines.find(function (x) { return x.id === routineId; });
+    if (!r) return;
+    orderedIds.forEach(function (id, i) {
+      var it = r.items.find(function (x) { return x.id === id; });
+      if (it) it.order = i;
+    });
+    r.items.sort(function (a, b) { return a.order - b.order; });
+    saveState();
+  }
+  function guRoutineItemDoneToday(routineId, itemId) {
+    var k = dkey(todayDate());
+    return !!(((state.glowUp.routineLog[routineId] || {})[k] || {})[itemId]);
+  }
+  function guToggleRoutineItem(routineId, itemId, anchorEl) {
+    var k = dkey(todayDate());
+    state.glowUp.routineLog[routineId] = state.glowUp.routineLog[routineId] || {};
+    state.glowUp.routineLog[routineId][k] = state.glowUp.routineLog[routineId][k] || {};
+    var cur = !!state.glowUp.routineLog[routineId][k][itemId];
+    var next = !cur;
+    state.glowUp.routineLog[routineId][k][itemId] = next;
+    var routine = state.glowUp.routines.find(function (r) { return r.id === routineId; });
+    var item = routine && routine.items.find(function (i) { return i.id === itemId; });
+    if (item && item.refType === 'exercise' && item.refId) {
+      var linkedTask = guLinkedTaskToday('exercise', item.refId);
+      var ex = state.glowUp.exercises.find(function (e) { return e.id === item.refId; });
+      if (next) {
+        if (linkedTask && !linkedTask.done) { setTaskDone(linkedTask.id, true); gamFlushEventQueue(anchorEl || null); }
+        if (ex) {
+          var already = (ex.completionLog || []).some(function (l) { return l.date === k; });
+          if (!already) { ex.completionLog = ex.completionLog || []; ex.completionLog.push({ date: k, at: Date.now() }); }
+        }
+      } else {
+        if (linkedTask && linkedTask.done) setTaskDone(linkedTask.id, false);
+        if (ex) ex.completionLog = (ex.completionLog || []).filter(function (l) { return l.date !== k; });
+      }
+    }
+    guUpdateStreakFor(k);
+    saveState();
+  }
+  function guRoutineProgressToday(routine) {
+    var items = routine.items;
+    if (!items.length) return 0;
+    var done = items.filter(function (it) { return guRoutineItemDoneToday(routine.id, it.id); }).length;
+    return Math.round(done / items.length * 100);
+  }
+  function guSyncTaskCompletion(task, done) {
+    if (!task.glowUpRef) return;
+    var k = dkey(todayDate());
+    if (task.glowUpRef.type === 'exercise') {
+      var ex = state.glowUp.exercises.find(function (e) { return e.id === task.glowUpRef.id; });
+      if (!ex) return;
+      ex.completionLog = ex.completionLog || [];
+      var has = ex.completionLog.some(function (l) { return l.date === k; });
+      if (done && !has) ex.completionLog.push({ date: k, at: Date.now() });
+      else if (!done && has) ex.completionLog = ex.completionLog.filter(function (l) { return l.date !== k; });
+      guUpdateStreakFor(k);
+    } else if (task.glowUpRef.type === 'routineItem') {
+      var rid = task.glowUpRef.routineId, iid = task.glowUpRef.itemId;
+      state.glowUp.routineLog[rid] = state.glowUp.routineLog[rid] || {};
+      state.glowUp.routineLog[rid][k] = state.glowUp.routineLog[rid][k] || {};
+      state.glowUp.routineLog[rid][k][iid] = done;
+      guUpdateStreakFor(k);
+    }
+  }
+
+  /* ================= Glow Up: reminders ================= */
+  function guCreateReminder(data) {
+    var r = Object.assign({ id: uid(), title: '', date: null, time: '09:00', frequency: 'once', days: [], categoryId: null, videoId: null, exerciseId: null, active: true, createdAt: Date.now(), lastFiredAt: null, firedOnce: false, completedDates: [], snoozedUntil: null }, data);
+    state.glowUp.reminders.push(r);
+    saveState();
+    return r;
+  }
+  function guUpdateReminder(id, patch) {
+    var r = state.glowUp.reminders.find(function (x) { return x.id === id; });
+    if (!r) return;
+    Object.assign(r, patch);
+    saveState();
+  }
+  function guDeleteReminder(id) {
+    state.glowUp.reminders = state.glowUp.reminders.filter(function (r) { return r.id !== id; });
+    saveState();
+  }
+  function guReminderDueNow(r, now) {
+    if (!r.active) return false;
+    if (r.snoozedUntil && now.getTime() < r.snoozedUntil) return false;
+    var todayK = dkey(now);
+    if (r.completedDates && r.completedDates.indexOf(todayK) !== -1) return false;
+    var nowMin = now.getHours() * 60 + now.getMinutes();
+    var remMin = r.time ? timeToMin(r.time) : 0;
+    if (nowMin < remMin) return false;
+    if (r.frequency === 'once') return r.date === todayK && !r.firedOnce;
+    if (r.frequency === 'daily') return true;
+    if (r.frequency === 'weekly_days') return (r.days || []).indexOf(now.getDay()) !== -1;
+    if (r.frequency === 'weekly') { if (!r.lastFiredAt) return true; return (now.getTime() - r.lastFiredAt) > 6 * 24 * 60 * 60 * 1000; }
+    return false;
+  }
+  function guFireReminder(r) {
+    r.lastFiredAt = Date.now();
+    if (r.frequency === 'once') r.firedOnce = true;
+    saveState();
+    toast('⏰ ' + (r.title || 'תזכורת Glow Up'));
+    if (state.glowUp.settings.webNotificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
+      try { new Notification('Glow Up', { body: r.title || 'תזכורת', tag: r.id }); } catch (e) {}
+    }
+  }
+  function guCheckReminders() {
+    var now = new Date();
+    state.glowUp.reminders.filter(function (r) { return guReminderDueNow(r, now); }).forEach(guFireReminder);
+  }
+  function guUpcomingReminders() {
+    return state.glowUp.reminders.filter(function (r) { return r.active; }).sort(function (a, b) { return (a.time || '').localeCompare(b.time || ''); });
+  }
+
+  /* ================= Glow Up: journal ================= */
+  function guCreateJournalEntry(data) {
+    var now = Date.now();
+    var e = Object.assign({ id: uid(), type: 'daily', date: dkey(todayDate()), tried: '', worked: '', didntWork: '', tipsApplied: '', improve: '', notes: '', goalsNextWeek: '', createdAt: now, updatedAt: now }, data);
+    state.glowUp.journal.push(e);
+    saveState();
+    return e;
+  }
+  function guUpdateJournalEntry(id, patch) {
+    var e = state.glowUp.journal.find(function (x) { return x.id === id; });
+    if (!e) return;
+    Object.assign(e, patch, { updatedAt: Date.now() });
+    saveState();
+  }
+  function guDeleteJournalEntry(id) {
+    state.glowUp.journal = state.glowUp.journal.filter(function (e) { return e.id !== id; });
+    saveState();
+  }
+
+  /* ================= Glow Up: home-tab metrics ================= */
+  var GU_QUOTES = [
+    'כל יום קטן של טיפוח הוא השקעה בך.',
+    'עקביות מנצחת מושלמות.',
+    'את/ה הפרויקט הכי חשוב שבו את/ה משקיע/ה.',
+    'צעד קטן היום, ביטחון גדול יותר מחר.',
+    'הגוף והמראה שלך מקשיבים לכל מה שאת/ה עושה בשבילם.',
+    'אל תשווה את ההתחלה שלך לאמצע של מישהו אחר.',
+    'תתמיד - התוצאה מגיעה גם בלי שתשים לב.'
+  ];
+  function guHashStr(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
+  function guDailyQuote() { return GU_QUOTES[guHashStr(dkey(todayDate())) % GU_QUOTES.length]; }
+  function guWeeklyProgressPct() {
+    var n = 0, d = todayDate();
+    for (var i = 0; i < 7; i++) { var dd = new Date(d); dd.setDate(d.getDate() - i); if (guDayHasCompletion(dkey(dd))) n++; }
+    return Math.round(n / 7 * 100);
+  }
+  function guHabitsDoneToday() {
+    var k = dkey(todayDate()), n = 0;
+    Object.keys(state.glowUp.routineLog).forEach(function (rid) {
+      var day = state.glowUp.routineLog[rid][k];
+      if (day) n += Object.keys(day).filter(function (id) { return day[id]; }).length;
+    });
+    return n;
+  }
+  function guExercisesDoneThisWeek() {
+    var weekStart = todayDate(); weekStart.setDate(weekStart.getDate() - 6);
+    var n = 0;
+    state.glowUp.exercises.forEach(function (e) { (e.completionLog || []).forEach(function (l) { if (new Date(l.date + 'T00:00:00') >= weekStart) n++; }); });
+    return n;
+  }
+  function guActiveExercises() { return state.glowUp.exercises.filter(function (e) { return !e.archived; }); }
+  function guActiveTips() { return state.glowUp.tips.filter(function (t) { return !t.archived; }); }
+  function guActiveVideos() { return state.glowUp.videos.filter(function (v) { return !v.archived; }); }
+  function guTodaysPlanItems() {
+    var out = [];
+    state.glowUp.routines.filter(function (r) { return !r.paused; }).forEach(function (r) {
+      r.items.slice().sort(function (a, b) { return a.order - b.order; }).forEach(function (it) {
+        out.push({ routineId: r.id, routineName: r.name, item: it, done: guRoutineItemDoneToday(r.id, it.id) });
+      });
+    });
+    return out;
+  }
+
+  /* ================= Glow Up: shared small UI bits ================= */
+  function guCatCheckboxesHtml(selectedIds, name) {
+    return '<div class="gu-cat-check-grid">' + guCats().map(function (c) {
+      var checked = (selectedIds || []).indexOf(c.id) !== -1;
+      return '<label class="gu-cat-check' + (checked ? ' active' : '') + '"><input type="checkbox" value="' + c.id + '" data-gucc="' + name + '"' + (checked ? ' checked' : '') + '>' + c.emoji + ' ' + escapeAttr(c.name) + '</label>';
+    }).join('') + '</div>';
+  }
+  function guReadCheckedCats(root, name) {
+    return Array.prototype.map.call(root.querySelectorAll('[data-gucc="' + name + '"]:checked'), function (el) { return el.value; });
+  }
+  function guFavBtn(active, dataAttr) {
+    return '<button class="gu-fav-btn' + (active ? ' active' : '') + '" ' + dataAttr + ' aria-label="מועדף" title="מועדף">' + icon('star') + '</button>';
+  }
+
+  /* ================= Glow Up: main render ================= */
+  var GU_TABS = [['home', 'בית'], ['exercises', 'תרגילים'], ['tips', 'טיפים'], ['videos', 'סרטונים'], ['routines', 'שגרות'], ['goals', 'מטרות'], ['journal', 'יומן'], ['progress', 'התקדמות'], ['categories', 'קטגוריות'], ['settings', 'נתונים']];
+  var guTab = 'home';
+  function renderGlowUp() {
+    var el = document.getElementById('panel-glowup');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title gu-title">' + icon('glow') + ' Glow Up</h2><p class="page-sub">מערכת אישית לטיפוח, הרגלים וביטחון עצמי</p></div></div>' +
+      '<div class="range-tabs gu-tabs">' + GU_TABS.map(function (t) { return '<button data-gu-tab="' + t[0] + '" class="' + (guTab === t[0] ? 'active' : '') + '">' + t[1] + '</button>'; }).join('') + '</div>' +
+      '<div id="gu-body"></div>';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-tab]'), function (b) {
+      b.addEventListener('click', function () { guTab = b.dataset.guTab; renderGlowUp(); });
+    });
+    renderGuBody();
+  }
+  function renderGuBody() {
+    var el = document.getElementById('gu-body');
+    if (!el) return;
+    if (guTab === 'home') el.innerHTML = guHomeHtml();
+    else if (guTab === 'exercises') el.innerHTML = guExercisesHtml();
+    else if (guTab === 'tips') el.innerHTML = guTipsHtml();
+    else if (guTab === 'videos') el.innerHTML = guVideosHtml();
+    else if (guTab === 'routines') el.innerHTML = guRoutinesHtml();
+    else if (guTab === 'goals') el.innerHTML = guGoalsHtml();
+    else if (guTab === 'journal') el.innerHTML = guJournalHtml();
+    else if (guTab === 'progress') el.innerHTML = guProgressHtml();
+    else if (guTab === 'categories') el.innerHTML = guCategoriesHtml();
+    else if (guTab === 'settings') el.innerHTML = guSettingsHtml();
+    el.classList.remove('panel-enter'); void el.offsetWidth; el.classList.add('panel-enter');
+    wireGuBody(el);
+    gamAnimateFillBars(el);
+  }
+  function guHomeHtml() {
+    var weekPct = guWeeklyProgressPct();
+    var plan = guTodaysPlanItems();
+    var planShown = plan.slice(0, 6);
+    return (
+      '<div class="card gu-hero-card">' +
+        '<div class="gu-hero-quote">"' + escapeAttr(guDailyQuote()) + '"</div>' +
+        '<div class="gu-hero-stats">' +
+          '<div class="gu-hero-stat"><div class="v num">' + weekPct + '%</div><div class="l">התקדמות שבועית</div></div>' +
+          '<div class="gu-hero-stat"><div class="v num">' + guHabitsDoneToday() + '</div><div class="l">הרגלים הושלמו היום</div></div>' +
+          '<div class="gu-hero-stat"><div class="v num">' + guExercisesDoneThisWeek() + '</div><div class="l">תרגילים השבוע</div></div>' +
+          '<div class="gu-hero-stat"><div class="v num">' + guActiveTips().length + '</div><div class="l">טיפים שמורים</div></div>' +
+          '<div class="gu-hero-stat"><div class="v num">' + guActiveVideos().length + '</div><div class="l">סרטונים שמורים</div></div>' +
+          '<div class="gu-hero-stat"><div class="v num">' + state.glowUp.streakCurrent + ' 🔥</div><div class="l">רצף ימים</div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="gu-quick-actions">' +
+        '<button class="btn btn-ghost btn-sm" id="gu-qa-start-routine">' + icon('play') + 'התחל שגרה' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-qa-mark-habit">' + icon('check') + 'סמן הרגל' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-qa-open-video">' + icon('play') + 'פתח סרטון' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-qa-quick-add">' + icon('plus') + 'הוספה מהירה' + '</button>' +
+      '</div>' +
+      '<div class="card" style="margin-top:14px;">' +
+        '<div class="gu-card-head"><h3>תוכנית Glow Up להיום</h3><button class="btn btn-ghost btn-sm" id="gu-open-weekly">' + icon('calendar') + 'תוכנית שבועית' + '</button></div>' +
+        (planShown.length ? '<div class="gu-plan-list">' + planShown.map(function (p) {
+          return '<div class="gu-plan-item' + (p.done ? ' done' : '') + '">' +
+            '<button class="t-check' + (p.done ? ' done' : '') + '" data-gu-plan-toggle="' + p.routineId + '|' + p.item.id + '" aria-label="סמן כהושלם"></button>' +
+            '<div class="gu-plan-text"><span class="gu-plan-title">' + escapeAttr(p.item.title) + '</span><span class="gu-plan-sub">' + escapeAttr(p.routineName) + (p.item.time ? ' · ' + p.item.time : '') + '</span></div>' +
+          '</div>';
+        }).join('') + '</div>' + (plan.length > 6 ? '<button class="btn btn-ghost btn-sm" data-gu-tab-jump="routines" style="margin-top:8px;">עוד ' + (plan.length - 6) + ' פריטים ←</button>' : '')
+          : '<p class="empty-msg">אין עדיין שגרות. ' + icon('plus') + '<button class="btn btn-ghost btn-sm" data-gu-tab-jump="routines">צור שגרה ראשונה</button></p>') +
+      '</div>' +
+      '<div class="gu-add-row">' +
+        '<button class="btn btn-ghost btn-sm" id="gu-add-exercise-home">' + icon('plus') + 'תרגיל' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-add-tip-home">' + icon('plus') + 'טיפ' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-add-video-home">' + icon('plus') + 'סרטון' + '</button>' +
+      '</div>'
+    );
+  }
+
+  /* ================= Glow Up: exercises tab ================= */
+  var guExView = 'grid';
+  var guExSearch = '';
+  var guExCatFilter = 'all';
+  var guExSort = 'name';
+  var GU_DIFFICULTY_LABEL = { easy: 'קלה', medium: 'בינונית', hard: 'מאתגרת' };
+  function guFilteredExercises() {
+    var list = guActiveExercises().filter(function (e) {
+      if (guExCatFilter !== 'all' && (e.categoryIds || []).indexOf(guExCatFilter) === -1) return false;
+      return guMatchesSearch(e, guExSearch, ['name', 'desc', 'notes', 'purpose']);
+    });
+    list.sort(function (a, b) {
+      if (guExSort === 'name') return a.name.localeCompare(b.name);
+      if (guExSort === 'date') return b.createdAt - a.createdAt;
+      if (guExSort === 'frequency') return (a.frequency || '').localeCompare(b.frequency || '');
+      if (guExSort === 'favorite') return (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0);
+      return 0;
+    });
+    return list;
+  }
+  function guExerciseCardHtml(e) {
+    var todayDone = (e.completionLog || []).some(function (l) { return l.date === dkey(todayDate()); });
+    var catChips = (e.categoryIds || []).map(guCatChip).join(' · ');
+    return '<div class="card gu-ex-card" data-gu-ex-open="' + e.id + '">' +
+      guFavBtn(e.favorite, 'data-gu-ex-fav="' + e.id + '"') +
+      '<div class="gu-ex-name">' + escapeAttr(e.name) + '</div>' +
+      (catChips ? '<div class="gu-ex-cats">' + catChips + '</div>' : '') +
+      (e.desc ? '<div class="gu-ex-desc">' + escapeAttr(e.desc) + '</div>' : '') +
+      '<div class="gu-ex-meta">' +
+        (e.durationMin ? '<span>⏱ ' + e.durationMin + ' דק׳</span>' : '') +
+        (e.difficulty ? '<span>' + (GU_DIFFICULTY_LABEL[e.difficulty] || '') + '</span>' : '') +
+      '</div>' +
+      '<div class="gu-ex-actions">' +
+        '<button class="btn btn-primary btn-sm' + (todayDone ? ' done' : '') + '" data-gu-ex-done="' + e.id + '">' + icon('check') + (todayDone ? 'הושלם היום' : 'סמן כהושלם') + '</button>' +
+        '<button class="btn-icon" data-gu-ex-task="' + e.id + '" title="הוסף ללוח היומי">' + icon('calendar') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+  function guExerciseListRowHtml(e) {
+    var todayDone = (e.completionLog || []).some(function (l) { return l.date === dkey(todayDate()); });
+    return '<div class="gu-ex-row" data-gu-ex-open="' + e.id + '">' +
+      '<button class="t-check' + (todayDone ? ' done' : '') + '" data-gu-ex-done="' + e.id + '" aria-label="סמן כהושלם"></button>' +
+      '<span class="gu-ex-row-name">' + escapeAttr(e.name) + '</span>' +
+      '<span class="gu-ex-row-cats">' + (e.categoryIds || []).map(guCatChip).join(' ') + '</span>' +
+      guFavBtn(e.favorite, 'data-gu-ex-fav="' + e.id + '"') +
+      '<button class="btn-icon" data-gu-ex-task="' + e.id + '" title="הוסף ללוח היומי">' + icon('calendar') + '</button>' +
+    '</div>';
+  }
+  function guExercisesHtml() {
+    var list = guFilteredExercises();
+    var catOpts = [['all', 'הכל']].concat(guCats().map(function (c) { return [c.id, c.emoji + ' ' + c.name]; }));
+    return '<div class="gu-toolbar">' +
+        '<input type="text" class="ach-search" id="gu-ex-search" placeholder="חיפוש תרגיל..." value="' + escapeAttr(guExSearch) + '">' +
+        '<select id="gu-ex-sort" class="gu-sort-select"><option value="name"' + (guExSort === 'name' ? ' selected' : '') + '>שם</option><option value="date"' + (guExSort === 'date' ? ' selected' : '') + '>תאריך הוספה</option><option value="frequency"' + (guExSort === 'frequency' ? ' selected' : '') + '>תדירות</option><option value="favorite"' + (guExSort === 'favorite' ? ' selected' : '') + '>מועדפים</option></select>' +
+        '<div class="seg"><button data-gu-ex-view="grid" class="' + (guExView === 'grid' ? 'active' : '') + '">' + icon('more') + '</button><button data-gu-ex-view="list" class="' + (guExView === 'list' ? 'active' : '') + '">' + icon('grip') + '</button></div>' +
+        '<button class="btn btn-primary btn-sm" id="gu-ex-add">' + icon('plus') + 'תרגיל' + '</button>' +
+      '</div>' +
+      '<div class="ach-cat-tabs">' + catOpts.map(function (c) { return '<button data-gu-ex-cat="' + c[0] + '" class="' + (guExCatFilter === c[0] ? 'active' : '') + '">' + c[1] + '</button>'; }).join('') + '</div>' +
+      (list.length ? (guExView === 'grid' ? '<div class="gu-ex-grid">' + list.map(guExerciseCardHtml).join('') + '</div>' : '<div class="gu-ex-list">' + list.map(guExerciseListRowHtml).join('') + '</div>')
+        : '<p class="empty-msg">לא נמצאו תרגילים. אפשר להוסיף תרגיל ראשון.</p>');
+  }
+  function openGuExerciseModal(existing) {
+    var isEdit = !!(existing && existing.id);
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal gu-modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (isEdit ? 'עריכת תרגיל' : 'תרגיל חדש') + '</h3>' +
+        '<div class="field" style="margin-bottom:10px;"><label>שם</label><input type="text" id="gex-name" maxlength="80" value="' + (existing ? escapeAttr(existing.name) : '') + '" placeholder="למשל: מתיחת צוואר"></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>קטגוריות</label>' + guCatCheckboxesHtml(existing ? existing.categoryIds : [], 'gex-cat') + '</div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>תיאור קצר</label><textarea id="gex-desc" placeholder="על מה התרגיל הזה">' + (existing ? escapeAttr(existing.desc || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>הוראות ביצוע</label><textarea id="gex-instructions" placeholder="שלבי הביצוע">' + (existing ? escapeAttr(existing.instructions || '') : '') + '</textarea></div>' +
+        '<div class="field-row" style="margin-bottom:10px;">' +
+          '<div class="field"><label>משך (דק׳)</label><input type="number" min="0" id="gex-duration" value="' + (existing && existing.durationMin ? existing.durationMin : '') + '"></div>' +
+          '<div class="field"><label>חזרות</label><input type="text" id="gex-reps" value="' + (existing ? escapeAttr(existing.reps || '') : '') + '" placeholder="למשל: 3x12"></div>' +
+        '</div>' +
+        '<div class="field-row" style="margin-bottom:10px;">' +
+          '<div class="field"><label>תדירות מומלצת</label><input type="text" id="gex-frequency" value="' + (existing ? escapeAttr(existing.frequency || '') : '') + '" placeholder="למשל: יומי"></div>' +
+          '<div class="field"><label>רמת קושי</label><select id="gex-difficulty"><option value="easy"' + (existing && existing.difficulty === 'easy' ? ' selected' : '') + '>קלה</option><option value="medium"' + (!existing || existing.difficulty === 'medium' ? ' selected' : '') + '>בינונית</option><option value="hard"' + (existing && existing.difficulty === 'hard' ? ' selected' : '') + '>מאתגרת</option></select></div>' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>ציוד נדרש</label><input type="text" id="gex-equipment" value="' + (existing ? escapeAttr(existing.equipment || '') : '') + '" placeholder="אופציונלי"></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>מטרת התרגיל</label><input type="text" id="gex-purpose" value="' + (existing ? escapeAttr(existing.purpose || '') : '') + '" placeholder="אופציונלי"></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>תמונה / קישור להדגמה</label><input type="text" id="gex-media" value="' + (existing ? escapeAttr(existing.mediaUrl || '') : '') + '" placeholder="קישור אופציונלי"></div>' +
+        '<div class="field" style="margin-bottom:12px;"><label>הערות אישיות</label><textarea id="gex-notes" placeholder="אופציונלי">' + (existing ? escapeAttr(existing.notes || '') : '') + '</textarea></div>' +
+        '<label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;color:var(--text-soft);"><input type="checkbox" id="gex-active"' + (!existing || existing.active ? ' checked' : '') + '> פעיל</label>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="gex-save">' + icon('check') + (isEdit ? 'שמור' : 'הוסף') + '</button>' +
+          (isEdit ? '<button class="btn btn-danger" id="gex-del">' + icon('trash') + '</button>' : '') +
+          '<button class="btn btn-ghost" id="gex-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gex-cancel').addEventListener('click', closeModal);
+    document.getElementById('gex-name').focus();
+    Array.prototype.forEach.call(wrap.querySelectorAll('[data-gucc="gex-cat"]'), function (cb) {
+      cb.addEventListener('change', function () { cb.closest('.gu-cat-check').classList.toggle('active', cb.checked); });
+    });
+    if (isEdit) document.getElementById('gex-del').addEventListener('click', function () {
+      closeModal();
+      openConfirmModal('למחוק את התרגיל "' + existing.name + '"? הפעולה בלתי הפיכה.', function () {
+        guDeleteExercise(existing.id); renderGuBody(); toast('נמחק');
+      }, { title: 'מחיקת תרגיל', confirmLabel: 'מחק' });
+    });
+    document.getElementById('gex-save').addEventListener('click', function () {
+      var name = document.getElementById('gex-name').value.trim();
+      if (!name) { document.getElementById('gex-name').focus(); return; }
+      var data = {
+        name: name,
+        categoryIds: guReadCheckedCats(wrap, 'gex-cat'),
+        desc: document.getElementById('gex-desc').value.trim(),
+        instructions: document.getElementById('gex-instructions').value.trim(),
+        durationMin: +document.getElementById('gex-duration').value || null,
+        reps: document.getElementById('gex-reps').value.trim(),
+        frequency: document.getElementById('gex-frequency').value.trim(),
+        difficulty: document.getElementById('gex-difficulty').value,
+        equipment: document.getElementById('gex-equipment').value.trim(),
+        purpose: document.getElementById('gex-purpose').value.trim(),
+        mediaUrl: document.getElementById('gex-media').value.trim(),
+        notes: document.getElementById('gex-notes').value.trim(),
+        active: document.getElementById('gex-active').checked
+      };
+      if (isEdit) guUpdateExercise(existing.id, data); else guCreateExercise(data);
+      closeModal(); renderGuBody();
+      toast(isEdit ? 'התרגיל עודכן' : 'התרגיל נוסף');
+    });
+  }
+  function openGuExerciseDetail(id) {
+    var ex = state.glowUp.exercises.find(function (e) { return e.id === id; });
+    if (!ex) return;
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    var history = (ex.completionLog || []).slice(-10).reverse();
+    wrap.innerHTML =
+      '<div class="modal gu-modal" role="dialog" aria-modal="true">' +
+        '<h3>' + escapeAttr(ex.name) + '</h3>' +
+        '<div class="gu-ex-cats" style="margin-bottom:10px;">' + (ex.categoryIds || []).map(guCatChip).join(' · ') + '</div>' +
+        (ex.desc ? '<p class="page-sub" style="margin-bottom:10px;">' + escapeAttr(ex.desc) + '</p>' : '') +
+        (ex.instructions ? '<div class="gu-detail-block"><b>הוראות ביצוע</b><p>' + escapeAttr(ex.instructions) + '</p></div>' : '') +
+        '<div class="gu-detail-grid">' +
+          (ex.durationMin ? '<div><b>משך</b><span>' + ex.durationMin + ' דק׳</span></div>' : '') +
+          (ex.reps ? '<div><b>חזרות</b><span>' + escapeAttr(ex.reps) + '</span></div>' : '') +
+          (ex.frequency ? '<div><b>תדירות</b><span>' + escapeAttr(ex.frequency) + '</span></div>' : '') +
+          '<div><b>קושי</b><span>' + (GU_DIFFICULTY_LABEL[ex.difficulty] || '') + '</span></div>' +
+          (ex.equipment ? '<div><b>ציוד</b><span>' + escapeAttr(ex.equipment) + '</span></div>' : '') +
+          (ex.purpose ? '<div><b>מטרה</b><span>' + escapeAttr(ex.purpose) + '</span></div>' : '') +
+        '</div>' +
+        (ex.notes ? '<div class="gu-detail-block"><b>הערות אישיות</b><p>' + escapeAttr(ex.notes) + '</p></div>' : '') +
+        '<div class="gu-detail-block"><b>היסטוריית ביצוע (10 אחרונים)</b>' +
+          (history.length ? '<ul class="gu-history-list">' + history.map(function (l) { return '<li>' + new Date(l.at).toLocaleDateString('he-IL') + '</li>'; }).join('') + '</ul>' : '<p class="page-sub">עדיין לא בוצע.</p>') +
+        '</div>' +
+        '<div class="modal-actions" style="flex-wrap:wrap;">' +
+          '<button class="btn btn-primary btn-block" data-gu-ex-done="' + ex.id + '">' + icon('check') + 'סמן כהושלם היום' + '</button>' +
+          '<button class="btn btn-ghost btn-sm" data-gu-ex-edit="' + ex.id + '">' + icon('edit') + 'עריכה' + '</button>' +
+          '<button class="btn btn-ghost btn-sm" data-gu-ex-dup="' + ex.id + '">' + icon('copy') + 'שכפול' + '</button>' +
+          '<button class="btn btn-ghost" id="gex-detail-close">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gex-detail-close').addEventListener('click', closeModal);
+    wrap.querySelector('[data-gu-ex-done]').addEventListener('click', function (e) { guMarkExerciseDone(ex.id, e.currentTarget); closeModal(); renderGuBody(); toast('בוצע!'); });
+    wrap.querySelector('[data-gu-ex-edit]').addEventListener('click', function () { closeModal(); openGuExerciseModal(ex); });
+    wrap.querySelector('[data-gu-ex-dup]').addEventListener('click', function () { guDuplicateExercise(ex.id); closeModal(); renderGuBody(); toast('שוכפל'); });
+  }
+
+  /* ================= Glow Up: tips tab ================= */
+  var guTipSearch = '';
+  var guTipCatFilter = 'all';
+  var guTipStatusFilter = 'all';
+  var GU_TIP_STATUS = { new: 'חדש', to_try: 'לבדיקה', tried: 'נוסה', useful: 'שימושי', not_relevant: 'לא רלוונטי' };
+  function guFilteredTips() {
+    return guActiveTips().filter(function (t) {
+      if (guTipCatFilter !== 'all' && (t.categoryIds || []).indexOf(guTipCatFilter) === -1) return false;
+      if (guTipStatusFilter !== 'all' && t.status !== guTipStatusFilter) return false;
+      return guMatchesSearch(t, guTipSearch, ['title', 'content', 'tags']);
+    }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+  }
+  function guTipCardHtml(t) {
+    return '<div class="card gu-tip-card" data-gu-tip-open="' + t.id + '">' +
+      guFavBtn(t.favorite, 'data-gu-tip-fav="' + t.id + '"') +
+      '<div class="gu-tip-status gu-tip-status-' + t.status + '">' + (GU_TIP_STATUS[t.status] || '') + '</div>' +
+      '<div class="gu-tip-title">' + escapeAttr(t.title) + '</div>' +
+      '<div class="gu-tip-content">' + escapeAttr(t.content) + '</div>' +
+      '<div class="gu-ex-cats">' + (t.categoryIds || []).map(guCatChip).join(' · ') + '</div>' +
+      (t.tags && t.tags.length ? '<div class="gu-tag-row">' + t.tags.map(function (tg) { return '<span class="gu-tag">#' + escapeAttr(tg) + '</span>'; }).join('') + '</div>' : '') +
+    '</div>';
+  }
+  function guTipsHtml() {
+    var list = guFilteredTips();
+    var catOpts = [['all', 'הכל']].concat(guCats().map(function (c) { return [c.id, c.emoji + ' ' + c.name]; }));
+    var statusOpts = [['all', 'הכל']].concat(Object.keys(GU_TIP_STATUS).map(function (k) { return [k, GU_TIP_STATUS[k]]; }));
+    return '<div class="gu-toolbar">' +
+        '<input type="text" class="ach-search" id="gu-tip-search" placeholder="חיפוש טיפ..." value="' + escapeAttr(guTipSearch) + '">' +
+        '<select id="gu-tip-status-filter" class="gu-sort-select">' + statusOpts.map(function (s) { return '<option value="' + s[0] + '"' + (guTipStatusFilter === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('') + '</select>' +
+        '<button class="btn btn-primary btn-sm" id="gu-tip-add">' + icon('plus') + 'טיפ' + '</button>' +
+      '</div>' +
+      '<div class="ach-cat-tabs">' + catOpts.map(function (c) { return '<button data-gu-tip-cat="' + c[0] + '" class="' + (guTipCatFilter === c[0] ? 'active' : '') + '">' + c[1] + '</button>'; }).join('') + '</div>' +
+      (list.length ? '<div class="gu-tip-grid">' + list.map(guTipCardHtml).join('') + '</div>' : '<p class="empty-msg">לא נמצאו טיפים. אפשר להוסיף טיפ ראשון.</p>');
+  }
+  function openGuTipModal(existing) {
+    var isEdit = !!(existing && existing.id);
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal gu-modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (isEdit ? 'עריכת טיפ' : 'טיפ חדש') + '</h3>' +
+        '<div class="field" style="margin-bottom:10px;"><label>כותרת</label><input type="text" id="gtip-title" maxlength="100" value="' + (existing ? escapeAttr(existing.title) : '') + '"></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>תוכן הטיפ</label><textarea id="gtip-content">' + (existing ? escapeAttr(existing.content || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>קטגוריות</label>' + guCatCheckboxesHtml(existing ? existing.categoryIds : [], 'gtip-cat') + '</div>' +
+        '<div class="field-row" style="margin-bottom:10px;">' +
+          '<div class="field"><label>מקור / קישור</label><input type="text" id="gtip-source" value="' + (existing ? escapeAttr(existing.source || '') : '') + '"></div>' +
+          '<div class="field"><label>סטטוס</label><select id="gtip-status">' + Object.keys(GU_TIP_STATUS).map(function (k) { return '<option value="' + k + '"' + (existing && existing.status === k ? ' selected' : (!existing && k === 'new' ? ' selected' : '')) + '>' + GU_TIP_STATUS[k] + '</option>'; }).join('') + '</select></div>' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>תגיות (מופרדות בפסיק)</label><input type="text" id="gtip-tags" value="' + (existing ? escapeAttr((existing.tags || []).join(', ')) : '') + '"></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>דירוג שימושיות (0-5)</label><input type="number" min="0" max="5" id="gtip-usefulness" value="' + (existing ? (existing.usefulness || 0) : 0) + '"></div>' +
+        '<div class="field" style="margin-bottom:12px;"><label>הערות אישיות</label><textarea id="gtip-notes">' + (existing ? escapeAttr(existing.notes || '') : '') + '</textarea></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="gtip-save">' + icon('check') + (isEdit ? 'שמור' : 'הוסף') + '</button>' +
+          (isEdit ? '<button class="btn btn-danger" id="gtip-del">' + icon('trash') + '</button>' : '') +
+          '<button class="btn btn-ghost" id="gtip-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gtip-cancel').addEventListener('click', closeModal);
+    document.getElementById('gtip-title').focus();
+    Array.prototype.forEach.call(wrap.querySelectorAll('[data-gucc="gtip-cat"]'), function (cb) {
+      cb.addEventListener('change', function () { cb.closest('.gu-cat-check').classList.toggle('active', cb.checked); });
+    });
+    if (isEdit) document.getElementById('gtip-del').addEventListener('click', function () {
+      closeModal();
+      openConfirmModal('למחוק את הטיפ "' + existing.title + '"?', function () { guDeleteTip(existing.id); renderGuBody(); toast('נמחק'); }, { title: 'מחיקת טיפ', confirmLabel: 'מחק' });
+    });
+    document.getElementById('gtip-save').addEventListener('click', function () {
+      var title = document.getElementById('gtip-title').value.trim();
+      if (!title) { document.getElementById('gtip-title').focus(); return; }
+      var tags = document.getElementById('gtip-tags').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      var data = {
+        title: title,
+        content: document.getElementById('gtip-content').value.trim(),
+        categoryIds: guReadCheckedCats(wrap, 'gtip-cat'),
+        source: document.getElementById('gtip-source').value.trim(),
+        status: document.getElementById('gtip-status').value,
+        tags: tags,
+        usefulness: Math.max(0, Math.min(5, +document.getElementById('gtip-usefulness').value || 0)),
+        notes: document.getElementById('gtip-notes').value.trim()
+      };
+      if (isEdit) guUpdateTip(existing.id, data); else guCreateTip(data);
+      closeModal(); renderGuBody();
+      toast(isEdit ? 'הטיפ עודכן' : 'הטיפ נוסף');
+    });
+  }
+
+  /* ================= Glow Up: videos tab ================= */
+  var guVideoSearch = '';
+  var guVideoFilter = 'all';
+  var guVideoCatFilter = 'all';
+  var guVideoPlatformFilter = 'all';
+  var GU_WATCH_STATUS = { not_watched: 'לא צפיתי', watched: 'צפיתי', watched_saved_tips: 'צפיתי ושמרתי טיפים', applied: 'יישמתי' };
+  function guFilteredVideos() {
+    return guActiveVideos().filter(function (v) {
+      if (guVideoFilter === 'favorites' && !v.favorite) return false;
+      if (guVideoFilter !== 'all' && guVideoFilter !== 'favorites' && v.watchStatus !== guVideoFilter) return false;
+      if (guVideoCatFilter !== 'all' && (v.categoryIds || []).indexOf(guVideoCatFilter) === -1) return false;
+      if (guVideoPlatformFilter !== 'all' && v.platform !== guVideoPlatformFilter) return false;
+      return guMatchesSearch(v, guVideoSearch, ['title', 'desc', 'whySaved', 'tags']);
+    }).sort(function (a, b) { return b.savedAt - a.savedAt; });
+  }
+  function guVideoCardHtml(v) {
+    var platformLabel = (GU_PLATFORMS.find(function (p) { return p.id === v.platform; }) || {}).label || v.platform;
+    return '<div class="card gu-video-card">' +
+      guFavBtn(v.favorite, 'data-gu-video-fav="' + v.id + '"') +
+      '<div class="gu-video-thumb" data-gu-video-open="' + v.id + '">' + icon('play', 'gu-video-play-ic') + '<span class="gu-video-platform">' + escapeAttr(platformLabel) + '</span></div>' +
+      '<div class="gu-video-title" data-gu-video-open="' + v.id + '">' + escapeAttr(v.title || guUrlDomain(v.url)) + '</div>' +
+      '<div class="gu-video-domain">' + escapeAttr(guUrlDomain(v.url)) + '</div>' +
+      '<div class="gu-tip-status gu-watch-' + v.watchStatus + '">' + GU_WATCH_STATUS[v.watchStatus] + '</div>' +
+      '<div class="gu-video-actions">' +
+        '<button class="btn btn-ghost btn-sm" data-gu-video-link="' + v.id + '">' + icon('send') + 'פתיחה' + '</button>' +
+        (v.watchStatus === 'not_watched' ? '<button class="btn btn-ghost btn-sm" data-gu-video-watched="' + v.id + '">' + icon('check') + 'צפיתי' + '</button>' : '') +
+        (v.watchStatus !== 'applied' ? '<button class="btn btn-ghost btn-sm" data-gu-video-applied="' + v.id + '">' + icon('star') + 'יישמתי' + '</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+  function guVideosHtml() {
+    var list = guFilteredVideos();
+    var filterOpts = [['all', 'כל הסרטונים'], ['not_watched', 'לא צפיתי'], ['watched', 'צפיתי'], ['applied', 'יישמתי'], ['favorites', 'מועדפים']];
+    var platformOpts = [['all', 'כל הפלטפורמות']].concat(GU_PLATFORMS.map(function (p) { return [p.id, p.label]; }));
+    return '<div class="gu-toolbar">' +
+        '<input type="text" class="ach-search" id="gu-video-search" placeholder="חיפוש סרטון..." value="' + escapeAttr(guVideoSearch) + '">' +
+        '<select id="gu-video-platform-filter" class="gu-sort-select">' + platformOpts.map(function (p) { return '<option value="' + p[0] + '"' + (guVideoPlatformFilter === p[0] ? ' selected' : '') + '>' + p[1] + '</option>'; }).join('') + '</select>' +
+        '<button class="btn btn-primary btn-sm" id="gu-video-add">' + icon('plus') + 'Add Video' + '</button>' +
+      '</div>' +
+      '<div class="ach-cat-tabs">' + filterOpts.map(function (f) { return '<button data-gu-video-filter="' + f[0] + '" class="' + (guVideoFilter === f[0] ? 'active' : '') + '">' + f[1] + '</button>'; }).join('') + '</div>' +
+      (list.length ? '<div class="gu-video-grid">' + list.map(guVideoCardHtml).join('') + '</div>' : '<p class="empty-msg">לא נמצאו סרטונים. אפשר להוסיף סרטון ראשון.</p>');
+  }
+  function openGuVideoModal(existing) {
+    var isEdit = !!(existing && existing.id);
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal gu-modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (isEdit ? 'עריכת סרטון' : 'Add Video') + '</h3>' +
+        '<div class="field" style="margin-bottom:10px;"><label>כתובת URL</label><input type="text" id="gvid-url" dir="ltr" value="' + (existing ? escapeAttr(existing.url) : '') + '" placeholder="https://..."></div>' +
+        '<p class="page-sub" id="gvid-platform-hint" style="margin:-4px 0 10px;">הדביקו קישור - הפלטפורמה תזוהה אוטומטית.</p>' +
+        '<div class="field" style="margin-bottom:10px;"><label>שם הסרטון</label><input type="text" id="gvid-title" value="' + (existing ? escapeAttr(existing.title) : '') + '"></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>קטגוריות</label>' + guCatCheckboxesHtml(existing ? existing.categoryIds : [], 'gvid-cat') + '</div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>תיאור אישי</label><textarea id="gvid-desc">' + (existing ? escapeAttr(existing.desc || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>למה שמרתי את הסרטון</label><textarea id="gvid-why">' + (existing ? escapeAttr(existing.whySaved || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>מה אני רוצה ללמוד ממנו</label><textarea id="gvid-learn">' + (existing ? escapeAttr(existing.wantToLearn || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>טיפים שהפקתי ממנו</label><textarea id="gvid-tipsext">' + (existing ? escapeAttr(existing.tipsExtracted || '') : '') + '</textarea></div>' +
+        '<div class="field-row" style="margin-bottom:10px;">' +
+          '<div class="field"><label>תגיות (מופרדות בפסיק)</label><input type="text" id="gvid-tags" value="' + (existing ? escapeAttr((existing.tags || []).join(', ')) : '') + '"></div>' +
+          '<div class="field"><label>סטטוס צפייה</label><select id="gvid-status">' + Object.keys(GU_WATCH_STATUS).map(function (k) { return '<option value="' + k + '"' + (existing && existing.watchStatus === k ? ' selected' : (!existing && k === 'not_watched' ? ' selected' : '')) + '>' + GU_WATCH_STATUS[k] + '</option>'; }).join('') + '</select></div>' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>דירוג אישי (0-5)</label><input type="number" min="0" max="5" id="gvid-rating" value="' + (existing ? (existing.rating || 0) : 0) + '"></div>' +
+        '<div class="field" style="margin-bottom:12px;"><label>הערות</label><textarea id="gvid-notes">' + (existing ? escapeAttr(existing.notes || '') : '') + '</textarea></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="gvid-save">' + icon('check') + (isEdit ? 'שמור' : 'שמור סרטון') + '</button>' +
+          (isEdit ? '<button class="btn btn-danger" id="gvid-del">' + icon('trash') + '</button>' : '') +
+          '<button class="btn btn-ghost" id="gvid-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gvid-cancel').addEventListener('click', closeModal);
+    document.getElementById('gvid-url').focus();
+    Array.prototype.forEach.call(wrap.querySelectorAll('[data-gucc="gvid-cat"]'), function (cb) {
+      cb.addEventListener('change', function () { cb.closest('.gu-cat-check').classList.toggle('active', cb.checked); });
+    });
+    var urlInput = document.getElementById('gvid-url');
+    var hint = document.getElementById('gvid-platform-hint');
+    urlInput.addEventListener('input', function () {
+      if (!urlInput.value.trim()) { hint.textContent = 'הדביקו קישור - הפלטפורמה תזוהה אוטומטית.'; return; }
+      var p = guDetectPlatform(urlInput.value.trim());
+      var label = (GU_PLATFORMS.find(function (x) { return x.id === p; }) || {}).label || p;
+      hint.textContent = 'זוהתה פלטפורמה: ' + label + ' (' + guUrlDomain(urlInput.value.trim()) + ')';
+    });
+    if (isEdit) document.getElementById('gvid-del').addEventListener('click', function () {
+      closeModal();
+      openConfirmModal('למחוק את הסרטון השמור?', function () { guDeleteVideo(existing.id); renderGuBody(); toast('נמחק'); }, { title: 'מחיקת סרטון', confirmLabel: 'מחק' });
+    });
+    document.getElementById('gvid-save').addEventListener('click', function () {
+      var url = urlInput.value.trim();
+      if (!url) { urlInput.focus(); return; }
+      var tags = document.getElementById('gvid-tags').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      var data = {
+        url: url,
+        platform: guDetectPlatform(url),
+        title: document.getElementById('gvid-title').value.trim(),
+        categoryIds: guReadCheckedCats(wrap, 'gvid-cat'),
+        desc: document.getElementById('gvid-desc').value.trim(),
+        whySaved: document.getElementById('gvid-why').value.trim(),
+        wantToLearn: document.getElementById('gvid-learn').value.trim(),
+        tipsExtracted: document.getElementById('gvid-tipsext').value.trim(),
+        tags: tags,
+        watchStatus: document.getElementById('gvid-status').value,
+        rating: Math.max(0, Math.min(5, +document.getElementById('gvid-rating').value || 0)),
+        notes: document.getElementById('gvid-notes').value.trim()
+      };
+      if (isEdit) guUpdateVideo(existing.id, data); else guCreateVideo(data);
+      closeModal(); renderGuBody();
+      toast(isEdit ? 'הסרטון עודכן' : 'הסרטון נשמר');
+    });
+  }
+
+  /* ================= Glow Up: routines tab + focus mode ================= */
+  var guFocusRoutineId = null;
+  var guFocusIdx = 0;
+  function guRoutineCardHtml(r) {
+    var pct = guRoutineProgressToday(r);
+    return '<div class="card gu-routine-card">' +
+      '<div class="gu-card-head"><h3>' + escapeAttr(r.name) + (r.paused ? ' <span class="gu-paused-tag">מושהית</span>' : '') + '</h3>' +
+        '<div class="gu-routine-head-actions">' +
+          '<button class="btn-icon" data-gu-routine-dup="' + r.id + '" title="שכפול">' + icon('copy') + '</button>' +
+          '<button class="btn-icon" data-gu-routine-del="' + r.id + '" title="מחיקה">' + icon('trash') + '</button>' +
+        '</div></div>' +
+      '<div class="balance-track" style="margin-bottom:10px;"><div class="balance-fill" style="width:' + pct + '%;background:var(--accent);"></div></div>' +
+      '<div class="page-sub" style="margin-bottom:10px;">' + r.items.length + ' פריטים · ' + pct + '% הושלם היום</div>' +
+      (r.items.length ? '<div class="gu-routine-items">' + r.items.slice().sort(function (a, b) { return a.order - b.order; }).map(function (it) {
+        var done = guRoutineItemDoneToday(r.id, it.id);
+        return '<div class="gu-plan-item' + (done ? ' done' : '') + '">' +
+          '<button class="t-check' + (done ? ' done' : '') + '" data-gu-routine-item-toggle="' + r.id + '|' + it.id + '" aria-label="סמן כהושלם"></button>' +
+          '<div class="gu-plan-text"><span class="gu-plan-title">' + escapeAttr(it.title) + (!it.required ? ' <span class="gu-optional-tag">אופציונלי</span>' : '') + '</span><span class="gu-plan-sub">' + (it.time ? it.time + ' · ' : '') + (it.durationMin ? it.durationMin + ' דק׳' : '') + '</span></div>' +
+          '<button class="btn-icon" data-gu-routine-item-del="' + r.id + '|' + it.id + '" aria-label="מחק פריט">' + icon('x') + '</button>' +
+        '</div>';
+      }).join('') + '</div>' : '<p class="empty-msg" style="padding:8px 0;">אין עדיין פריטים בשגרה.</p>') +
+      '<div class="gu-add-row" style="margin-top:10px;">' +
+        '<input type="text" class="ms-input" data-gu-routine-item-input="' + r.id + '" placeholder="הוסף פריט לשגרה...">' +
+        '<button class="btn btn-ghost btn-sm" data-gu-routine-item-add="' + r.id + '">' + icon('plus') + '</button>' +
+      '</div>' +
+      '<div class="modal-actions" style="margin-top:12px;">' +
+        '<button class="btn btn-primary btn-block" data-gu-routine-focus="' + r.id + '"' + (r.items.length ? '' : ' disabled') + '>' + icon('play') + 'מצב Focus' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" data-gu-routine-pause="' + r.id + '">' + (r.paused ? 'המשך שגרה' : 'השהה שגרה') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+  function openGuRoutineNameModal() {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>שגרה חדשה</h3>' +
+        '<div class="field" style="margin-bottom:14px;"><label>שם השגרה</label><input type="text" id="grt-name" maxlength="50" placeholder="למשל: שגרת בוקר"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="grt-save">' + icon('check') + 'צור שגרה' + '</button>' +
+          '<button class="btn btn-ghost" id="grt-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('grt-cancel').addEventListener('click', closeModal);
+    document.getElementById('grt-name').focus();
+    document.getElementById('grt-save').addEventListener('click', function () {
+      var name = document.getElementById('grt-name').value.trim();
+      if (!name) { document.getElementById('grt-name').focus(); return; }
+      guCreateRoutine(name);
+      closeModal(); renderGuBody();
+      toast('השגרה נוצרה');
+    });
+  }
+  function guRoutinesHtml() {
+    if (guFocusRoutineId) return guFocusModeHtml();
+    var list = state.glowUp.routines;
+    return '<div class="gu-card-head" style="margin-bottom:12px;"><h3 style="font-size:15px;">השגרות שלי</h3><button class="btn btn-primary btn-sm" id="gu-routine-add">' + icon('plus') + 'שגרה' + '</button></div>' +
+      (list.length ? list.map(guRoutineCardHtml).join('') : '<p class="empty-msg">אין עדיין שגרות. התחל ליצור שגרת בוקר, ערב או טיפוח.</p>');
+  }
+  function guFocusModeHtml() {
+    var r = state.glowUp.routines.find(function (x) { return x.id === guFocusRoutineId; });
+    if (!r || !r.items.length) { guFocusRoutineId = null; return guRoutinesHtml(); }
+    var items = r.items.slice().sort(function (a, b) { return a.order - b.order; });
+    if (guFocusIdx >= items.length) {
+      return '<div class="card gu-focus-done"><div class="gu-focus-done-ic">' + icon('trophy') + '</div><h3>סיימת את השגרה "' + escapeAttr(r.name) + '"!</h3><p class="page-sub">כל הכבוד על ההתמדה.</p><button class="btn btn-primary" id="gu-focus-exit">' + icon('check') + 'סגור' + '</button></div>';
+    }
+    var it = items[guFocusIdx];
+    var done = guRoutineItemDoneToday(r.id, it.id);
+    var pct = Math.round(guFocusIdx / items.length * 100);
+    return '<div class="card gu-focus-card">' +
+      '<div class="gu-focus-progress"><div class="balance-track"><div class="balance-fill" style="width:' + pct + '%;background:var(--accent);"></div></div><span class="page-sub">' + (guFocusIdx + 1) + ' / ' + items.length + '</span></div>' +
+      '<div class="gu-focus-title">' + escapeAttr(it.title) + '</div>' +
+      (it.durationMin ? '<div class="gu-focus-duration num" dir="ltr">⏱ ' + it.durationMin + ' דק׳</div>' : '') +
+      '<div class="modal-actions" style="margin-top:20px;">' +
+        '<button class="btn btn-primary btn-block" id="gu-focus-done-btn">' + icon('check') + (done ? 'הושלם - הבא' : 'בוצע - הבא') + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-focus-skip">דלג</button>' +
+        '<button class="btn btn-ghost" id="gu-focus-exit">' + icon('x') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* ================= Glow Up: journal tab ================= */
+  var guJournalSearch = '';
+  function guJournalEntryHtml(e) {
+    return '<div class="card gu-journal-card">' +
+      '<div class="gu-card-head"><h3>' + (e.type === 'weekly' ? 'סיכום שבועי' : 'יומן') + ' · <span class="num" dir="ltr">' + e.date + '</span></h3><button class="btn-icon" data-gu-journal-del="' + e.id + '">' + icon('trash') + '</button></div>' +
+      (e.tried ? '<div class="gu-detail-block"><b>מה ניסיתי</b><p>' + escapeAttr(e.tried) + '</p></div>' : '') +
+      (e.worked ? '<div class="gu-detail-block"><b>מה עבד</b><p>' + escapeAttr(e.worked) + '</p></div>' : '') +
+      (e.didntWork ? '<div class="gu-detail-block"><b>מה לא עבד</b><p>' + escapeAttr(e.didntWork) + '</p></div>' : '') +
+      (e.tipsApplied ? '<div class="gu-detail-block"><b>טיפים שיישמתי</b><p>' + escapeAttr(e.tipsApplied) + '</p></div>' : '') +
+      (e.improve ? '<div class="gu-detail-block"><b>מה לשפר</b><p>' + escapeAttr(e.improve) + '</p></div>' : '') +
+      (e.goalsNextWeek ? '<div class="gu-detail-block"><b>מטרות לשבוע הבא</b><p>' + escapeAttr(e.goalsNextWeek) + '</p></div>' : '') +
+      (e.notes ? '<div class="gu-detail-block"><b>הערות</b><p>' + escapeAttr(e.notes) + '</p></div>' : '') +
+      '<button class="btn btn-ghost btn-sm" data-gu-journal-edit="' + e.id + '">' + icon('edit') + 'עריכה' + '</button>' +
+    '</div>';
+  }
+  function guJournalHtml() {
+    var list = state.glowUp.journal.filter(function (e) {
+      return guMatchesSearch(e, guJournalSearch, ['tried', 'worked', 'didntWork', 'notes', 'date']);
+    }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+    return '<div class="gu-toolbar">' +
+        '<input type="text" class="ach-search" id="gu-journal-search" placeholder="חיפוש ביומן (לפי תאריך או תוכן)..." value="' + escapeAttr(guJournalSearch) + '">' +
+        '<button class="btn btn-ghost btn-sm" id="gu-journal-add-daily">' + icon('plus') + 'רשומה יומית' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-journal-add-weekly">' + icon('plus') + 'סיכום שבועי' + '</button>' +
+      '</div>' +
+      (list.length ? list.map(guJournalEntryHtml).join('') : '<p class="empty-msg">היומן ריק. התחל ברשומה ראשונה.</p>');
+  }
+  function openGuJournalModal(existing, type) {
+    var isEdit = !!(existing && existing.id);
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    var t = isEdit ? existing.type : type;
+    wrap.innerHTML =
+      '<div class="modal gu-modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (t === 'weekly' ? 'סיכום שבועי' : 'רשומת יומן') + '</h3>' +
+        '<div class="field" style="margin-bottom:10px;"><label>תאריך</label><input type="date" id="gj-date" value="' + (existing ? existing.date : dkey(todayDate())) + '"></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>מה ניסיתי' + (t === 'weekly' ? ' השבוע' : ' היום') + '</label><textarea id="gj-tried">' + (existing ? escapeAttr(existing.tried || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>מה עבד</label><textarea id="gj-worked">' + (existing ? escapeAttr(existing.worked || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>מה לא עבד</label><textarea id="gj-didnt">' + (existing ? escapeAttr(existing.didntWork || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>אילו טיפים יישמתי</label><textarea id="gj-tips">' + (existing ? escapeAttr(existing.tipsApplied || '') : '') + '</textarea></div>' +
+        '<div class="field" style="margin-bottom:10px;"><label>מה אני רוצה לשפר</label><textarea id="gj-improve">' + (existing ? escapeAttr(existing.improve || '') : '') + '</textarea></div>' +
+        (t === 'weekly' ? '<div class="field" style="margin-bottom:10px;"><label>מטרות לשבוע הבא</label><textarea id="gj-goals">' + (existing ? escapeAttr(existing.goalsNextWeek || '') : '') + '</textarea></div>' : '') +
+        '<div class="field" style="margin-bottom:12px;"><label>הערות אישיות</label><textarea id="gj-notes">' + (existing ? escapeAttr(existing.notes || '') : '') + '</textarea></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="gj-save">' + icon('check') + 'שמור' + '</button>' +
+          '<button class="btn btn-ghost" id="gj-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gj-cancel').addEventListener('click', closeModal);
+    document.getElementById('gj-save').addEventListener('click', function () {
+      var data = {
+        type: t, date: document.getElementById('gj-date').value || dkey(todayDate()),
+        tried: document.getElementById('gj-tried').value.trim(),
+        worked: document.getElementById('gj-worked').value.trim(),
+        didntWork: document.getElementById('gj-didnt').value.trim(),
+        tipsApplied: document.getElementById('gj-tips').value.trim(),
+        improve: document.getElementById('gj-improve').value.trim(),
+        goalsNextWeek: t === 'weekly' ? document.getElementById('gj-goals').value.trim() : '',
+        notes: document.getElementById('gj-notes').value.trim()
+      };
+      if (isEdit) guUpdateJournalEntry(existing.id, data); else guCreateJournalEntry(data);
+      closeModal(); renderGuBody();
+      toast('נשמר ביומן');
+    });
+  }
+
+  /* ================= Glow Up: goals subview (reuses existing state.goals) ================= */
+  function guGoalsHtml() {
+    var guGoals = state.goals.filter(function (g) { return g.glowUp; });
+    return '<p class="page-sub" style="margin-bottom:14px;">מטרות Glow Up הן חלק ממערכת היעדים הקיימת שלך - הן מופיעות גם בעמוד "יעדים".</p>' +
+      '<button class="btn btn-primary btn-sm" id="gu-goal-add" style="margin-bottom:14px;">' + icon('plus') + 'מטרת Glow Up' + '</button>' +
+      (guGoals.length ? guGoals.map(goalCardHtml).join('') : '<p class="empty-msg">אין עדיין מטרות Glow Up. לדוגמה: "לבנות שגרת טיפוח עקבית".</p>') +
+      '<button class="btn btn-ghost btn-sm" data-gu-tab-jump-global="goals" style="margin-top:12px;">' + icon('flag') + 'פתח את כל היעדים' + '</button>';
+  }
+  function openGuGoalQuickModal() {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>מטרת Glow Up חדשה</h3>' +
+        '<div class="field" style="margin-bottom:12px;"><label>שם המטרה</label><input type="text" id="gg-title" maxlength="80" placeholder="למשל: לבנות שגרת טיפוח עקבית"></div>' +
+        '<div class="field" style="margin-bottom:14px;"><label>תאריך יעד (אופציונלי)</label><input type="date" id="gg-date"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="gg-save">' + icon('check') + 'צור' + '</button>' +
+          '<button class="btn btn-ghost" id="gg-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gg-cancel').addEventListener('click', closeModal);
+    document.getElementById('gg-title').focus();
+    document.getElementById('gg-save').addEventListener('click', function () {
+      var title = document.getElementById('gg-title').value.trim();
+      if (!title) { document.getElementById('gg-title').focus(); return; }
+      state.goals.push({ id: uid(), title: title, targetDate: document.getElementById('gg-date').value || null, milestones: [], manualProgress: 0, glowUp: true });
+      saveState(); closeModal(); renderGuBody();
+      toast('המטרה נוספה');
+    });
+  }
+
+  /* ================= Glow Up: progress tab ================= */
+  var guProgressRange = 7;
+  function guStatsForRange(days) {
+    var cutoff = days === 'all' ? null : (function () { var d = todayDate(); d.setDate(d.getDate() - (days - 1)); return d; })();
+    var inRange = function (k) { return !cutoff || new Date(k + 'T00:00:00') >= cutoff; };
+    var exercisesDone = 0, tipsUseful = 0, videosWatched = 0, videosApplied = 0, routinesCompletedDays = 0;
+    state.glowUp.exercises.forEach(function (e) { (e.completionLog || []).forEach(function (l) { if (inRange(l.date)) exercisesDone++; }); });
+    tipsUseful = state.glowUp.tips.filter(function (t) { return t.status === 'useful'; }).length;
+    videosWatched = state.glowUp.videos.filter(function (v) { return v.watchStatus !== 'not_watched'; }).length;
+    videosApplied = state.glowUp.videos.filter(function (v) { return v.watchStatus === 'applied'; }).length;
+    Object.keys(state.glowUp.streakLog).forEach(function (k) { if (inRange(k) && state.glowUp.streakLog[k]) routinesCompletedDays++; });
+    var catStreaks = {};
+    guCats().forEach(function (c) {
+      var exList = state.glowUp.exercises.filter(function (e) { return (e.categoryIds || []).indexOf(c.id) !== -1; });
+      var n = 0;
+      exList.forEach(function (e) { (e.completionLog || []).forEach(function (l) { if (inRange(l.date)) n++; }); });
+      if (n > 0) catStreaks[c.id] = n;
+    });
+    return { exercisesDone: exercisesDone, tipsUseful: tipsUseful, videosWatched: videosWatched, videosApplied: videosApplied, routinesCompletedDays: routinesCompletedDays, catStreaks: catStreaks };
+  }
+  function guProgressHtml() {
+    var ranges = [[7, '7 ימים'], [30, '30 ימים'], [90, '90 ימים'], ['all', 'כל הזמנים']];
+    var s = guStatsForRange(guProgressRange);
+    var topCats = Object.keys(s.catStreaks).sort(function (a, b) { return s.catStreaks[b] - s.catStreaks[a]; }).slice(0, 5);
+    return '<div class="range-tabs">' + ranges.map(function (r) { return '<button data-gu-prange="' + r[0] + '" class="' + (guProgressRange === r[0] ? 'active' : '') + '">' + r[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="stat-tile-grid">' +
+        '<div class="stat-tile"><div class="st-val num">' + guHabitsDoneToday() + '</div><div class="st-lbl">הרגלים הושלמו היום</div></div>' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + s.exercisesDone + '</div><div class="st-lbl">תרגילים שהושלמו</div></div>' +
+        '<div class="stat-tile"><div class="st-val num">' + state.glowUp.streakCurrent + '</div><div class="st-lbl">רצף ימים נוכחי</div></div>' +
+        '<div class="stat-tile"><div class="st-val num">' + state.glowUp.streakLongest + '</div><div class="st-lbl">שיא רצף</div></div>' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + s.tipsUseful + '</div><div class="st-lbl">טיפים שסומנו כשימושיים</div></div>' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + s.videosWatched + '</div><div class="st-lbl">סרטונים שנצפו</div></div>' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + s.videosApplied + '</div><div class="st-lbl">סרטונים שיושמו</div></div>' +
+        '<div class="stat-tile"><div class="st-val num" dir="ltr">' + s.routinesCompletedDays + '</div><div class="st-lbl">ימים עם שגרה שהושלמה</div></div>' +
+      '</div>' +
+      '<div class="card"><h3 style="margin-bottom:10px;">קטגוריות שבהן אני מתמיד</h3>' +
+        (topCats.length ? topCats.map(function (cid) {
+          var c = guCat(cid); if (!c) return '';
+          var pct = Math.round(s.catStreaks[cid] / Math.max.apply(null, topCats.map(function (k) { return s.catStreaks[k]; })) * 100);
+          return '<div class="cat-bar-row"><span class="cb-label">' + c.emoji + ' ' + escapeAttr(c.name) + '</span><div class="cat-bar-track"><div class="cat-bar-fill" data-fill-pct="' + pct + '" style="background:' + c.color + ';"></div></div><span class="cb-num num">' + s.catStreaks[cid] + '</span></div>';
+        }).join('') : '<p class="page-sub">אין עדיין נתוני התמדה בקטגוריות.</p>') +
+      '</div>' +
+      '<p class="page-sub" style="margin-top:12px;">הנתונים האלה מבוססים רק על ביצוע ההרגלים שלך בפועל - לא על שינוי במראה או תוצאות חיצוניות שאינן תחת שליטתך.</p>';
+  }
+
+  /* ================= Glow Up: categories manager ================= */
+  function guCategoriesHtml() {
+    var cats = state.glowUp.categories.slice().sort(function (a, b) { return a.order - b.order; });
+    return '<div class="gu-card-head" style="margin-bottom:12px;"><h3 style="font-size:15px;">קטגוריות</h3><button class="btn btn-primary btn-sm" id="gu-cat-add">' + icon('plus') + 'קטגוריה' + '</button></div>' +
+      '<div class="gu-cat-manage-list">' + cats.map(function (c, i) {
+        var n = guItemsForCat(c.id);
+        var pct = guCatProgress(c.id);
+        return '<div class="card gu-cat-manage-row' + (c.hidden ? ' gu-cat-hidden' : '') + '" data-gu-cat-id="' + c.id + '">' +
+          '<span class="gu-cat-emoji" style="background:' + c.color + '33;">' + c.emoji + '</span>' +
+          '<div class="gu-cat-manage-info"><div class="gu-cat-manage-name">' + escapeAttr(c.name) + '</div>' +
+            (c.desc ? '<div class="page-sub">' + escapeAttr(c.desc) + '</div>' : '') +
+            '<div class="page-sub">' + n + ' פריטים' + (pct !== null ? ' · ' + pct + '% היום' : '') + '</div></div>' +
+          '<div class="gu-cat-manage-actions">' +
+            '<button class="btn-icon" data-gu-cat-up="' + i + '" title="הזז למעלה">↑</button>' +
+            '<button class="btn-icon" data-gu-cat-down="' + i + '" title="הזז למטה">↓</button>' +
+            '<button class="btn-icon" data-gu-cat-edit="' + c.id + '" title="עריכה">' + icon('edit') + '</button>' +
+            '<button class="btn-icon" data-gu-cat-hide="' + c.id + '" title="' + (c.hidden ? 'הצג' : 'הסתר') + '">' + (c.hidden ? icon('play') : icon('pause')) + '</button>' +
+            '<button class="btn-icon" data-gu-cat-del="' + c.id + '" title="מחיקה">' + icon('trash') + '</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+  }
+  function openGuCategoryModal(existing) {
+    var isEdit = !!(existing && existing.id);
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (isEdit ? 'עריכת קטגוריה' : 'קטגוריה חדשה') + '</h3>' +
+        '<div class="field" style="margin-bottom:10px;"><label>שם</label><input type="text" id="gcat-name" maxlength="40" value="' + (existing ? escapeAttr(existing.name) : '') + '"></div>' +
+        '<div class="field-row" style="margin-bottom:10px;">' +
+          '<div class="field"><label>אייקון (אמוג׳י)</label><input type="text" id="gcat-emoji" maxlength="4" value="' + (existing ? existing.emoji : '✨') + '"></div>' +
+          '<div class="field"><label>צבע</label><input type="color" id="gcat-color" value="' + (existing ? existing.color : '#45d6c8') + '"></div>' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:12px;"><label>תיאור</label><input type="text" id="gcat-desc" value="' + (existing ? escapeAttr(existing.desc || '') : '') + '"></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="gcat-save">' + icon('check') + 'שמור' + '</button>' +
+          '<button class="btn btn-ghost" id="gcat-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gcat-cancel').addEventListener('click', closeModal);
+    document.getElementById('gcat-name').focus();
+    document.getElementById('gcat-save').addEventListener('click', function () {
+      var name = document.getElementById('gcat-name').value.trim();
+      if (!name) { document.getElementById('gcat-name').focus(); return; }
+      var data = { name: name, emoji: document.getElementById('gcat-emoji').value.trim() || '✨', color: document.getElementById('gcat-color').value, desc: document.getElementById('gcat-desc').value.trim() };
+      if (isEdit) Object.assign(existing, data);
+      else state.glowUp.categories.push(Object.assign({ id: uid(), order: state.glowUp.categories.length, hidden: false, archived: false }, data));
+      saveState(); closeModal(); renderGuBody();
+      toast(isEdit ? 'הקטגוריה עודכנה' : 'הקטגוריה נוספה');
+    });
+  }
+
+  /* ================= Glow Up: settings / data tab ================= */
+  function guSettingsHtml() {
+    var notifSupported = 'Notification' in window;
+    return '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:4px;">תזכורות ועדכונים</h3>' +
+        '<p class="page-sub" style="margin-bottom:12px;">התזכורות פועלות בתוך האפליקציה. ' + (notifSupported ? 'אפשר גם להפעיל התראות דפדפן (Web Notifications).' : 'הדפדפן הזה לא תומך בהתראות דפדפן - התזכורות יעבדו בתוך האפליקציה בלבד.') + '</p>' +
+        (notifSupported ? '<div class="settings-row" style="border:none;padding:0;"><div><div class="lbl">התראות דפדפן</div><div class="desc">בקשת הרשאה תתבצע רק עם ההפעלה</div></div>' +
+          '<label class="switch"><input type="checkbox" id="gu-set-webnotif"' + (state.glowUp.settings.webNotificationsEnabled ? ' checked' : '') + '><span></span></label></div>' : '') +
+      '</div>' +
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:4px;">תזכורות קרובות</h3>' +
+        '<button class="btn btn-ghost btn-sm" id="gu-reminder-add" style="margin:8px 0 12px;">' + icon('plus') + 'תזכורת' + '</button>' +
+        (guUpcomingReminders().length ? guUpcomingReminders().map(guReminderRowHtml).join('') : '<p class="empty-msg">אין תזכורות פעילות.</p>') +
+      '</div>' +
+      '<div class="card">' +
+        '<h3 style="margin-bottom:4px;">גיבוי וייבוא נתוני Glow Up</h3>' +
+        '<p class="page-sub" style="margin-bottom:12px;">הנתונים נשמרים באותו מקום כמו שאר האפליקציה (localStorage במכשיר הזה). אפשר גם לייצא קובץ גיבוי נפרד ל-Glow Up בלבד.</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn btn-ghost btn-sm" id="gu-export-json">' + icon('download') + 'ייצוא לקובץ JSON' + '</button>' +
+          '<label class="btn btn-ghost btn-sm" style="cursor:pointer;">' + icon('upload') + 'ייבוא מקובץ<input type="file" accept=".json" id="gu-import-json" style="display:none;"></label>' +
+        '</div>' +
+      '</div>';
+  }
+  function guReminderRowHtml(r) {
+    var freqLabel = { once: 'חד-פעמי', daily: 'יומי', weekly_days: 'ימים נבחרים', weekly: 'שבועי' }[r.frequency] || r.frequency;
+    return '<div class="gu-reminder-row">' +
+      '<div class="gu-reminder-info"><b>' + escapeAttr(r.title || 'תזכורת') + '</b><span class="page-sub">' + (r.time || '') + ' · ' + freqLabel + '</span></div>' +
+      '<div class="gu-reminder-actions">' +
+        '<button class="btn-icon" data-gu-rem-snooze="' + r.id + '" title="דחה שעה">' + icon('pause') + '</button>' +
+        '<button class="btn-icon" data-gu-rem-edit="' + r.id + '" title="עריכה">' + icon('edit') + '</button>' +
+        '<button class="btn-icon" data-gu-rem-del="' + r.id + '" title="מחיקה">' + icon('trash') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+  function openGuReminderModal(existing) {
+    var isEdit = !!(existing && existing.id);
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    var days = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+    wrap.innerHTML =
+      '<div class="modal gu-modal" role="dialog" aria-modal="true">' +
+        '<h3>' + (isEdit ? 'עריכת תזכורת' : 'תזכורת חדשה') + '</h3>' +
+        '<div class="field" style="margin-bottom:10px;"><label>הודעת התזכורת</label><input type="text" id="grm-title" maxlength="80" value="' + (existing ? escapeAttr(existing.title) : '') + '" placeholder="למשל: לבדוק את הטיפים ששמרתי"></div>' +
+        '<div class="field-row" style="margin-bottom:10px;">' +
+          '<div class="field"><label>שעה</label><input type="time" id="grm-time" value="' + (existing ? existing.time : '09:00') + '"></div>' +
+          '<div class="field"><label>תדירות</label><select id="grm-freq"><option value="once"' + (existing && existing.frequency === 'once' ? ' selected' : '') + '>חד-פעמית</option><option value="daily"' + (existing && existing.frequency === 'daily' ? ' selected' : '') + '>יומית</option><option value="weekly_days"' + (existing && existing.frequency === 'weekly_days' ? ' selected' : '') + '>ימים נבחרים</option><option value="weekly"' + (existing && existing.frequency === 'weekly' ? ' selected' : '') + '>שבועית</option></select></div>' +
+        '</div>' +
+        '<div class="field" id="grm-date-field" style="margin-bottom:10px;"><label>תאריך (לחד-פעמית)</label><input type="date" id="grm-date" value="' + (existing ? (existing.date || '') : dkey(todayDate())) + '"></div>' +
+        '<div class="field" id="grm-days-field" style="margin-bottom:10px;"><label>ימים</label><div class="cat-grid" style="grid-template-columns:repeat(7,1fr);">' + days.map(function (d, i) { return '<button type="button" class="cat-opt' + (existing && (existing.days || []).indexOf(i) !== -1 ? ' active' : '') + '" data-grm-day="' + i + '">' + d + '</button>'; }).join('') + '</div></div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-primary btn-block" id="grm-save">' + icon('check') + 'שמור' + '</button>' +
+          (isEdit ? '<button class="btn btn-danger" id="grm-del">' + icon('trash') + '</button>' : '') +
+          '<button class="btn btn-ghost" id="grm-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('grm-cancel').addEventListener('click', closeModal);
+    document.getElementById('grm-title').focus();
+    var selectedDays = existing ? (existing.days || []).slice() : [];
+    Array.prototype.forEach.call(wrap.querySelectorAll('[data-grm-day]'), function (b) {
+      b.addEventListener('click', function () {
+        var d = +b.dataset.grmDay;
+        var idx = selectedDays.indexOf(d);
+        if (idx === -1) { selectedDays.push(d); b.classList.add('active'); } else { selectedDays.splice(idx, 1); b.classList.remove('active'); }
+      });
+    });
+    if (isEdit) document.getElementById('grm-del').addEventListener('click', function () {
+      closeModal(); guDeleteReminder(existing.id); renderGuBody(); toast('התזכורת נמחקה');
+    });
+    document.getElementById('grm-save').addEventListener('click', function () {
+      var title = document.getElementById('grm-title').value.trim();
+      if (!title) { document.getElementById('grm-title').focus(); return; }
+      var data = { title: title, time: document.getElementById('grm-time').value || '09:00', frequency: document.getElementById('grm-freq').value, date: document.getElementById('grm-date').value || null, days: selectedDays.slice(), active: true };
+      if (isEdit) guUpdateReminder(existing.id, data); else guCreateReminder(data);
+      closeModal(); renderGuBody();
+      toast(isEdit ? 'התזכורת עודכנה' : 'התזכורת נוספה');
+    });
+  }
+
+  /* ================= Glow Up: quick-add & goal-card wiring helpers ================= */
+  function openGuQuickAddModal() {
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>הוספה מהירה</h3>' +
+        '<div class="modal-actions" style="flex-direction:column;">' +
+          '<button class="btn btn-primary btn-block" id="gqa-ex">' + icon('plus') + 'תרגיל חדש' + '</button>' +
+          '<button class="btn btn-primary btn-block" id="gqa-tip">' + icon('plus') + 'טיפ חדש' + '</button>' +
+          '<button class="btn btn-primary btn-block" id="gqa-video">' + icon('plus') + 'סרטון חדש' + '</button>' +
+          '<button class="btn btn-ghost" id="gqa-cancel">' + icon('x') + '</button>' +
+        '</div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('gqa-cancel').addEventListener('click', closeModal);
+    document.getElementById('gqa-ex').addEventListener('click', function () { closeModal(); openGuExerciseModal(null); });
+    document.getElementById('gqa-tip').addEventListener('click', function () { closeModal(); openGuTipModal(null); });
+    document.getElementById('gqa-video').addEventListener('click', function () { closeModal(); openGuVideoModal(null); });
+  }
+  function wireGoalCardsIn(root, rerenderFn) {
+    Array.prototype.forEach.call(root.querySelectorAll('[data-goal-del]'), function (b) {
+      b.addEventListener('click', function () {
+        openConfirmModal('למחוק את היעד הזה?', function () {
+          state.goals = state.goals.filter(function (g) { return g.id !== b.dataset.goalDel; });
+          saveState(); rerenderFn();
+        });
+      });
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('[data-ms-toggle]'), function (b) {
+      b.addEventListener('click', function () {
+        var parts = b.dataset.msToggle.split('|');
+        var g = state.goals.find(function (x) { return x.id === parts[0]; });
+        var m = g && g.milestones.find(function (x) { return x.id === parts[1]; });
+        if (m) m.done = !m.done;
+        saveState(); rerenderFn();
+      });
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('[data-ms-del]'), function (b) {
+      b.addEventListener('click', function () {
+        var parts = b.dataset.msDel.split('|');
+        var g = state.goals.find(function (x) { return x.id === parts[0]; });
+        if (g) g.milestones = g.milestones.filter(function (x) { return x.id !== parts[1]; });
+        saveState(); rerenderFn();
+      });
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('[data-ms-add]'), function (b) {
+      b.addEventListener('click', function () {
+        var input = root.querySelector('[data-ms-input="' + b.dataset.msAdd + '"]');
+        var title = input.value.trim();
+        if (!title) return;
+        var g = state.goals.find(function (x) { return x.id === b.dataset.msAdd; });
+        if (g) g.milestones.push({ id: uid(), title: title, done: false });
+        saveState(); rerenderFn();
+      });
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('[data-ms-input]'), function (inp) {
+      inp.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        root.querySelector('[data-ms-add="' + inp.dataset.msInput + '"]').click();
+      });
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('[data-manual-progress]'), function (rng) {
+      rng.addEventListener('input', function () {
+        var g = state.goals.find(function (x) { return x.id === rng.dataset.manualProgress; });
+        if (g) g.manualProgress = +rng.value;
+        var row = rng.closest('.goal-card');
+        row.querySelector('.balance-fill').style.width = rng.value + '%';
+        row.querySelector('.goal-progress-row .num').textContent = rng.value + '%';
+      });
+      rng.addEventListener('change', function () { saveState(); });
+    });
+  }
+
+  /* ================= Glow Up: export / import ================= */
+  function guExportJson() {
+    var payload = { exportedAt: new Date().toISOString(), app: 'מסלול - Glow Up', data: state.glowUp };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'glowup-backup-' + dkey(todayDate()) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    toast('קובץ הגיבוי ירד');
+  }
+  function guImportJsonFile(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var parsed;
+      try { parsed = JSON.parse(reader.result); } catch (e) { toast('קובץ לא תקין'); return; }
+      var data = parsed && parsed.data ? parsed.data : parsed;
+      var validKeys = ['categories', 'exercises', 'tips', 'videos', 'reminders', 'routines', 'journal'];
+      var looksValid = data && typeof data === 'object' && validKeys.some(function (k) { return Array.isArray(data[k]); });
+      if (!looksValid) { toast('קובץ לא מוכר - ייבוא בוטל'); return; }
+      openConfirmModal('נמצא קובץ גיבוי של Glow Up. למזג עם הנתונים הקיימים, או להחליף אותם לגמרי?', function () {
+        guMergeImport(data);
+      }, { title: 'ייבוא נתוני Glow Up', confirmLabel: 'מיזוג (מומלץ)' });
+    };
+    reader.readAsText(file);
+  }
+  function guMergeImport(data) {
+    ['exercises', 'tips', 'videos', 'reminders', 'routines', 'journal', 'collections'].forEach(function (k) {
+      if (Array.isArray(data[k])) {
+        var existingIds = state.glowUp[k].map(function (x) { return x.id; });
+        data[k].forEach(function (item) { if (existingIds.indexOf(item.id) === -1) state.glowUp[k].push(item); });
+      }
+    });
+    if (Array.isArray(data.categories)) {
+      var existingCatIds = state.glowUp.categories.map(function (c) { return c.id; });
+      data.categories.forEach(function (c) { if (existingCatIds.indexOf(c.id) === -1) state.glowUp.categories.push(c); });
+    }
+    saveState(); renderGuBody();
+    toast('הנתונים מוזגו בהצלחה');
+  }
+
+  /* ================= Glow Up: master wiring ================= */
+  function wireGuBody(el) {
+    if (guTab === 'home') wireGuHome(el);
+    else if (guTab === 'exercises') wireGuExercises(el);
+    else if (guTab === 'tips') wireGuTips(el);
+    else if (guTab === 'videos') wireGuVideos(el);
+    else if (guTab === 'routines') wireGuRoutines(el);
+    else if (guTab === 'goals') wireGuGoals(el);
+    else if (guTab === 'journal') wireGuJournal(el);
+    else if (guTab === 'progress') wireGuProgress(el);
+    else if (guTab === 'categories') wireGuCategories(el);
+    else if (guTab === 'settings') wireGuSettings(el);
+  }
+  function guJumpTab(tabId) { guTab = tabId; renderGlowUp(); }
+  function wireGuHome(el) {
+    var startBtn = document.getElementById('gu-qa-start-routine');
+    if (startBtn) startBtn.addEventListener('click', function () {
+      var r = state.glowUp.routines.filter(function (x) { return !x.paused && x.items.length; })[0];
+      if (!r) { toast('אין עדיין שגרה פעילה - צור שגרה ראשונה'); guJumpTab('routines'); return; }
+      guFocusRoutineId = r.id; guFocusIdx = 0; guJumpTab('routines');
+    });
+    var markBtn = document.getElementById('gu-qa-mark-habit');
+    if (markBtn) markBtn.addEventListener('click', function () {
+      var plan = guTodaysPlanItems().filter(function (p) { return !p.done; })[0];
+      if (!plan) { toast('כל הכבוד, כל הפריטים של היום הושלמו!'); return; }
+      guToggleRoutineItem(plan.routineId, plan.item.id, markBtn);
+      renderGuBody(); renderDashboard();
+      toast('סומן כהושלם: ' + plan.item.title);
+    });
+    var openVidBtn = document.getElementById('gu-qa-open-video');
+    if (openVidBtn) openVidBtn.addEventListener('click', function () {
+      var v = guActiveVideos().filter(function (x) { return x.watchStatus === 'not_watched'; }).sort(function (a, b) { return b.savedAt - a.savedAt; })[0];
+      if (!v) { toast('אין סרטונים שלא נצפו'); return; }
+      window.open(v.url, '_blank', 'noopener');
+    });
+    var quickAddBtn = document.getElementById('gu-qa-quick-add');
+    if (quickAddBtn) quickAddBtn.addEventListener('click', openGuQuickAddModal);
+    var weeklyBtn = document.getElementById('gu-open-weekly');
+    if (weeklyBtn) weeklyBtn.addEventListener('click', function () { guJumpTab('routines'); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-plan-toggle]'), function (b) {
+      b.addEventListener('click', function () {
+        var parts = b.dataset.guPlanToggle.split('|');
+        guToggleRoutineItem(parts[0], parts[1], b);
+        renderGuBody(); renderDashboard();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-tab-jump]'), function (b) {
+      b.addEventListener('click', function () { guJumpTab(b.dataset.guTabJump); });
+    });
+    var addEx = document.getElementById('gu-add-exercise-home'); if (addEx) addEx.addEventListener('click', function () { openGuExerciseModal(null); });
+    var addTip = document.getElementById('gu-add-tip-home'); if (addTip) addTip.addEventListener('click', function () { openGuTipModal(null); });
+    var addVid = document.getElementById('gu-add-video-home'); if (addVid) addVid.addEventListener('click', function () { openGuVideoModal(null); });
+  }
+  function wireGuExercises(el) {
+    var search = document.getElementById('gu-ex-search');
+    if (search) search.addEventListener('input', function () { guExSearch = search.value; renderGuBody(); setTimeout(function () { var i = document.getElementById('gu-ex-search'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 0); });
+    var sort = document.getElementById('gu-ex-sort');
+    if (sort) sort.addEventListener('change', function () { guExSort = sort.value; renderGuBody(); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-ex-view]'), function (b) { b.addEventListener('click', function () { guExView = b.dataset.guExView; renderGuBody(); }); });
+    var addBtn = document.getElementById('gu-ex-add'); if (addBtn) addBtn.addEventListener('click', function () { openGuExerciseModal(null); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-ex-cat]'), function (b) { b.addEventListener('click', function () { guExCatFilter = b.dataset.guExCat; renderGuBody(); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-ex-open]'), function (card) { card.addEventListener('click', function () { openGuExerciseDetail(card.dataset.guExOpen); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-ex-fav]'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); var ex = state.glowUp.exercises.find(function (x) { return x.id === b.dataset.guExFav; }); if (ex) guUpdateExercise(ex.id, { favorite: !ex.favorite }); renderGuBody(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-ex-done]'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); guMarkExerciseDone(b.dataset.guExDone, b); renderGuBody(); renderDashboard(); toast('בוצע!'); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-ex-task]'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); var t = guAddExerciseAsTask(b.dataset.guExTask); toast(t ? 'נוסף ללוח היומי' : 'כבר קיים בלוח היום'); });
+    });
+  }
+  function wireGuTips(el) {
+    var search = document.getElementById('gu-tip-search');
+    if (search) search.addEventListener('input', function () { guTipSearch = search.value; renderGuBody(); setTimeout(function () { var i = document.getElementById('gu-tip-search'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 0); });
+    var statusFilter = document.getElementById('gu-tip-status-filter');
+    if (statusFilter) statusFilter.addEventListener('change', function () { guTipStatusFilter = statusFilter.value; renderGuBody(); });
+    var addBtn = document.getElementById('gu-tip-add'); if (addBtn) addBtn.addEventListener('click', function () { openGuTipModal(null); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-tip-cat]'), function (b) { b.addEventListener('click', function () { guTipCatFilter = b.dataset.guTipCat; renderGuBody(); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-tip-open]'), function (card) { card.addEventListener('click', function () { var t = state.glowUp.tips.find(function (x) { return x.id === card.dataset.guTipOpen; }); openGuTipModal(t); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-tip-fav]'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); var t = state.glowUp.tips.find(function (x) { return x.id === b.dataset.guTipFav; }); if (t) guUpdateTip(t.id, { favorite: !t.favorite }); renderGuBody(); });
+    });
+  }
+  function wireGuVideos(el) {
+    var search = document.getElementById('gu-video-search');
+    if (search) search.addEventListener('input', function () { guVideoSearch = search.value; renderGuBody(); setTimeout(function () { var i = document.getElementById('gu-video-search'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 0); });
+    var platformFilter = document.getElementById('gu-video-platform-filter');
+    if (platformFilter) platformFilter.addEventListener('change', function () { guVideoPlatformFilter = platformFilter.value; renderGuBody(); });
+    var addBtn = document.getElementById('gu-video-add'); if (addBtn) addBtn.addEventListener('click', function () { openGuVideoModal(null); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-video-filter]'), function (b) { b.addEventListener('click', function () { guVideoFilter = b.dataset.guVideoFilter; renderGuBody(); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-video-fav]'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); var v = state.glowUp.videos.find(function (x) { return x.id === b.dataset.guVideoFav; }); if (v) guUpdateVideo(v.id, { favorite: !v.favorite }); renderGuBody(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-video-open]'), function (b) {
+      b.addEventListener('click', function () { var v = state.glowUp.videos.find(function (x) { return x.id === b.dataset.guVideoOpen; }); openGuVideoModal(v); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-video-link]'), function (b) {
+      b.addEventListener('click', function () { var v = state.glowUp.videos.find(function (x) { return x.id === b.dataset.guVideoLink; }); if (v) window.open(v.url, '_blank', 'noopener'); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-video-watched]'), function (b) {
+      b.addEventListener('click', function () { guUpdateVideo(b.dataset.guVideoWatched, { watchStatus: 'watched' }); renderGuBody(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-video-applied]'), function (b) {
+      b.addEventListener('click', function () { guUpdateVideo(b.dataset.guVideoApplied, { watchStatus: 'applied' }); renderGuBody(); toast('יישמת את הסרטון - כל הכבוד!'); });
+    });
+  }
+  function wireGuRoutines(el) {
+    var addBtn = document.getElementById('gu-routine-add');
+    if (addBtn) addBtn.addEventListener('click', openGuRoutineNameModal);
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-dup]'), function (b) { b.addEventListener('click', function () { guDuplicateRoutine(b.dataset.guRoutineDup); renderGuBody(); toast('השגרה שוכפלה'); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-del]'), function (b) {
+      b.addEventListener('click', function () {
+        openConfirmModal('למחוק את השגרה? הפעולה בלתי הפיכה.', function () { guDeleteRoutine(b.dataset.guRoutineDel); renderGuBody(); toast('נמחק'); }, { title: 'מחיקת שגרה', confirmLabel: 'מחק' });
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-item-toggle]'), function (b) {
+      b.addEventListener('click', function () { var p = b.dataset.guRoutineItemToggle.split('|'); guToggleRoutineItem(p[0], p[1], b); renderGuBody(); renderDashboard(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-item-del]'), function (b) {
+      b.addEventListener('click', function () { var p = b.dataset.guRoutineItemDel.split('|'); guDeleteRoutineItem(p[0], p[1]); renderGuBody(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-item-add]'), function (b) {
+      b.addEventListener('click', function () {
+        var input = el.querySelector('[data-gu-routine-item-input="' + b.dataset.guRoutineItemAdd + '"]');
+        var title = input.value.trim();
+        if (!title) return;
+        guAddRoutineItem(b.dataset.guRoutineItemAdd, { title: title });
+        renderGuBody();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-item-input]'), function (inp) {
+      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); el.querySelector('[data-gu-routine-item-add="' + inp.dataset.guRoutineItemInput + '"]').click(); } });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-focus]'), function (b) {
+      b.addEventListener('click', function () { guFocusRoutineId = b.dataset.guRoutineFocus; guFocusIdx = 0; renderGuBody(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-routine-pause]'), function (b) {
+      b.addEventListener('click', function () { var r = state.glowUp.routines.find(function (x) { return x.id === b.dataset.guRoutinePause; }); if (r) guUpdateRoutine(r.id, { paused: !r.paused }); renderGuBody(); });
+    });
+    var focusDoneBtn = document.getElementById('gu-focus-done-btn');
+    if (focusDoneBtn) focusDoneBtn.addEventListener('click', function () {
+      var r = state.glowUp.routines.find(function (x) { return x.id === guFocusRoutineId; });
+      var items = r.items.slice().sort(function (a, b) { return a.order - b.order; });
+      var it = items[guFocusIdx];
+      if (it && !guRoutineItemDoneToday(r.id, it.id)) guToggleRoutineItem(r.id, it.id, focusDoneBtn);
+      guFocusIdx++; renderGuBody(); renderDashboard();
+    });
+    var focusSkip = document.getElementById('gu-focus-skip');
+    if (focusSkip) focusSkip.addEventListener('click', function () { guFocusIdx++; renderGuBody(); });
+    Array.prototype.forEach.call(el.querySelectorAll('#gu-focus-exit'), function (b) { b.addEventListener('click', function () { guFocusRoutineId = null; guFocusIdx = 0; renderGuBody(); }); });
+  }
+  function wireGuGoals(el) {
+    var addBtn = document.getElementById('gu-goal-add'); if (addBtn) addBtn.addEventListener('click', openGuGoalQuickModal);
+    var jump = el.querySelector('[data-gu-tab-jump-global]'); if (jump) jump.addEventListener('click', function () { showPanel('goals'); });
+    wireGoalCardsIn(el, renderGuBody);
+  }
+  function wireGuJournal(el) {
+    var search = document.getElementById('gu-journal-search');
+    if (search) search.addEventListener('input', function () { guJournalSearch = search.value; renderGuBody(); setTimeout(function () { var i = document.getElementById('gu-journal-search'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 0); });
+    var addDaily = document.getElementById('gu-journal-add-daily'); if (addDaily) addDaily.addEventListener('click', function () { openGuJournalModal(null, 'daily'); });
+    var addWeekly = document.getElementById('gu-journal-add-weekly'); if (addWeekly) addWeekly.addEventListener('click', function () { openGuJournalModal(null, 'weekly'); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-journal-del]'), function (b) {
+      b.addEventListener('click', function () { openConfirmModal('למחוק את הרשומה הזו?', function () { guDeleteJournalEntry(b.dataset.guJournalDel); renderGuBody(); toast('נמחק'); }, { title: 'מחיקת רשומה', confirmLabel: 'מחק' }); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-journal-edit]'), function (b) {
+      b.addEventListener('click', function () { var entry = state.glowUp.journal.find(function (x) { return x.id === b.dataset.guJournalEdit; }); openGuJournalModal(entry); });
+    });
+  }
+  function wireGuProgress(el) {
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-prange]'), function (b) {
+      b.addEventListener('click', function () { var v = b.dataset.guPrange; guProgressRange = v === 'all' ? 'all' : +v; renderGuBody(); });
+    });
+  }
+  function wireGuCategories(el) {
+    var addBtn = document.getElementById('gu-cat-add'); if (addBtn) addBtn.addEventListener('click', function () { openGuCategoryModal(null); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-cat-edit]'), function (b) { b.addEventListener('click', function () { openGuCategoryModal(guCat(b.dataset.guCatEdit)); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-cat-hide]'), function (b) {
+      b.addEventListener('click', function () { var c = guCat(b.dataset.guCatHide); if (c) { c.hidden = !c.hidden; saveState(); } renderGuBody(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-cat-del]'), function (b) {
+      b.addEventListener('click', function () {
+        openConfirmModal('למחוק את הקטגוריה? פריטים משויכים לא יימחקו, רק השיוך יוסר.', function () {
+          var id = b.dataset.guCatDel;
+          state.glowUp.categories = state.glowUp.categories.filter(function (c) { return c.id !== id; });
+          state.glowUp.exercises.forEach(function (e) { e.categoryIds = (e.categoryIds || []).filter(function (c) { return c !== id; }); });
+          state.glowUp.tips.forEach(function (t) { t.categoryIds = (t.categoryIds || []).filter(function (c) { return c !== id; }); });
+          state.glowUp.videos.forEach(function (v) { v.categoryIds = (v.categoryIds || []).filter(function (c) { return c !== id; }); });
+          saveState(); renderGuBody(); toast('הקטגוריה נמחקה');
+        }, { title: 'מחיקת קטגוריה', confirmLabel: 'מחק' });
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-cat-up]'), function (b) {
+      b.addEventListener('click', function () {
+        var cats = state.glowUp.categories.slice().sort(function (a, b2) { return a.order - b2.order; });
+        var i = +b.dataset.guCatUp; if (i <= 0) return;
+        var tmp = cats[i].order; cats[i].order = cats[i - 1].order; cats[i - 1].order = tmp;
+        saveState(); renderGuBody();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-cat-down]'), function (b) {
+      b.addEventListener('click', function () {
+        var cats = state.glowUp.categories.slice().sort(function (a, b2) { return a.order - b2.order; });
+        var i = +b.dataset.guCatDown; if (i >= cats.length - 1) return;
+        var tmp = cats[i].order; cats[i].order = cats[i + 1].order; cats[i + 1].order = tmp;
+        saveState(); renderGuBody();
+      });
+    });
+  }
+  function wireGuSettings(el) {
+    var webNotif = document.getElementById('gu-set-webnotif');
+    if (webNotif) webNotif.addEventListener('change', function () {
+      if (webNotif.checked) {
+        Notification.requestPermission().then(function (perm) {
+          state.glowUp.settings.notifPermissionAsked = true;
+          state.glowUp.settings.webNotificationsEnabled = perm === 'granted';
+          saveState(); renderGuBody();
+          if (perm !== 'granted') toast('ההרשאה לא אושרה - התזכורות ימשיכו לפעול בתוך האפליקציה');
+        });
+      } else { state.glowUp.settings.webNotificationsEnabled = false; saveState(); }
+    });
+    var addRem = document.getElementById('gu-reminder-add'); if (addRem) addRem.addEventListener('click', function () { openGuReminderModal(null); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-rem-edit]'), function (b) { b.addEventListener('click', function () { openGuReminderModal(state.glowUp.reminders.find(function (r) { return r.id === b.dataset.guRemEdit; })); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-rem-del]'), function (b) {
+      b.addEventListener('click', function () { openConfirmModal('למחוק את התזכורת?', function () { guDeleteReminder(b.dataset.guRemDel); renderGuBody(); }, { title: 'מחיקת תזכורת', confirmLabel: 'מחק' }); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-gu-rem-snooze]'), function (b) {
+      b.addEventListener('click', function () { guUpdateReminder(b.dataset.guRemSnooze, { snoozedUntil: Date.now() + 60 * 60 * 1000 }); toast('התזכורת נדחתה בשעה'); renderGuBody(); });
+    });
+    var exportBtn = document.getElementById('gu-export-json'); if (exportBtn) exportBtn.addEventListener('click', guExportJson);
+    var importInput = document.getElementById('gu-import-json');
+    if (importInput) importInput.addEventListener('change', function () { if (importInput.files && importInput.files[0]) guImportJsonFile(importInput.files[0]); importInput.value = ''; });
+  }
+
   /* ================= theme ================= */
   function applyTheme() {
     var root = document.documentElement;
@@ -2111,6 +3857,7 @@
     { id: 'habits', label: 'הרגלים', icon: 'flame', primary: true },
     { id: 'advisor', label: 'יועץ', icon: 'spark', primary: true },
     { id: 'progress', label: 'התקדמות', icon: 'trophy' },
+    { id: 'glowup', label: 'Glow Up', icon: 'glow' },
     { id: 'focus', label: 'פוקוס', icon: 'target' },
     { id: 'fitness', label: 'כושר', icon: 'dumbbell' },
     { id: 'goals', label: 'יעדים', icon: 'flag' },
@@ -2182,6 +3929,7 @@
     if (id === 'learning') renderLearning();
     if (id === 'settings') renderSettings();
     if (id === 'progress') renderProgress();
+    if (id === 'glowup') renderGlowUp();
     window.scrollTo(0, 0);
     var activeEl = document.getElementById('panel-' + id);
     activeEl.classList.remove('panel-enter');
@@ -2545,6 +4293,7 @@
     var wasAlreadyDone = t.done;
     t.done = newVal;
     t.completedAt = newVal ? Date.now() : null;
+    if (t.glowUpRef) guSyncTaskCompletion(t, newVal);
     saveState();
     if (newVal && !wasAlreadyDone) gamOnTaskCompleted(t);
   }
@@ -3961,6 +5710,8 @@
   applyTheme();
   renderNav();
   showPanel('dashboard');
+  guCheckReminders();
+  setInterval(guCheckReminders, 60000);
 
   var splashEl = document.getElementById('splash');
   if (splashEl) {
