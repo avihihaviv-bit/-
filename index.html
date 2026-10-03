@@ -868,6 +868,69 @@
   .lvl-reward-lv { font-size: 11px; color: var(--text-soft); font-weight: 700; margin-bottom: 2px; }
   .lvl-reward-xp { font-size: 12px; font-weight: 700; }
   .lvl-reward-chip.unlocked .lvl-reward-xp { color: var(--accent); }
+
+  /* ================= Upgrade Shop ================= */
+  .rarity-common { color: var(--text-faint); background: var(--surface-3); }
+  .rarity-rare { color: var(--cat-social); background: color-mix(in srgb, var(--cat-social) 22%, transparent); }
+  .rarity-epic { color: var(--cat-personal); background: color-mix(in srgb, var(--cat-personal) 22%, transparent); }
+  .rarity-legendary { color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 24%, transparent); }
+  .rarity-border-common { border-color: var(--border); }
+  .rarity-border-rare { border-color: color-mix(in srgb, var(--cat-social) 55%, var(--border)); }
+  .rarity-border-epic { border-color: color-mix(in srgb, var(--cat-personal) 55%, var(--border)); }
+  .rarity-border-legendary { border-color: color-mix(in srgb, var(--accent-2) 60%, var(--border)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-2) 30%, transparent); }
+  .shop-hero-card { background: linear-gradient(135deg, color-mix(in srgb, var(--glow-2) 14%, var(--surface-2)), color-mix(in srgb, var(--accent) 10%, var(--surface-2))); margin-bottom: 14px; }
+  .shop-hero-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+  @media (min-width: 640px) { .shop-hero-stats { grid-template-columns: repeat(5, 1fr); } }
+  .shop-hero-stat { background: var(--surface); border-radius: var(--radius-s); padding: 10px; text-align: center; }
+  .shop-hero-stat .v { font-size: 16px; font-weight: 800; }
+  .shop-hero-stat .l { font-size: 10px; color: var(--text-soft); margin-top: 2px; }
+  .shop-hero-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .shop-active-card { margin-bottom: 14px; }
+  .shop-mult-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--glow-2) 20%, transparent); color: var(--glow-2); }
+  .shop-active-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); }
+  .shop-active-row:first-of-type { border-top: none; }
+  .shop-active-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .shop-active-info b { font-size: 13px; }
+  .shop-active-time { font-size: 12px; color: var(--text-soft); white-space: nowrap; }
+  .shop-pot-ic { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .shop-upgrade-ic { width: 32px; height: 32px; border-radius: 9px; background: var(--surface-3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent); }
+  .shop-section-title { font-size: 14px; font-weight: 700; margin: 18px 0 10px; }
+  .shop-upgrade-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 8px; }
+  @media (min-width: 640px) { .shop-upgrade-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .shop-upgrade-grid { grid-template-columns: repeat(3, 1fr); } }
+  .shop-upgrade-card { transition: transform 0.18s var(--ease-out); }
+  .shop-upgrade-head { display: flex; align-items: flex-start; gap: 10px; }
+  .shop-upgrade-name { font-weight: 700; font-size: 13.5px; }
+  .shop-upgrade-meta { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-soft); margin-bottom: 10px; }
+  .shop-state-locked { opacity: 0.55; }
+  .shop-state-max { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .shop-purchase-pop { animation: shop-pop 0.4s var(--ease-out); }
+  @keyframes shop-pop { 0% { transform: scale(1); } 40% { transform: scale(1.04); } 100% { transform: scale(1); } }
+  .shop-potion-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 8px; }
+  @media (min-width: 640px) { .shop-potion-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .shop-potion-grid { grid-template-columns: repeat(3, 1fr); } }
+  .shop-potion-card { position: relative; border-width: 1.5px; }
+  .shop-sale-badge { position: absolute; top: 10px; left: 10px; background: var(--danger); color: #fff; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .shop-rarity-tag { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 999px; display: inline-block; margin-top: 2px; }
+  .shop-daily-card { margin-bottom: 18px; background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); }
+  .shop-daily-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 640px) { .shop-daily-grid { grid-template-columns: repeat(4, 1fr); } }
+  .shop-daily-item { background: var(--surface); border-radius: var(--radius-s); padding: 12px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .shop-daily-tag { font-size: 9.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.03em; }
+  .shop-daily-tag.sale { color: var(--danger); }
+  .shop-daily-item b { font-size: 12px; }
+  .shop-tx-list { display: flex; flex-direction: column; gap: 2px; }
+  .shop-tx-row { display: grid; grid-template-columns: 70px 1fr auto; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid var(--border); font-size: 12px; }
+  .shop-tx-row:first-child { border-top: none; }
+  .shop-tree-branch { margin-bottom: 14px; }
+  .shop-tree-chain { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .shop-tree-node { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-s); padding: 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; min-width: 110px; font-size: 12px; }
+  .shop-tree-node.shop-state-max, .shop-tree-node.owned { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface-2)); }
+  .shop-tree-node.shop-state-locked { opacity: 0.5; }
+  .shop-tree-ic { color: var(--accent); }
+  .shop-tree-lock { font-size: 10px; color: var(--text-faint); }
+  .shop-tree-arrow { color: var(--text-faint); font-size: 14px; }
+  @media (prefers-reduced-motion: reduce) { .shop-upgrade-card, .shop-purchase-pop { transition: none !important; animation: none !important; } }
   .streak-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .streak-day { aspect-ratio: 1; border-radius: 5px; background: var(--surface-3); font-size: 9.5px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
   .streak-day.success { background: color-mix(in srgb, var(--success) 55%, var(--surface-3)); color: var(--accent-ink); }
@@ -948,6 +1011,7 @@
     <section class="panel" id="panel-settings" hidden></section>
     <section class="panel" id="panel-progress" hidden></section>
     <section class="panel" id="panel-glowup" hidden></section>
+    <section class="panel" id="panel-upgrades" hidden></section>
   </main>
 
   <nav class="bottom-nav" id="nav-mobile"></nav>
@@ -1278,6 +1342,23 @@
       gu.settings = Object.assign({ webNotificationsEnabled: false, notifPermissionAsked: false }, gu.settings || {});
       merged.glowUp = gu;
 
+      merged.shop = merged.shop && typeof merged.shop === 'object' ? merged.shop : {};
+      var sh = merged.shop;
+      sh.schemaVersion = typeof sh.schemaVersion === 'number' ? sh.schemaVersion : 1;
+      sh.coins = (typeof sh.coins === 'number' && sh.coins >= 0) ? sh.coins : 0;
+      sh.coinEvents = sh.coinEvents && typeof sh.coinEvents === 'object' ? sh.coinEvents : {};
+      sh.transactions = Array.isArray(sh.transactions) ? sh.transactions : [];
+      sh.upgrades = sh.upgrades && typeof sh.upgrades === 'object' ? sh.upgrades : {};
+      sh.potionsOwned = sh.potionsOwned && typeof sh.potionsOwned === 'object' ? sh.potionsOwned : {};
+      sh.activePotions = Array.isArray(sh.activePotions) ? sh.activePotions : [];
+      sh.potionUseLog = Array.isArray(sh.potionUseLog) ? sh.potionUseLog : [];
+      sh.cosmeticPurchases = Array.isArray(sh.cosmeticPurchases) ? sh.cosmeticPurchases : [];
+      sh.streakShieldLog = Array.isArray(sh.streakShieldLog) ? sh.streakShieldLog : [];
+      sh.dailyLuckyProcs = sh.dailyLuckyProcs && typeof sh.dailyLuckyProcs === 'object' ? sh.dailyLuckyProcs : {};
+      sh.economy = Object.assign(defaultShopEconomy(), sh.economy || {});
+      sh.economy.coinRewards = Object.assign(defaultShopEconomy().coinRewards, sh.economy.coinRewards || {});
+      merged.shop = sh;
+
       return merged;
     } catch (e) { return def; }
   }
@@ -1330,6 +1411,20 @@
 
   function defaultXPValues() {
     return { small: 10, regular: 20, important: 35, challenging: 50, gym: 40, focusBlock: 25, morningBonus: 30, halfDayBonus: 50, fullDayBonus: 100, perfectDayBonus: 150 };
+  }
+  function defaultShopEconomy() {
+    return {
+      coinRewards: { small: 1, regular: 2, important: 4, challenging: 6, gym: 5, focusBlock: 3, dailySuccess: 10, perfectDay: 15, levelUp: 20, achievementBase: 5 },
+      maxXPMasteryLevel: 5, xpMasteryPctPerLevel: 5,
+      maxCoinMagnetLevel: 5, coinMagnetPctPerLevel: 5,
+      maxDailyBonusLevel: 4, dailyBonusPctPerLevel: 6,
+      maxComboMasterLevel: 4, comboMasterPctPerLevel: 5,
+      maxStreakMasterLevel: 4, streakMasterPctPerLevel: 6,
+      maxFocusMasterLevel: 4, focusMasterPctPerLevel: 6,
+      maxDailyMomentumLevel: 4, dailyMomentumPctPerLevel: 4,
+      maxAchievementHunterLevel: 3, achievementHunterCoinsPerLevel: 5,
+      maxLuckyProcsPerDay: 3
+    };
   }
   var XP_FIELD_LABELS = {
     small: 'משימה קטנה', regular: 'משימה רגילה', important: 'משימה חשובה', challenging: 'משימה מאתגרת',
@@ -1414,12 +1509,15 @@
     requestAnimationFrame(tick);
   }
 
+  var XP_MODIFIER_KINDS = { task: true, bonus: true, combo: true, challenge: true };
   function grantXPOnce(eventId, amount, kind, meta) {
     if (!eventId || !(amount > 0)) return null;
     if (state.gam.xpEvents[eventId]) return null;
+    var finalAmount = XP_MODIFIER_KINDS[kind] ? shopApplyXPModifiers(amount, kind, meta || {}) : amount;
+    if (!(finalAmount > 0)) return null;
     var beforeLevel = levelInfoFromXP(state.gam.totalXP).level;
-    state.gam.xpEvents[eventId] = { xp: amount, kind: kind, at: Date.now(), meta: meta || null };
-    state.gam.totalXP += amount;
+    state.gam.xpEvents[eventId] = { xp: finalAmount, baseXp: amount, kind: kind, at: Date.now(), meta: meta || null };
+    state.gam.totalXP += finalAmount;
     var afterInfo = levelInfoFromXP(state.gam.totalXP);
     var leveledUp = [];
     if (afterInfo.level > beforeLevel) {
@@ -1428,10 +1526,10 @@
         leveledUp.push(lv);
       }
     }
-    gamQueueEvent({ type: 'xp', amount: amount, kind: kind });
+    gamQueueEvent({ type: 'xp', amount: finalAmount, kind: kind });
     if (leveledUp.length) gamQueueEvent({ type: 'levelup', from: beforeLevel, to: afterInfo.level, levels: leveledUp, totalXP: state.gam.totalXP });
-    if (leveledUp.length && kind !== 'levelreward') gamCheckLevelRewards();
-    return { granted: true, amount: amount, newTotal: state.gam.totalXP, leveledUp: leveledUp };
+    if (leveledUp.length && kind !== 'levelreward') { gamCheckLevelRewards(); shopGrantLevelUpCoins(leveledUp); }
+    return { granted: true, amount: finalAmount, newTotal: state.gam.totalXP, leveledUp: leveledUp };
   }
 
   /* ================= level rewards: locked XP prizes unlocked by reaching a level ================= */
@@ -1453,6 +1551,253 @@
         }
       });
     }
+  }
+
+  /* ================= Upgrade Shop: catalogs ================= */
+  var UPGRADES = [
+    { id: 'xpMastery', name: 'XP Mastery', icon: 'zap', branch: 'xp', desc: 'מגדיל XP ממשימות ב-5% לכל רמה, עד 25%', maxLevel: 5, pctPerLevel: 5, costs: [100, 200, 350, 550, 800], unlockLevel: 1 },
+    { id: 'coinMagnet', name: 'Coin Magnet', icon: 'wallet', branch: 'coins', desc: 'מגדיל Coins ממשימות ב-5% לכל רמה, עד 25%', maxLevel: 5, pctPerLevel: 5, costs: [80, 160, 280, 450, 650], unlockLevel: 1 },
+    { id: 'dailyMomentum', name: 'Daily Momentum', icon: 'calendar', branch: 'dailyRoutine', desc: 'בונוס XP קטן על משימות שהושלמו בזמן המתוכנן', maxLevel: 4, pctPerLevel: 4, costs: [100, 180, 300, 480], unlockLevel: 2 },
+    { id: 'dailyBonus', name: 'Daily Bonus', icon: 'trophy', branch: 'dailyRoutine', desc: 'מגדיל את כל בונוסי ה-XP היומיים (בוקר / חצי יום / יום מוצלח / Perfect Day)', maxLevel: 4, pctPerLevel: 6, costs: [150, 280, 450, 700], unlockLevel: 3 },
+    { id: 'achievementHunter', name: 'Achievement Hunter', icon: 'star', branch: 'achievements', desc: 'בונוס Coins חד-פעמי בכל פתיחת הישג חדש', maxLevel: 3, pctPerLevel: 0, costs: [150, 300, 500], unlockLevel: 4 },
+    { id: 'comboMaster', name: 'Combo Master', icon: 'spark', branch: 'xp', desc: 'מגדיל את בונוס ה-XP על רצף משימות ברצף', maxLevel: 4, pctPerLevel: 5, costs: [120, 220, 380, 600], unlockLevel: 5 },
+    { id: 'streakMaster', name: 'Streak Master', icon: 'flame', branch: 'streaks', desc: 'מגדיל את תגמולי ה-Coins על רצפים ארוכים', maxLevel: 4, pctPerLevel: 6, costs: [150, 280, 450, 700], unlockLevel: 6 },
+    { id: 'focusMaster', name: 'Focus Master', icon: 'target', branch: 'focus', desc: 'בונוס XP על בלוקי פוקוס ולמידה', maxLevel: 4, pctPerLevel: 6, costs: [130, 240, 400, 620], unlockLevel: 7 }
+  ];
+  var POTIONS = [
+    { id: 'xp_potion', name: 'XP Potion', icon: 'zap', rarity: 'rare', price: 150, durationMin: 30, effect: { type: 'xpMult', value: 2 }, desc: 'מכפיל XP פי 2 למשך 30 דקות' },
+    { id: 'greater_xp_potion', name: 'Greater XP Potion', icon: 'zap', rarity: 'epic', price: 300, durationMin: 60, effect: { type: 'xpMult', value: 2 }, desc: 'מכפיל XP פי 2 למשך שעה' },
+    { id: 'mega_xp_potion', name: 'Mega XP Potion', icon: 'zap', rarity: 'legendary', price: 350, durationMin: 20, effect: { type: 'xpMult', value: 3 }, desc: 'מכפיל XP פי 3 למשך 20 דקות' },
+    { id: 'double_xp_day', name: 'Double XP Day', icon: 'glow', rarity: 'legendary', price: 500, durationMin: 'day', effect: { type: 'xpMult', value: 2 }, desc: 'מכפיל XP פי 2 עד סוף היום - יום שלם של XP כפול' },
+    { id: 'coin_potion', name: 'Coin Potion', icon: 'wallet', rarity: 'rare', price: 180, durationMin: 30, effect: { type: 'coinMult', value: 1.5 }, desc: '50% יותר Coins ממשימות מזכות למשך 30 דקות' },
+    { id: 'daily_boost', name: 'Daily Boost', icon: 'spark', rarity: 'common', price: 250, durationMin: 'day', effect: { type: 'coinMult', value: 1.3 }, desc: 'בונוס Coins על משימות מזכות עד סוף היום' },
+    { id: 'focus_potion', name: 'Focus Potion', icon: 'target', rarity: 'rare', price: 220, durationMin: 45, effect: { type: 'focusXPBonus', value: 0.5 }, desc: 'בונוס XP על בלוקי פוקוס ולמידה למשך 45 דקות' },
+    { id: 'lucky_potion', name: 'Lucky Potion', icon: 'star', rarity: 'rare', price: 200, durationMin: 30, effect: { type: 'luckyCoin', chance: 0.25, bonusMin: 5, bonusMax: 20 }, desc: 'סיכוי של 25% לבונוס Coins על משימה מזכה, עד 3 פעמים ביום' },
+    { id: 'streak_shield', name: 'Streak Shield', icon: 'flame', rarity: 'epic', price: 400, durationMin: null, effect: { type: 'streakShield' }, desc: 'מגן על הרצף פעם אחת אם מפספסים יום - הפעלה ידנית מהמלאי' }
+  ];
+  var POTION_RARITY_LABEL = { common: 'Common', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' };
+
+  /* ================= Upgrade Shop: core calculations ================= */
+  function shopUpgradeDef(id) { return UPGRADES.filter(function (u) { return u.id === id; })[0] || null; }
+  function shopPotionDef(id) { return POTIONS.filter(function (p) { return p.id === id; })[0] || null; }
+  function shopUpgradeLevel(id) { return state.shop.upgrades[id] || 0; }
+  function shopUpgradeMaxLevel(id) { var def = shopUpgradeDef(id); return def ? def.maxLevel : 0; }
+  function shopUpgradeCostForNext(id) {
+    var def = shopUpgradeDef(id); if (!def) return null;
+    var lvl = shopUpgradeLevel(id);
+    if (lvl >= def.maxLevel) return null;
+    return def.costs[lvl];
+  }
+  function shopPlayerLevel() { return levelInfoFromXP(state.gam.totalXP).level; }
+
+  function shopExpirePotions() {
+    var now = Date.now();
+    var before = state.shop.activePotions.length;
+    state.shop.activePotions = state.shop.activePotions.filter(function (ap) {
+      if (ap.expiresAt === null) return true;
+      return ap.expiresAt > now;
+    });
+    if (state.shop.activePotions.length !== before) saveState();
+  }
+  function shopActiveXPMultiplier() {
+    shopExpirePotions();
+    var mult = 1;
+    state.shop.activePotions.forEach(function (ap) { var def = shopPotionDef(ap.potionId); if (def && def.effect.type === 'xpMult') mult = Math.max(mult, def.effect.value); });
+    return mult;
+  }
+  function shopActiveCoinMultiplier() {
+    shopExpirePotions();
+    var mult = 1;
+    state.shop.activePotions.forEach(function (ap) { var def = shopPotionDef(ap.potionId); if (def && def.effect.type === 'coinMult') mult = Math.max(mult, def.effect.value); });
+    return mult;
+  }
+  function shopActiveFocusBonus() {
+    shopExpirePotions();
+    var bonus = 0;
+    state.shop.activePotions.forEach(function (ap) { var def = shopPotionDef(ap.potionId); if (def && def.effect.type === 'focusXPBonus') bonus = Math.max(bonus, def.effect.value); });
+    return bonus;
+  }
+  function shopLuckyPotionDef() {
+    shopExpirePotions();
+    var found = null;
+    state.shop.activePotions.forEach(function (ap) { var def = shopPotionDef(ap.potionId); if (def && def.effect.type === 'luckyCoin') found = def; });
+    return found;
+  }
+  function shopApplyXPModifiers(amount, kind, meta) {
+    meta = meta || {};
+    var econ = state.shop.economy;
+    var mult = 1 + shopUpgradeLevel('xpMastery') * (econ.xpMasteryPctPerLevel / 100);
+    mult *= shopActiveXPMultiplier();
+    var total = amount * mult;
+    if (kind === 'combo') total *= (1 + shopUpgradeLevel('comboMaster') * (econ.comboMasterPctPerLevel / 100));
+    if (kind === 'bonus') total *= (1 + shopUpgradeLevel('dailyBonus') * (econ.dailyBonusPctPerLevel / 100));
+    if (meta.category === 'learning' || meta.focus) {
+      total *= (1 + shopUpgradeLevel('focusMaster') * (econ.focusMasterPctPerLevel / 100));
+      total += amount * shopActiveFocusBonus();
+    }
+    if (meta.onTime) total *= (1 + shopUpgradeLevel('dailyMomentum') * (econ.dailyMomentumPctPerLevel / 100));
+    return Math.max(0, Math.round(total));
+  }
+  var COIN_MODIFIER_KINDS = { task: true, bonus: true, challenge: true, streak: true };
+  function shopApplyCoinModifiers(amount, kind) {
+    var econ = state.shop.economy;
+    var mult = 1 + shopUpgradeLevel('coinMagnet') * (econ.coinMagnetPctPerLevel / 100);
+    mult *= shopActiveCoinMultiplier();
+    if (kind === 'streak') mult *= (1 + shopUpgradeLevel('streakMaster') * (econ.streakMasterPctPerLevel / 100));
+    return Math.max(0, Math.round(amount * mult));
+  }
+  function shopLogTransaction(tx) {
+    state.shop.transactions.unshift(tx);
+    if (state.shop.transactions.length > 300) state.shop.transactions.length = 300;
+  }
+  function grantCoinsOnce(eventId, amount, kind, meta) {
+    if (!eventId || !(amount > 0)) return null;
+    if (state.shop.coinEvents[eventId]) return null;
+    var finalAmount = COIN_MODIFIER_KINDS[kind] ? shopApplyCoinModifiers(amount, kind) : amount;
+    if (!(finalAmount > 0)) return null;
+    state.shop.coinEvents[eventId] = { coins: finalAmount, baseCoins: amount, kind: kind, at: Date.now(), meta: meta || null };
+    state.shop.coins += finalAmount;
+    shopLogTransaction({ type: 'earn', amount: finalAmount, kind: kind, meta: meta || null, at: Date.now() });
+    gamQueueEvent({ type: 'coins', amount: finalAmount, kind: kind });
+    return { granted: true, amount: finalAmount, newBalance: state.shop.coins };
+  }
+  function gamTaskCoins(task, sortedList) {
+    var r = state.shop.economy.coinRewards;
+    if (task.importance === 'small') return r.small;
+    if (task.importance === 'important') return r.important;
+    if (task.importance === 'challenging') return r.challenging;
+    if (task.importance === 'regular') return r.regular;
+    if (task.category === 'fitness') return r.gym;
+    if (task.category === 'learning') return r.focusBlock;
+    var dur = gamTaskDurationMin(task, sortedList);
+    if (dur <= 10) return r.small;
+    if (dur <= 50) return r.regular;
+    if (dur <= 90) return r.important;
+    return r.challenging;
+  }
+  function shopMaybeProcLucky(baseEventId) {
+    var def = shopLuckyPotionDef();
+    if (!def) return;
+    var todayKey = dkey(todayDate());
+    var procs = state.shop.dailyLuckyProcs[todayKey] || 0;
+    if (procs >= state.shop.economy.maxLuckyProcsPerDay) return;
+    if (Math.random() >= def.effect.chance) return;
+    var bonus = Math.round(def.effect.bonusMin + Math.random() * (def.effect.bonusMax - def.effect.bonusMin));
+    var res = grantCoinsOnce('lucky:' + baseEventId, bonus, 'lucky', {});
+    if (res) {
+      state.shop.dailyLuckyProcs[todayKey] = procs + 1;
+      gamQueueEvent({ type: 'bonus', label: '🍀 Lucky Potion!', amount: 0, coinsOnly: bonus, perfect: false });
+    }
+  }
+  function shopGrantLevelUpCoins(levels) {
+    levels.forEach(function (lv) {
+      grantCoinsOnce('coinlevelup:' + lv, state.shop.economy.coinRewards.levelUp, 'levelup_coins', { level: lv });
+    });
+  }
+
+  /* ================= Upgrade Shop: purchases ================= */
+  function shopPurchaseUpgrade(id) {
+    var def = shopUpgradeDef(id);
+    if (!def) return { ok: false, reason: 'not_found' };
+    if (shopPlayerLevel() < def.unlockLevel) return { ok: false, reason: 'locked' };
+    var lvl = shopUpgradeLevel(id);
+    if (lvl >= def.maxLevel) return { ok: false, reason: 'max_level' };
+    var cost = def.costs[lvl];
+    if (state.shop.coins < cost) return { ok: false, reason: 'insufficient_coins' };
+    state.shop.coins -= cost;
+    state.shop.upgrades[id] = lvl + 1;
+    shopLogTransaction({ type: 'spend', amount: cost, kind: 'upgrade', meta: { upgradeId: id, newLevel: lvl + 1 }, at: Date.now() });
+    saveState();
+    return { ok: true, newLevel: lvl + 1 };
+  }
+  function shopBuyPotion(potionId) {
+    var def = shopPotionDef(potionId);
+    if (!def) return { ok: false, reason: 'not_found' };
+    var price = shopEffectivePotionPrice(potionId);
+    if (state.shop.coins < price) return { ok: false, reason: 'insufficient_coins' };
+    state.shop.coins -= price;
+    state.shop.potionsOwned[potionId] = (state.shop.potionsOwned[potionId] || 0) + 1;
+    shopLogTransaction({ type: 'spend', amount: price, kind: 'potion_buy', meta: { potionId: potionId }, at: Date.now() });
+    saveState();
+    return { ok: true };
+  }
+  function shopUsePotion(potionId) {
+    var def = shopPotionDef(potionId);
+    if (!def) return { ok: false, reason: 'not_found' };
+    if (!(state.shop.potionsOwned[potionId] > 0)) return { ok: false, reason: 'not_owned' };
+    if (def.effect.type === 'streakShield') return { ok: false, reason: 'use_streak_shield_action' };
+    shopExpirePotions();
+    var alreadyActive = state.shop.activePotions.some(function (ap) { return ap.potionId === potionId; });
+    if (alreadyActive) return { ok: false, reason: 'already_active' };
+    var now = Date.now();
+    var expiresAt;
+    if (def.durationMin === 'day') { var end = new Date(); end.setHours(23, 59, 59, 999); expiresAt = end.getTime(); }
+    else expiresAt = now + def.durationMin * 60000;
+    state.shop.activePotions.push({ potionId: potionId, activatedAt: now, expiresAt: expiresAt });
+    state.shop.potionsOwned[potionId] -= 1;
+    state.shop.potionUseLog.unshift({ potionId: potionId, activatedAt: now, expiresAt: expiresAt });
+    if (state.shop.potionUseLog.length > 100) state.shop.potionUseLog.length = 100;
+    saveState();
+    gamQueueEvent({ type: 'potion', label: '🧪 ' + def.name + ' הופעל!' });
+    return { ok: true, expiresAt: expiresAt };
+  }
+  function shopCancelPotion(potionId) {
+    var before = state.shop.activePotions.length;
+    state.shop.activePotions = state.shop.activePotions.filter(function (ap) { return ap.potionId !== potionId; });
+    if (state.shop.activePotions.length !== before) { saveState(); return true; }
+    return false;
+  }
+  function shopUseStreakShield() {
+    if (!(state.shop.potionsOwned.streak_shield > 0)) return { ok: false, reason: 'not_owned' };
+    var yesterday = todayDate(); yesterday.setDate(yesterday.getDate() - 1);
+    var yKey = dkey(yesterday);
+    var lv = state.gam.streak.log[yKey];
+    if (lv === 'success' || lv === 'perfect') return { ok: false, reason: 'not_needed' };
+    state.gam.streak.log[yKey] = 'success';
+    state.shop.potionsOwned.streak_shield -= 1;
+    state.shop.streakShieldLog.unshift({ protectedDate: yKey, at: Date.now() });
+    gamRecomputeStreak();
+    saveState();
+    return { ok: true, protectedDate: yKey };
+  }
+
+  /* ================= Upgrade Shop: cosmetics via coins ================= */
+  var COSMETIC_COIN_PRICE = { emerald: 200, violet: 350, gold: 550, inferno: 900, neon: 300, cosmic: 700 };
+  function shopCosmeticOwnedByCoins(type, id) {
+    return state.shop.cosmeticPurchases.some(function (c) { return c.type === type && c.id === id; });
+  }
+  function shopBuyCosmetic(type, id) {
+    var price = COSMETIC_COIN_PRICE[id];
+    if (!price) return { ok: false, reason: 'not_purchasable' };
+    if (shopCosmeticOwnedByCoins(type, id)) return { ok: false, reason: 'already_owned' };
+    if (state.shop.coins < price) return { ok: false, reason: 'insufficient_coins' };
+    state.shop.coins -= price;
+    state.shop.cosmeticPurchases.push({ type: type, id: id, at: Date.now() });
+    shopLogTransaction({ type: 'spend', amount: price, kind: 'cosmetic', meta: { cosmeticType: type, id: id }, at: Date.now() });
+    saveState();
+    return { ok: true };
+  }
+
+  /* ================= Upgrade Shop: daily shop (deterministic rotation) ================= */
+  function shopDailyShopItems() {
+    var todayKey = dkey(todayDate());
+    var seed = guHashStr(todayKey + ':shop');
+    var potionIdx = seed % POTIONS.length;
+    var saleIdx = (seed >> 3) % POTIONS.length;
+    var upgradeCandidates = UPGRADES.filter(function (u) { return shopUpgradeLevel(u.id) < u.maxLevel; });
+    var upgradePick = upgradeCandidates.length ? upgradeCandidates[seed % upgradeCandidates.length] : null;
+    var cosmeticCandidates = Object.keys(COSMETIC_COIN_PRICE).filter(function (id) { return !shopCosmeticOwnedByCoins('barColor', id) && !shopCosmeticOwnedByCoins('frame', id); });
+    var cosmeticPick = cosmeticCandidates.length ? cosmeticCandidates[seed % cosmeticCandidates.length] : null;
+    return { dateKey: todayKey, featuredPotionId: POTIONS[potionIdx].id, salePotionId: POTIONS[saleIdx].id, saleDiscountPct: 20, upgradePickId: upgradePick ? upgradePick.id : null, cosmeticPickId: cosmeticPick };
+  }
+  function shopIsTodaysSaleItem(potionId) {
+    return shopDailyShopItems().salePotionId === potionId;
+  }
+  function shopEffectivePotionPrice(potionId) {
+    var def = shopPotionDef(potionId);
+    if (!def) return 0;
+    if (shopIsTodaysSaleItem(potionId)) return Math.round(def.price * (1 - shopDailyShopItems().saleDiscountPct / 100));
+    return def.price;
   }
 
   function gamTaskDurationMin(task, sortedList) {
@@ -1510,6 +1855,7 @@
       if (grantXPOnce('bonus:full:' + dateKey, xp.fullDayBonus, 'bonus', { label: 'יום מוצלח' })) {
         bonuses.full = true;
         gamQueueEvent({ type: 'bonus', label: 'יום מוצלח!', amount: xp.fullDayBonus });
+        grantCoinsOnce('bonus:full:' + dateKey, state.shop.economy.coinRewards.dailySuccess, 'bonus', { label: 'יום מוצלח' });
       }
     }
 
@@ -1519,6 +1865,7 @@
         if (grantXPOnce('bonus:perfect:' + dateKey, xp.perfectDayBonus, 'bonus', { label: 'Perfect Day' })) {
           bonuses.perfect = true;
           gamQueueEvent({ type: 'bonus', label: 'Perfect Day!', amount: xp.perfectDayBonus, perfect: true });
+          grantCoinsOnce('bonus:perfect:' + dateKey, state.shop.economy.coinRewards.perfectDay, 'bonus', { label: 'Perfect Day' });
         }
       }
     }
@@ -1550,6 +1897,13 @@
     state.gam.streak.current = current;
     if (current > state.gam.streak.longest) state.gam.streak.longest = current;
     state.gam.streak.lastDate = todayKey;
+    shopCheckStreakCoinMilestones(current);
+  }
+  var STREAK_COIN_MILESTONES = { 3: 15, 7: 35, 14: 70, 30: 150, 60: 300, 100: 500 };
+  function shopCheckStreakCoinMilestones(current) {
+    Object.keys(STREAK_COIN_MILESTONES).map(Number).forEach(function (m) {
+      if (current >= m) grantCoinsOnce('streakcoins:' + m, STREAK_COIN_MILESTONES[m], 'streak', { milestone: m });
+    });
   }
 
   function gamRegisterCombo() {
@@ -1620,6 +1974,7 @@
     { id: 'gold', label: 'מסגרת זהב', unlockLevel: 15, cls: 'frame-gold' },
     { id: 'cosmic', label: 'מסגרת קוסמית', unlockLevel: 30, cls: 'frame-cosmic' }
   ];
+  var ACH_RARITY_COIN_MULT = { common: 1, rare: 2, epic: 4, legendary: 8 };
   function gamCheckAchievements() {
     var ctx = gamAchievementContext();
     var newlyUnlocked = [];
@@ -1628,6 +1983,10 @@
       if (a.check(ctx)) {
         state.gam.achievements[a.id] = { at: Date.now() };
         if (a.xp > 0) grantXPOnce('ach:' + a.id, a.xp, 'achievement', { name: a.name });
+        var baseCoins = Math.round(state.shop.economy.coinRewards.achievementBase * (ACH_RARITY_COIN_MULT[a.rarity] || 1));
+        grantCoinsOnce('ach:' + a.id, baseCoins, 'achievement', { name: a.name });
+        var hunterLvl = shopUpgradeLevel('achievementHunter');
+        if (hunterLvl > 0) grantCoinsOnce('achhunter:' + a.id, hunterLvl * state.shop.economy.achievementHunterCoinsPerLevel, 'achievement_hunter_bonus', { name: a.name });
         newlyUnlocked.push(a);
         gamQueueEvent({ type: 'achievement', achievement: a });
       }
@@ -1706,6 +2065,7 @@
         if (grantXPOnce('challenge:' + c.instanceId, c.xp, 'challenge', { title: c.title })) {
           c.claimed = true;
           gamQueueEvent({ type: 'challenge', title: c.title });
+          grantCoinsOnce('challenge:' + c.instanceId, Math.round(c.xp * 0.4), 'challenge', { title: c.title });
         }
       }
     });
@@ -1715,8 +2075,15 @@
   function gamOnTaskCompleted(task) {
     var todayKey = dkey(todayDate());
     var sortedToday = todayTasks();
+    var dueMin = timeToMin(task.time);
+    var compMin = dueMin;
+    if (task.completedAt) { var cd = new Date(task.completedAt); compMin = cd.getHours() * 60 + cd.getMinutes(); }
+    var onTime = (compMin - dueMin) <= 15;
     var xpAmount = gamTaskXP(task, sortedToday);
-    grantXPOnce('task:' + task.id, xpAmount, 'task', { title: task.title, category: task.category });
+    grantXPOnce('task:' + task.id, xpAmount, 'task', { title: task.title, category: task.category, onTime: onTime });
+    var coinAmount = gamTaskCoins(task, sortedToday);
+    var coinRes = grantCoinsOnce('task:' + task.id, coinAmount, 'task', { title: task.title, category: task.category });
+    if (coinRes) shopMaybeProcLucky('task:' + task.id);
     gamRegisterCombo();
     gamEvaluateDailyBonuses(todayKey);
     gamEvaluateChallenges();
@@ -1767,13 +2134,26 @@
   function gamShowBonusToast(ev) {
     var el = document.createElement('div');
     el.className = 'bonus-toast' + (ev.perfect ? ' perfect' : '');
-    el.innerHTML = '<span class="bt-ic">' + icon(ev.perfect ? 'trophy' : 'zap') + '</span><div><div class="bt-label">' + escapeAttr(ev.label) + '</div><div class="bt-xp num" dir="ltr">+' + ev.amount + ' XP</div></div>';
+    var valueHtml = ev.coinsOnly ? '+' + ev.coinsOnly + ' 🪙' : '+' + ev.amount + ' XP';
+    el.innerHTML = '<span class="bt-ic">' + icon(ev.perfect ? 'trophy' : 'zap') + '</span><div><div class="bt-label">' + escapeAttr(ev.label) + '</div><div class="bt-xp num" dir="ltr">' + valueHtml + '</div></div>';
     document.body.appendChild(el);
     setTimeout(function () { el.remove(); }, ev.perfect ? 4200 : 2800);
     if (ev.perfect) {
       gamSpawnParticles(document.body, 16);
       if (state.gam.settings.sound) gamPlayTone(784, 0.16);
     }
+  }
+  function gamShowCoinToast(amount, anchorEl) {
+    var layer = document.getElementById('xp-toast-layer');
+    if (!layer) return;
+    var el = document.createElement('div');
+    el.className = 'xp-toast coin-toast';
+    el.textContent = '+' + amount + ' 🪙';
+    var rect = anchorEl ? anchorEl.getBoundingClientRect() : { left: window.innerWidth / 2 + 20, top: window.innerHeight / 2 };
+    el.style.left = Math.max(8, rect.left + 40) + 'px';
+    el.style.top = Math.max(8, rect.top - 10) + 'px';
+    layer.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1500);
   }
   var levelUpOverlayOpen = false;
   var pendingLevelUpOverlay = null;
@@ -1822,15 +2202,17 @@
   function gamFlushEventQueue(anchorEl) {
     if (!gamEventQueue.length) return;
     var queue = gamEventQueue; gamEventQueue = [];
-    var totalXPGained = 0;
-    queue.forEach(function (e) { if (e.type === 'xp') totalXPGained += e.amount; });
+    var totalXPGained = 0, totalCoinsGained = 0;
+    queue.forEach(function (e) { if (e.type === 'xp') totalXPGained += e.amount; if (e.type === 'coins') totalCoinsGained += e.amount; });
     if (totalXPGained > 0) gamShowXPToast(totalXPGained, anchorEl);
+    if (totalCoinsGained > 0) gamShowCoinToast(totalCoinsGained, anchorEl);
     if (anchorEl) { anchorEl.classList.add('task-xp-glow'); setTimeout(function () { anchorEl.classList.remove('task-xp-glow'); }, 950); }
     queue.forEach(function (e) {
       if (e.type === 'combo') gamShowComboFlash(e.count);
       else if (e.type === 'achievement') gamShowAchievementToast(e.achievement);
       else if (e.type === 'bonus') gamShowBonusToast(e);
       else if (e.type === 'challenge') toast('אתגר הושלם: ' + e.title);
+      else if (e.type === 'potion') toast(e.label);
     });
     var levelupEvents = queue.filter(function (e) { return e.type === 'levelup'; });
     if (levelupEvents.length) {
@@ -3716,6 +4098,336 @@
     if (importInput) importInput.addEventListener('change', function () { if (importInput.files && importInput.files[0]) guImportJsonFile(importInput.files[0]); importInput.value = ''; });
   }
 
+  /* ================= Upgrade Shop: render ================= */
+  var shopTab = 'shop';
+  function shopTimeLeftLabel(expiresAt) {
+    if (expiresAt === null) return '';
+    var ms = expiresAt - Date.now();
+    if (ms <= 0) return 'הסתיים';
+    var mins = Math.ceil(ms / 60000);
+    if (mins >= 60) { var h = Math.floor(mins / 60), m = mins % 60; return h + 'ש׳ ' + (m ? m + 'ד׳' : ''); }
+    return mins + ' דק׳';
+  }
+  function shopEffectDescription(ap) {
+    var def = shopPotionDef(ap.potionId);
+    if (!def) return '';
+    return def.name + ' - ' + def.desc;
+  }
+  function shopActiveEffectsHtml() {
+    shopExpirePotions();
+    var active = state.shop.activePotions;
+    var xpMult = shopActiveXPMultiplier();
+    var coinMult = shopActiveCoinMultiplier();
+    return '<div class="card shop-active-card" id="shop-active-effects-card">' +
+      '<div class="gu-card-head"><h3>Active Effects</h3>' +
+        (xpMult > 1 || coinMult > 1 ? '<span class="shop-mult-badge">' + (xpMult > 1 ? 'XP ×' + xpMult + ' ' : '') + (coinMult > 1 ? 'Coins ×' + coinMult : '') + '</span>' : '') +
+      '</div>' +
+      (active.length ? active.map(function (ap) {
+        var def = shopPotionDef(ap.potionId);
+        var pct = ap.expiresAt === null ? 100 : Math.max(0, Math.min(100, Math.round((ap.expiresAt - Date.now()) / (ap.expiresAt - ap.activatedAt) * 100)));
+        return '<div class="shop-active-row">' +
+          '<span class="shop-pot-ic rarity-' + (def ? def.rarity : 'common') + '">' + icon(def ? def.icon : 'zap') + '</span>' +
+          '<div class="shop-active-info"><b>' + escapeAttr(def ? def.name : ap.potionId) + '</b><span class="page-sub">' + escapeAttr(shopEffectDescription(ap)) + '</span>' +
+            '<div class="balance-track" style="margin-top:4px;"><div class="balance-fill" style="width:' + pct + '%;background:var(--glow-2);"></div></div></div>' +
+          '<div class="shop-active-time num" dir="ltr">' + shopTimeLeftLabel(ap.expiresAt) + '</div>' +
+          '<button class="btn-icon" data-shop-cancel-potion="' + ap.potionId + '" title="בטל">' + icon('x') + '</button>' +
+        '</div>';
+      }).join('') : '<p class="empty-msg" style="padding:10px 0;">אין אפקטים פעילים כרגע.</p>') +
+      (active.length > 1 ? '<p class="page-sub" style="margin-top:8px;">מכפילי XP/Coins מאותו סוג לא נערמים - משתמשים במכפיל הגבוה ביותר. אפקטים מסוגים שונים (למשל XP ופוקוס) מצטרפים זה לזה.</p>' : '') +
+    '</div>';
+  }
+  function shopHeaderHtml() {
+    var totalUpgrades = Object.keys(state.shop.upgrades).reduce(function (s, k) { return s + state.shop.upgrades[k]; }, 0);
+    var xpMult = shopActiveXPMultiplier();
+    return '<div class="card shop-hero-card">' +
+      '<div class="shop-hero-stats">' +
+        '<div class="shop-hero-stat"><div class="v num" dir="ltr">🪙 ' + state.shop.coins + '</div><div class="l">Coins</div></div>' +
+        '<div class="shop-hero-stat"><div class="v num">' + shopPlayerLevel() + '</div><div class="l">רמה נוכחית</div></div>' +
+        '<div class="shop-hero-stat"><div class="v num">' + totalUpgrades + '</div><div class="l">שדרוגים שנרכשו</div></div>' +
+        '<div class="shop-hero-stat"><div class="v num">' + state.shop.activePotions.length + '</div><div class="l">שיקויים פעילים</div></div>' +
+        '<div class="shop-hero-stat"><div class="v num" dir="ltr">×' + xpMult + '</div><div class="l">מכפיל XP פעיל</div></div>' +
+      '</div>' +
+      '<div class="shop-hero-actions">' +
+        '<button class="btn btn-primary btn-sm" data-shop-tab-btn="shop">' + icon('wallet') + 'Shop' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" data-shop-tab-btn="inventory">' + icon('more') + 'Inventory' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" data-shop-tab-btn="tree">' + icon('flag') + 'Upgrade Tree' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" data-shop-tab-btn="settings">' + icon('settings') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+  function renderUpgrades() {
+    var el = document.getElementById('panel-upgrades');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title gu-title">' + icon('crown') + ' Upgrades</h2><p class="page-sub">חנות שדרוגים - XP מהיר יותר, Coins, שיקויים ויכולות מיוחדות</p></div></div>' +
+      shopHeaderHtml() +
+      shopActiveEffectsHtml() +
+      '<div id="shop-body"></div>';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-tab-btn]'), function (b) {
+      b.addEventListener('click', function () { shopTab = b.dataset.shopTabBtn; renderUpgradesBody(); });
+    });
+    renderUpgradesBody();
+  }
+  function renderUpgradesBody() {
+    var el = document.getElementById('shop-body');
+    if (!el) return;
+    if (shopTab === 'shop') el.innerHTML = shopBuyTabHtml();
+    else if (shopTab === 'inventory') el.innerHTML = shopInventoryHtml();
+    else if (shopTab === 'tree') el.innerHTML = shopTreeHtml();
+    else if (shopTab === 'settings') el.innerHTML = shopSettingsHtml();
+    el.classList.remove('panel-enter'); void el.offsetWidth; el.classList.add('panel-enter');
+    wireUpgradesBody(el);
+    gamAnimateFillBars(el);
+    shopStartTicker();
+  }
+  var shopTicker = null;
+  function shopStartTicker() {
+    clearInterval(shopTicker);
+    shopTicker = setInterval(function () {
+      var card = document.getElementById('shop-active-effects-card');
+      if (!card) { clearInterval(shopTicker); return; }
+      card.outerHTML = shopActiveEffectsHtml();
+      var fresh = document.getElementById('shop-active-effects-card');
+      if (fresh) Array.prototype.forEach.call(fresh.querySelectorAll('[data-shop-cancel-potion]'), function (b) {
+        b.addEventListener('click', function () { shopCancelPotion(b.dataset.shopCancelPotion); renderUpgrades(); });
+      });
+    }, 15000);
+  }
+
+  function shopUpgradeStateLabel(id) {
+    var def = shopUpgradeDef(id);
+    var lvl = shopUpgradeLevel(id);
+    if (shopPlayerLevel() < def.unlockLevel) return 'locked';
+    if (lvl >= def.maxLevel) return 'max';
+    return 'available';
+  }
+  function shopUpgradeCardHtml(def) {
+    var lvl = shopUpgradeLevel(def.id);
+    var state2 = shopUpgradeStateLabel(def.id);
+    var cost = shopUpgradeCostForNext(def.id);
+    var pct = def.pctPerLevel ? (lvl * def.pctPerLevel) : lvl;
+    return '<div class="card shop-upgrade-card shop-state-' + state2 + '">' +
+      '<div class="shop-upgrade-head"><span class="shop-upgrade-ic">' + icon(def.icon) + '</span>' +
+        '<div><div class="shop-upgrade-name">' + escapeAttr(def.name) + '</div><div class="page-sub">' + escapeAttr(def.desc) + '</div></div></div>' +
+      '<div class="balance-track" style="margin:10px 0 6px;"><div class="balance-fill" data-fill-pct="' + Math.round(lvl / def.maxLevel * 100) + '" style="background:var(--accent);"></div></div>' +
+      '<div class="shop-upgrade-meta"><span>רמה ' + lvl + ' / ' + def.maxLevel + '</span>' + (def.pctPerLevel ? '<span>+' + pct + '%</span>' : (lvl ? '<span>+' + (lvl * state.shop.economy.achievementHunterCoinsPerLevel) + ' 🪙/הישג</span>' : '')) + '</div>' +
+      (state2 === 'locked' ? '<button class="btn btn-ghost btn-sm btn-block" disabled>🔒 נפתח ברמה ' + def.unlockLevel + '</button>' :
+        state2 === 'max' ? '<button class="btn btn-ghost btn-sm btn-block" disabled>' + icon('check') + 'רמה מקסימלית' + '</button>' :
+        '<button class="btn btn-primary btn-sm btn-block" data-shop-buy-upgrade="' + def.id + '">' + icon('plus') + 'Purchase · 🪙' + cost + '</button>') +
+    '</div>';
+  }
+  function shopPotionCardHtml(def) {
+    var owned = state.shop.potionsOwned[def.id] || 0;
+    var onSale = shopIsTodaysSaleItem(def.id);
+    var price = shopEffectivePotionPrice(def.id);
+    return '<div class="card shop-potion-card rarity-border-' + def.rarity + '">' +
+      (onSale ? '<span class="shop-sale-badge">-' + shopDailyShopItems().saleDiscountPct + '%</span>' : '') +
+      '<div class="shop-upgrade-head"><span class="shop-pot-ic rarity-' + def.rarity + '">' + icon(def.icon) + '</span>' +
+        '<div><div class="shop-upgrade-name">' + escapeAttr(def.name) + '</div><span class="shop-rarity-tag rarity-' + def.rarity + '">' + POTION_RARITY_LABEL[def.rarity] + '</span></div></div>' +
+      '<p class="page-sub" style="margin:8px 0;">' + escapeAttr(def.desc) + '</p>' +
+      '<div class="shop-upgrade-meta"><span>במלאי: ' + owned + '</span>' + (onSale ? '<span class="num" dir="ltr"><s>🪙' + def.price + '</s> 🪙' + price + '</span>' : '<span class="num" dir="ltr">🪙' + price + '</span>') + '</div>' +
+      '<button class="btn btn-primary btn-sm btn-block" data-shop-buy-potion="' + def.id + '">' + icon('plus') + 'Purchase' + '</button>' +
+    '</div>';
+  }
+  function shopDailyShopHtml() {
+    var picks = shopDailyShopItems();
+    var potionDef = shopPotionDef(picks.featuredPotionId);
+    var saleDef = shopPotionDef(picks.salePotionId);
+    var upgradeDef = picks.upgradePickId ? shopUpgradeDef(picks.upgradePickId) : null;
+    return '<div class="card shop-daily-card">' +
+      '<div class="gu-card-head"><h3>🗓️ Daily Shop</h3><span class="page-sub">מתחלף כל יום</span></div>' +
+      '<div class="shop-daily-grid">' +
+        (potionDef ? '<div class="shop-daily-item"><span class="shop-daily-tag">מומלץ היום</span>' + icon(potionDef.icon) + '<b>' + escapeAttr(potionDef.name) + '</b></div>' : '') +
+        (saleDef ? '<div class="shop-daily-item"><span class="shop-daily-tag sale">מבצע -' + picks.saleDiscountPct + '%</span>' + icon(saleDef.icon) + '<b>' + escapeAttr(saleDef.name) + '</b></div>' : '') +
+        (upgradeDef ? '<div class="shop-daily-item"><span class="shop-daily-tag">שדרוג בפוקוס</span>' + icon(upgradeDef.icon) + '<b>' + escapeAttr(upgradeDef.name) + '</b></div>' : '') +
+        (picks.cosmeticPickId ? '<div class="shop-daily-item"><span class="shop-daily-tag">קוסמטיקה נדירה</span>' + icon('star') + '<b>' + escapeAttr(picks.cosmeticPickId) + '</b></div>' : '') +
+      '</div>' +
+    '</div>';
+  }
+  function shopBuyTabHtml() {
+    return shopDailyShopHtml() +
+      '<h3 class="shop-section-title">שדרוגים קבועים</h3>' +
+      '<div class="shop-upgrade-grid">' + UPGRADES.map(shopUpgradeCardHtml).join('') + '</div>' +
+      '<h3 class="shop-section-title">שיקויים</h3>' +
+      '<div class="shop-potion-grid">' + POTIONS.map(shopPotionCardHtml).join('') + '</div>' +
+      '<h3 class="shop-section-title">קוסמטיקה נדירה (Coins)</h3>' +
+      '<div class="shop-upgrade-grid">' + Object.keys(COSMETIC_COIN_PRICE).map(function (id) {
+        var isBar = BAR_COLORS.some(function (b) { return b.id === id; });
+        var def = isBar ? BAR_COLORS.filter(function (b) { return b.id === id; })[0] : FRAMES.filter(function (f) { return f.id === id; })[0];
+        var levelUnlocked = shopPlayerLevel() >= def.unlockLevel;
+        var coinOwned = shopCosmeticOwnedByCoins(isBar ? 'barColor' : 'frame', id);
+        var owned = levelUnlocked || coinOwned;
+        return '<div class="card shop-upgrade-card' + (owned ? ' shop-state-max' : '') + '">' +
+          '<div class="shop-upgrade-head"><span class="shop-upgrade-ic">' + icon('star') + '</span><div><div class="shop-upgrade-name">' + escapeAttr(def.label) + '</div><div class="page-sub">' + (isBar ? 'צבע פס התקדמות' : 'מסגרת תג רמה') + '</div></div></div>' +
+          (owned ? '<button class="btn btn-ghost btn-sm btn-block" disabled>' + icon('check') + (levelUnlocked ? 'פתוח לפי רמה' : 'נרכש') + '</button>' :
+            '<button class="btn btn-primary btn-sm btn-block" data-shop-buy-cosmetic="' + (isBar ? 'barColor' : 'frame') + ':' + id + '">' + icon('plus') + 'Purchase · 🪙' + COSMETIC_COIN_PRICE[id] + '</button>') +
+        '</div>';
+      }).join('') + '</div>';
+  }
+  var shopInvFilter = 'all';
+  function shopInventoryHtml() {
+    var filters = [['all', 'All'], ['potions', 'Potions'], ['permanent', 'Permanent Upgrades'], ['cosmetics', 'Cosmetics'], ['active', 'Active'], ['available', 'Available']];
+    var ownedUpgrades = UPGRADES.filter(function (u) { return shopUpgradeLevel(u.id) > 0; });
+    var ownedPotions = Object.keys(state.shop.potionsOwned).filter(function (id) { return state.shop.potionsOwned[id] > 0; });
+    var html = '<div class="ach-cat-tabs">' + filters.map(function (f) { return '<button data-shop-inv-filter="' + f[0] + '" class="' + (shopInvFilter === f[0] ? 'active' : '') + '">' + f[1] + '</button>'; }).join('') + '</div>';
+    if (shopInvFilter === 'all' || shopInvFilter === 'active') html += shopActiveEffectsHtml();
+    if (shopInvFilter === 'all' || shopInvFilter === 'potions' || shopInvFilter === 'available') {
+      html += '<h3 class="shop-section-title">שיקויים במלאי</h3>' +
+        (ownedPotions.length ? '<div class="shop-potion-grid">' + ownedPotions.map(function (id) {
+          var def = shopPotionDef(id);
+          var isActive = state.shop.activePotions.some(function (ap) { return ap.potionId === id; });
+          var isShield = def.effect.type === 'streakShield';
+          return '<div class="card shop-potion-card rarity-border-' + def.rarity + '">' +
+            '<div class="shop-upgrade-head"><span class="shop-pot-ic rarity-' + def.rarity + '">' + icon(def.icon) + '</span><div><div class="shop-upgrade-name">' + escapeAttr(def.name) + '</div><span class="page-sub">במלאי: ' + state.shop.potionsOwned[id] + '</span></div></div>' +
+            '<p class="page-sub" style="margin:8px 0;">' + escapeAttr(def.desc) + '</p>' +
+            (isShield ? '<button class="btn btn-primary btn-sm btn-block" data-shop-use-shield="1">' + icon('flame') + 'הגן על אתמול' + '</button>' :
+              isActive ? '<button class="btn btn-ghost btn-sm btn-block" disabled>' + icon('check') + 'פעיל כבר' + '</button>' :
+              '<button class="btn btn-primary btn-sm btn-block" data-shop-use-potion="' + id + '">' + icon('play') + 'Use' + '</button>') +
+          '</div>';
+        }).join('') + '</div>' : '<p class="empty-msg">אין שיקויים במלאי - אפשר לקנות ב-Shop.</p>');
+    }
+    if (shopInvFilter === 'all' || shopInvFilter === 'permanent') {
+      html += '<h3 class="shop-section-title">שדרוגים קבועים שנרכשו</h3>' +
+        (ownedUpgrades.length ? '<div class="shop-upgrade-grid">' + ownedUpgrades.map(shopUpgradeCardHtml).join('') + '</div>' : '<p class="empty-msg">עדיין לא נרכשו שדרוגים.</p>');
+    }
+    if (shopInvFilter === 'all' || shopInvFilter === 'cosmetics') {
+      html += '<h3 class="shop-section-title">קוסמטיקה שנפתחה</h3>' +
+        (state.shop.cosmeticPurchases.length ? '<div class="shop-upgrade-grid">' + state.shop.cosmeticPurchases.map(function (c) {
+          var def = c.type === 'barColor' ? BAR_COLORS.filter(function (b) { return b.id === c.id; })[0] : FRAMES.filter(function (f) { return f.id === c.id; })[0];
+          return '<div class="card shop-upgrade-card shop-state-max"><div class="shop-upgrade-head"><span class="shop-upgrade-ic">' + icon('star') + '</span><div class="shop-upgrade-name">' + escapeAttr(def ? def.label : c.id) + '</div></div></div>';
+        }).join('') + '</div>' : '<p class="empty-msg">אין קוסמטיקה שנרכשה ב-Coins עדיין.</p>');
+    }
+    if (shopInvFilter === 'all') {
+      html += '<h3 class="shop-section-title">היסטוריית עסקאות</h3><div class="shop-tx-list">' +
+        (state.shop.transactions.length ? state.shop.transactions.slice(0, 25).map(function (tx) {
+          return '<div class="shop-tx-row"><span>' + (tx.type === 'earn' ? '🪙+' : '🪙-') + tx.amount + '</span><span class="page-sub">' + shopTxLabel(tx) + '</span><span class="page-sub num" dir="ltr">' + new Date(tx.at).toLocaleDateString('he-IL') + '</span></div>';
+        }).join('') : '<p class="empty-msg">אין עדיין היסטוריה.</p>') + '</div>';
+    }
+    return html;
+  }
+  function shopTxLabel(tx) {
+    if (tx.kind === 'task') return 'משימה: ' + (tx.meta && tx.meta.title || '');
+    if (tx.kind === 'bonus') return (tx.meta && tx.meta.label) || 'בונוס יומי';
+    if (tx.kind === 'achievement') return 'הישג: ' + (tx.meta && tx.meta.name || '');
+    if (tx.kind === 'challenge') return 'אתגר: ' + (tx.meta && tx.meta.title || '');
+    if (tx.kind === 'streak') return 'רצף ' + (tx.meta && tx.meta.milestone) + ' ימים';
+    if (tx.kind === 'levelup_coins') return 'עלייה לרמה ' + (tx.meta && tx.meta.level);
+    if (tx.kind === 'lucky') return 'Lucky Potion';
+    if (tx.kind === 'upgrade') return 'שדרוג: ' + (tx.meta && tx.meta.upgradeId) + ' → רמה ' + (tx.meta && tx.meta.newLevel);
+    if (tx.kind === 'potion_buy') return 'קניית שיקוי';
+    if (tx.kind === 'cosmetic') return 'קוסמטיקה: ' + (tx.meta && tx.meta.id);
+    if (tx.kind === 'achievement_hunter_bonus') return 'Achievement Hunter בונוס';
+    return tx.kind || '';
+  }
+  var SHOP_BRANCH_LABEL = { xp: 'XP', coins: 'Coins', streaks: 'Streaks', achievements: 'Achievements', focus: 'Focus', dailyRoutine: 'Daily Routine', special: 'Special' };
+  function shopTreeHtml() {
+    var branches = ['xp', 'coins', 'streaks', 'achievements', 'focus', 'dailyRoutine', 'special'];
+    return branches.map(function (br) {
+      var ups = UPGRADES.filter(function (u) { return u.branch === br; });
+      if (br === 'special') {
+        return '<div class="card shop-tree-branch"><h3>' + SHOP_BRANCH_LABEL[br] + '</h3>' +
+          '<div class="shop-tree-chain">' +
+            ['🔮 Level Reward Coins - תגמול Coins אוטומטי בכל עלייה ברמה', '🏆 Quest Rewards - בונוס Coins על השלמת אתגרים שבועיים', '🛡️ Streak Shield - שיקוי המגן על הרצף', '🍀 Lucky Potion - סיכוי לבונוס Coins', '⚡ Double XP Day - יום שלם של XP כפול', '🎨 Rare Cosmetics - פתיחת מסגרות וצבעים ב-Coins'].map(function (s) {
+              return '<div class="shop-tree-node owned">' + s + '</div>';
+            }).join('<div class="shop-tree-arrow">→</div>') +
+          '</div></div>';
+      }
+      if (!ups.length) return '';
+      return '<div class="card shop-tree-branch"><h3>' + SHOP_BRANCH_LABEL[br] + '</h3>' +
+        '<div class="shop-tree-chain">' +
+          ups.map(function (u) {
+            var st = shopUpgradeStateLabel(u.id);
+            var lvl = shopUpgradeLevel(u.id);
+            return '<div class="shop-tree-node shop-state-' + st + '">' +
+              '<span class="shop-tree-ic">' + icon(u.icon) + '</span>' +
+              '<b>' + escapeAttr(u.name) + '</b>' +
+              '<span class="page-sub">רמה ' + lvl + '/' + u.maxLevel + '</span>' +
+              (st === 'locked' ? '<span class="shop-tree-lock">🔒 Lv.' + u.unlockLevel + '</span>' : '') +
+            '</div>';
+          }).join('<div class="shop-tree-arrow">→</div>') +
+        '</div></div>';
+    }).join('');
+  }
+  function shopSettingsHtml() {
+    var econ = state.shop.economy;
+    return '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:4px;">תגמולי Coins</h3>' +
+        '<p class="page-sub" style="margin-bottom:12px;">כמה Coins כל סוג פעילות נותן. שינוי לא משפיע על Coins שכבר ניתנו.</p>' +
+        '<div class="xpval-grid">' + Object.keys(econ.coinRewards).map(function (k) {
+          return '<div class="xpval-field"><label>' + k + '</label><input type="number" min="0" max="2000" step="1" data-shop-coinval="' + k + '" value="' + econ.coinRewards[k] + '"></div>';
+        }).join('') + '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<h3 style="margin-bottom:4px;">מגבלות ומכפילים</h3>' +
+        '<div class="xpval-grid">' +
+          '<div class="xpval-field"><label>Lucky Potion - מקסימום ביום</label><input type="number" min="0" max="20" data-shop-econ="maxLuckyProcsPerDay" value="' + econ.maxLuckyProcsPerDay + '"></div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function wireUpgradesBody(el) {
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-cancel-potion]'), function (b) {
+      b.addEventListener('click', function () { shopCancelPotion(b.dataset.shopCancelPotion); renderUpgrades(); toast('האפקט בוטל'); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-buy-upgrade]'), function (b) {
+      b.addEventListener('click', function () {
+        var res = shopPurchaseUpgrade(b.dataset.shopBuyUpgrade);
+        if (res.ok) { b.closest('.shop-upgrade-card').classList.add('shop-purchase-pop'); toast('נרכש! רמה ' + res.newLevel); renderUpgrades(); }
+        else if (res.reason === 'insufficient_coins') toast('אין מספיק Coins');
+        else if (res.reason === 'max_level') toast('כבר ברמה המקסימלית');
+        else if (res.reason === 'locked') toast('נעול עדיין');
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-buy-potion]'), function (b) {
+      b.addEventListener('click', function () {
+        var res = shopBuyPotion(b.dataset.shopBuyPotion);
+        if (res.ok) { toast('השיקוי נוסף למלאי'); renderUpgrades(); }
+        else toast('אין מספיק Coins');
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-use-potion]'), function (b) {
+      b.addEventListener('click', function () {
+        var res = shopUsePotion(b.dataset.shopUsePotion);
+        if (res.ok) { gamFlushEventQueue(null); toast('השיקוי הופעל!'); renderUpgrades(); }
+        else if (res.reason === 'already_active') toast('השיקוי הזה כבר פעיל');
+        else toast('לא ניתן להפעיל');
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-use-shield]'), function (b) {
+      b.addEventListener('click', function () {
+        var res = shopUseStreakShield();
+        if (res.ok) toast('הרצף הוגן ל-' + res.protectedDate + '!');
+        else if (res.reason === 'not_needed') toast('הרצף של אתמול תקין - לא נדרשת הגנה');
+        else toast('אין Streak Shield במלאי');
+        renderUpgrades();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-buy-cosmetic]'), function (b) {
+      b.addEventListener('click', function () {
+        var parts = b.dataset.shopBuyCosmetic.split(':');
+        var res = shopBuyCosmetic(parts[0], parts[1]);
+        if (res.ok) { toast('נפתח!'); renderUpgrades(); }
+        else if (res.reason === 'insufficient_coins') toast('אין מספיק Coins');
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-inv-filter]'), function (b) {
+      b.addEventListener('click', function () { shopInvFilter = b.dataset.shopInvFilter; renderUpgradesBody(); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-coinval]'), function (inp) {
+      inp.addEventListener('change', function () {
+        var v = Math.max(0, Math.round(+inp.value) || 0);
+        state.shop.economy.coinRewards[inp.dataset.shopCoinval] = v;
+        saveState();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-shop-econ]'), function (inp) {
+      inp.addEventListener('change', function () {
+        var v = Math.max(0, Math.round(+inp.value) || 0);
+        state.shop.economy[inp.dataset.shopEcon] = v;
+        saveState();
+      });
+    });
+  }
+
   /* ================= theme ================= */
   function applyTheme() {
     var root = document.documentElement;
@@ -3900,6 +4612,7 @@
     { id: 'advisor', label: 'יועץ', icon: 'spark', primary: true },
     { id: 'progress', label: 'התקדמות', icon: 'trophy' },
     { id: 'glowup', label: 'Glow Up', icon: 'glow' },
+    { id: 'upgrades', label: 'Upgrades', icon: 'crown' },
     { id: 'focus', label: 'פוקוס', icon: 'target' },
     { id: 'fitness', label: 'כושר', icon: 'dumbbell' },
     { id: 'goals', label: 'יעדים', icon: 'flag' },
@@ -3972,6 +4685,7 @@
     if (id === 'settings') renderSettings();
     if (id === 'progress') renderProgress();
     if (id === 'glowup') renderGlowUp();
+    if (id === 'upgrades') renderUpgrades();
     window.scrollTo(0, 0);
     var activeEl = document.getElementById('panel-' + id);
     activeEl.classList.remove('panel-enter');
@@ -5752,6 +6466,7 @@
   applyTheme();
   renderNav();
   gamCheckLevelRewards();
+  shopExpirePotions();
   saveState();
   showPanel('dashboard');
   gamFlushEventQueue(null);
