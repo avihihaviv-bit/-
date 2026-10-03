@@ -324,6 +324,27 @@
   .ring-track { stroke: var(--surface-3); }
   .ring-fill { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset 0.6s var(--ease-out); }
   .ring-pct { font-size: 24px; font-weight: 800; }
+  .ds-card { display: flex; flex-direction: column; gap: 14px; }
+  .ds-head { display: flex; align-items: center; justify-content: space-between; }
+  .ds-head h3 { font-size: 15px; }
+  .ds-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+  .ds-badge-great { background: color-mix(in srgb, #34d399 20%, transparent); color: #34d399; }
+  .ds-badge-good { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); }
+  .ds-badge-ok { background: color-mix(in srgb, #fbbf24 20%, transparent); color: #fbbf24; }
+  .ds-badge-low { background: color-mix(in srgb, #f87171 20%, transparent); color: #f87171; }
+  .ds-main { display: flex; align-items: center; gap: 18px; }
+  .ds-ring-wrap { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
+  .ds-ring-wrap svg { transform: rotate(-90deg); }
+  .ds-ring-track { stroke: var(--surface-3); }
+  .ds-ring-fill { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset 0.8s var(--ease-out); }
+  .ds-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; }
+  .ds-breakdown { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .ds-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-soft); }
+  .ds-row b { margin-inline-start: auto; color: var(--text); }
+  .ds-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ds-dot-done { background: #34d399; }
+  .ds-dot-pending { background: var(--text-soft); opacity: .5; }
+  .ds-dot-overdue { background: #f87171; }
   .stat-list { display: flex; flex-direction: column; gap: 6px; }
   .stat-list .row { display: flex; justify-content: space-between; gap: 14px; font-size: 13px; color: var(--text-soft); min-width: 150px; }
   .stat-list .row b { color: var(--text); font-weight: 600; }
@@ -384,6 +405,7 @@
   .t-title { flex: 1; font-size: 14.5px; font-weight: 500; }
   .t-row.done .t-title { text-decoration: line-through; color: var(--text-faint); }
   .t-cat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cat, var(--accent)); flex-shrink: 0; }
+  .t-xp-badge { font-size: 10.5px; color: var(--accent); font-family: "JetBrains Mono", monospace; flex-shrink: 0; opacity: .8; }
   .empty-msg { text-align: center; color: var(--text-soft); padding: 30px 0; font-size: 14px; }
 
   /* habits */
@@ -606,6 +628,9 @@
   .gc-level-badge { display: flex; align-items: center; gap: 12px; }
   .gc-level-ring { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: conic-gradient(var(--accent) calc(var(--gc-pct, 0) * 1%), var(--surface-3) 0); position: relative; }
   .gc-level-ring::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: var(--bg); }
+  .gc-level-ring.frame-neon { box-shadow: 0 0 0 2px #22d3ee, 0 0 14px 2px rgba(34,211,238,.55); }
+  .gc-level-ring.frame-gold { box-shadow: 0 0 0 2px #f59e0b, 0 0 14px 2px rgba(245,158,11,.5); }
+  .gc-level-ring.frame-cosmic { box-shadow: 0 0 0 2px #a78bfa, 0 0 18px 3px rgba(167,139,250,.55); background: conic-gradient(#a78bfa calc(var(--gc-pct, 0) * 1%), var(--surface-3) 0); }
   .gc-level-num { position: relative; z-index: 1; font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 18px; }
   .gc-title-col .gc-title { font-weight: 700; font-size: 15px; }
   .gc-title-col .gc-sub { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
@@ -670,6 +695,13 @@
   .stat-tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
   @media (min-width: 640px) { .stat-tile-grid { grid-template-columns: repeat(4, 1fr); } }
   .stat-tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 14px; }
+  .session-summary-modal { max-width: 420px; }
+  .ss-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0; }
+  .ss-tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 12px; text-align: center; }
+  .ss-val { font-size: 19px; font-weight: 800; }
+  .ss-lbl { font-size: 11.5px; color: var(--text-soft); margin-top: 2px; }
+  .ss-row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; padding: 8px 0; border-top: 1px solid var(--border); }
+  .ss-fact { font-size: 13px; color: var(--text-soft); background: var(--surface-2); border-radius: var(--radius-m); padding: 10px 12px; margin-top: 8px; }
   .stat-tile .st-val { font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 19px; }
   .stat-tile .st-lbl { font-size: 11.5px; color: var(--text-soft); margin-top: 2px; }
   .xp-chart-wrap { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 16px; margin-bottom: 16px; }
@@ -689,6 +721,17 @@
   .ach-card .ach-name { font-weight: 700; font-size: 12.5px; margin-bottom: 3px; }
   .ach-card .ach-desc { font-size: 10.5px; color: var(--text-faint); line-height: 1.4; }
   .ach-card .ach-date { font-size: 9.5px; color: var(--text-faint); margin-top: 6px; font-family: "JetBrains Mono", monospace; }
+  .ach-rarity { position: absolute; top: 8px; left: 8px; font-size: 8.5px; font-weight: 800; letter-spacing: 0.4px; padding: 2px 6px; border-radius: 999px; text-transform: uppercase; }
+  .ach-rarity.common { background: var(--surface-3); color: var(--text-faint); }
+  .ach-rarity.rare { background: color-mix(in srgb, var(--cat-social) 25%, transparent); color: var(--cat-social); }
+  .ach-rarity.epic { background: color-mix(in srgb, var(--cat-personal) 25%, transparent); color: var(--cat-personal); }
+  .ach-rarity.legendary { background: color-mix(in srgb, var(--accent-2) 25%, transparent); color: var(--accent-2); }
+  .ach-card .ach-prog { font-size: 10px; color: var(--text-faint); margin-top: 4px; font-family: "JetBrains Mono", monospace; }
+  .ach-toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .ach-search { flex: 1; min-width: 140px; padding: 8px 12px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 13px; }
+  .ach-cat-tabs { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+  .ach-cat-tabs button { white-space: nowrap; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft); font-size: 12px; cursor: pointer; }
+  .ach-cat-tabs button.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
 
   .chal-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-m); padding: 14px; margin-bottom: 10px; }
   .chal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
@@ -721,7 +764,7 @@
   .switch input:checked + span::before { transform: translateX(18px); }
 
   @media (prefers-reduced-motion: reduce) {
-    .xp-toast, .task-xp-glow, .task-xp-glow::after, .combo-flash, .levelup-overlay, .levelup-card, .levelup-glow, .ach-toast, .ach-toast .ach-ic, .gam-particle, .gc-bar-fill, .chal-bar-fill, .cat-bar-fill, .bonus-toast { animation: none !important; transition: none !important; }
+    .xp-toast, .task-xp-glow, .task-xp-glow::after, .combo-flash, .levelup-overlay, .levelup-card, .levelup-glow, .ach-toast, .ach-toast .ach-ic, .gam-particle, .gc-bar-fill, .chal-bar-fill, .cat-bar-fill, .bonus-toast, .bonus-toast .bt-ic, .bonus-toast.perfect .bt-ic, .ds-ring-fill { animation: none !important; transition: none !important; }
   }
 </style>
 
@@ -1056,7 +1099,7 @@
       g.cosmetics = Object.assign({ unlocked: [], equipped: { cardStyle: 'premium', barColor: 'default', frame: 'default', title: null } }, g.cosmetics || {});
       if (!Array.isArray(g.cosmetics.unlocked)) g.cosmetics.unlocked = [];
       g.cosmetics.equipped = Object.assign({ cardStyle: 'premium', barColor: 'default', frame: 'default', title: null }, g.cosmetics.equipped || {});
-      g.settings = Object.assign({ xp: defaultXPValues(), sound: false }, g.settings || {});
+      g.settings = Object.assign({ xp: defaultXPValues(), sound: false, animations: true, particles: true, showXPOnTasks: true, showStatsOnHome: true }, g.settings || {});
       g.settings.xp = Object.assign(defaultXPValues(), g.settings.xp || {});
       merged.gam = g;
 
@@ -1148,6 +1191,7 @@
   var gamEventQueue = [];
   function gamQueueEvent(ev) { gamEventQueue.push(ev); }
   function prefersReducedMotion() {
+    if (state.gam && state.gam.settings && state.gam.settings.animations === false) return true;
     try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   }
   function gamAnimateFillBars(root) {
@@ -1161,6 +1205,7 @@
   }
   function gamSpawnParticles(container, count) {
     if (prefersReducedMotion()) return;
+    if (state.gam && state.gam.settings && state.gam.settings.particles === false) return;
     for (var i = 0; i < count; i++) {
       (function () {
         var p = document.createElement('div');
@@ -1341,27 +1386,29 @@
     var levelInfo = levelInfoFromXP(state.gam.totalXP);
     return { totalTasksDone: totalTasksDone, catDone: catDone, perfectDays: perfectDays, longestStreak: state.gam.streak.longest, level: levelInfo.level, totalXP: state.gam.totalXP, morningStreak: gamMorningStreak() };
   }
+  var ACH_CATEGORIES = { productivity: 'Productivity', consistency: 'Consistency', learning: 'Learning', fitness: 'Fitness', morning: 'Morning Routine', milestones: 'Milestones', special: 'Special' };
+  var ACH_RARITY_LABEL = { common: 'Common', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' };
   var ACHIEVEMENTS = [
-    { id: 'first_step', name: 'First Step', desc: 'השלמת המשימה הראשונה', xp: 10, icon: 'star', check: function (c) { return c.totalTasksDone >= 1; } },
-    { id: 'getting_started', name: 'Getting Started', desc: 'השלמת 10 משימות', xp: 20, icon: 'star', check: function (c) { return c.totalTasksDone >= 10; } },
-    { id: 'consistent', name: 'Consistent', desc: 'השלמת 50 משימות', xp: 40, icon: 'star', check: function (c) { return c.totalTasksDone >= 50; } },
-    { id: 'productivity_machine', name: 'Productivity Machine', desc: 'השלמת 100 משימות', xp: 80, icon: 'star', check: function (c) { return c.totalTasksDone >= 100; } },
-    { id: 'early_bird', name: 'Early Bird', desc: 'כל משימות הבוקר - 7 ימים ברצף', xp: 70, icon: 'sun', check: function (c) { return c.morningStreak >= 7; } },
-    { id: 'gym_warrior', name: 'Gym Warrior', desc: '10 אימונים הושלמו', xp: 50, icon: 'dumbbell', check: function (c) { return (c.catDone.fitness || 0) >= 10; } },
-    { id: 'scholar', name: 'Scholar', desc: '20 בלוקי למידה הושלמו', xp: 50, icon: 'book', check: function (c) { return (c.catDone.learning || 0) >= 20; } },
-    { id: 'perfect_day_1', name: 'Perfect Day', desc: 'יום מושלם ראשון', xp: 60, icon: 'trophy', check: function (c) { return c.perfectDays >= 1; } },
-    { id: 'streak_3', name: 'Warming Up', desc: '3 ימים רצופים', xp: 15, icon: 'flame', check: function (c) { return c.longestStreak >= 3; } },
-    { id: 'streak_7', name: 'Weekly Champion', desc: '7 ימים רצופים', xp: 40, icon: 'flame', check: function (c) { return c.longestStreak >= 7; } },
-    { id: 'streak_14', name: 'Two Weeks Strong', desc: '14 ימים רצופים', xp: 80, icon: 'flame', check: function (c) { return c.longestStreak >= 14; } },
-    { id: 'streak_30', name: 'Unstoppable', desc: '30 ימים רצופים', xp: 200, icon: 'flame', check: function (c) { return c.longestStreak >= 30; } },
-    { id: 'streak_60', name: 'Iron Will', desc: '60 ימים רצופים', xp: 400, icon: 'flame', check: function (c) { return c.longestStreak >= 60; } },
-    { id: 'streak_100', name: 'Centurion', desc: '100 ימים רצופים', xp: 700, icon: 'flame', check: function (c) { return c.longestStreak >= 100; } },
-    { id: 'level_10', name: 'Level 10', desc: 'הגעת לרמה 10', xp: 50, icon: 'crown', check: function (c) { return c.level >= 10; } },
-    { id: 'level_25', name: 'Level 25', desc: 'הגעת לרמה 25', xp: 120, icon: 'crown', check: function (c) { return c.level >= 25; } },
-    { id: 'level_50', name: 'Level 50', desc: 'הגעת לרמה 50', xp: 300, icon: 'crown', check: function (c) { return c.level >= 50; } },
-    { id: 'xp_1000', name: 'XP Collector I', desc: 'צבירת 1,000 XP', xp: 0, icon: 'zap', check: function (c) { return c.totalXP >= 1000; } },
-    { id: 'xp_5000', name: 'XP Collector II', desc: 'צבירת 5,000 XP', xp: 0, icon: 'zap', check: function (c) { return c.totalXP >= 5000; } },
-    { id: 'xp_10000', name: 'XP Collector III', desc: 'צבירת 10,000 XP', xp: 0, icon: 'zap', check: function (c) { return c.totalXP >= 10000; } }
+    { id: 'first_step', name: 'First Step', desc: 'השלמת המשימה הראשונה', xp: 10, icon: 'star', category: 'productivity', rarity: 'common', check: function (c) { return c.totalTasksDone >= 1; }, progress: function (c) { return { cur: Math.min(c.totalTasksDone, 1), max: 1 }; } },
+    { id: 'getting_started', name: 'Getting Started', desc: 'השלמת 10 משימות', xp: 20, icon: 'star', category: 'productivity', rarity: 'common', check: function (c) { return c.totalTasksDone >= 10; }, progress: function (c) { return { cur: Math.min(c.totalTasksDone, 10), max: 10 }; } },
+    { id: 'consistent', name: 'Consistent', desc: 'השלמת 50 משימות', xp: 40, icon: 'star', category: 'productivity', rarity: 'rare', check: function (c) { return c.totalTasksDone >= 50; }, progress: function (c) { return { cur: Math.min(c.totalTasksDone, 50), max: 50 }; } },
+    { id: 'productivity_machine', name: 'Productivity Machine', desc: 'השלמת 100 משימות', xp: 80, icon: 'star', category: 'productivity', rarity: 'epic', check: function (c) { return c.totalTasksDone >= 100; }, progress: function (c) { return { cur: Math.min(c.totalTasksDone, 100), max: 100 }; } },
+    { id: 'early_bird', name: 'Early Bird', desc: 'כל משימות הבוקר - 7 ימים ברצף', xp: 70, icon: 'sun', category: 'morning', rarity: 'epic', check: function (c) { return c.morningStreak >= 7; }, progress: function (c) { return { cur: Math.min(c.morningStreak, 7), max: 7 }; } },
+    { id: 'gym_warrior', name: 'Gym Warrior', desc: '10 אימונים הושלמו', xp: 50, icon: 'dumbbell', category: 'fitness', rarity: 'rare', check: function (c) { return (c.catDone.fitness || 0) >= 10; }, progress: function (c) { return { cur: Math.min(c.catDone.fitness || 0, 10), max: 10 }; } },
+    { id: 'scholar', name: 'Scholar', desc: '20 בלוקי למידה הושלמו', xp: 50, icon: 'book', category: 'learning', rarity: 'rare', check: function (c) { return (c.catDone.learning || 0) >= 20; }, progress: function (c) { return { cur: Math.min(c.catDone.learning || 0, 20), max: 20 }; } },
+    { id: 'perfect_day_1', name: 'Perfect Day', desc: 'יום מושלם ראשון', xp: 60, icon: 'trophy', category: 'special', rarity: 'rare', check: function (c) { return c.perfectDays >= 1; }, progress: function (c) { return { cur: Math.min(c.perfectDays, 1), max: 1 }; } },
+    { id: 'streak_3', name: 'Warming Up', desc: '3 ימים רצופים', xp: 15, icon: 'flame', category: 'consistency', rarity: 'common', check: function (c) { return c.longestStreak >= 3; }, progress: function (c) { return { cur: Math.min(c.longestStreak, 3), max: 3 }; } },
+    { id: 'streak_7', name: 'Weekly Champion', desc: '7 ימים רצופים', xp: 40, icon: 'flame', category: 'consistency', rarity: 'rare', check: function (c) { return c.longestStreak >= 7; }, progress: function (c) { return { cur: Math.min(c.longestStreak, 7), max: 7 }; } },
+    { id: 'streak_14', name: 'Two Weeks Strong', desc: '14 ימים רצופים', xp: 80, icon: 'flame', category: 'consistency', rarity: 'epic', check: function (c) { return c.longestStreak >= 14; }, progress: function (c) { return { cur: Math.min(c.longestStreak, 14), max: 14 }; } },
+    { id: 'streak_30', name: 'Unstoppable', desc: '30 ימים רצופים', xp: 200, icon: 'flame', category: 'consistency', rarity: 'epic', check: function (c) { return c.longestStreak >= 30; }, progress: function (c) { return { cur: Math.min(c.longestStreak, 30), max: 30 }; } },
+    { id: 'streak_60', name: 'Iron Will', desc: '60 ימים רצופים', xp: 400, icon: 'flame', category: 'consistency', rarity: 'legendary', check: function (c) { return c.longestStreak >= 60; }, progress: function (c) { return { cur: Math.min(c.longestStreak, 60), max: 60 }; } },
+    { id: 'streak_100', name: 'Centurion', desc: '100 ימים רצופים', xp: 700, icon: 'flame', category: 'consistency', rarity: 'legendary', check: function (c) { return c.longestStreak >= 100; }, progress: function (c) { return { cur: Math.min(c.longestStreak, 100), max: 100 }; } },
+    { id: 'level_10', name: 'Level 10', desc: 'הגעת לרמה 10', xp: 50, icon: 'crown', category: 'milestones', rarity: 'rare', check: function (c) { return c.level >= 10; }, progress: function (c) { return { cur: Math.min(c.level, 10), max: 10 }; } },
+    { id: 'level_25', name: 'Level 25', desc: 'הגעת לרמה 25', xp: 120, icon: 'crown', category: 'milestones', rarity: 'epic', check: function (c) { return c.level >= 25; }, progress: function (c) { return { cur: Math.min(c.level, 25), max: 25 }; } },
+    { id: 'level_50', name: 'Level 50', desc: 'הגעת לרמה 50', xp: 300, icon: 'crown', category: 'milestones', rarity: 'legendary', check: function (c) { return c.level >= 50; }, progress: function (c) { return { cur: Math.min(c.level, 50), max: 50 }; } },
+    { id: 'xp_1000', name: 'XP Collector I', desc: 'צבירת 1,000 XP', xp: 0, icon: 'zap', category: 'productivity', rarity: 'rare', check: function (c) { return c.totalXP >= 1000; }, progress: function (c) { return { cur: Math.min(c.totalXP, 1000), max: 1000 }; } },
+    { id: 'xp_5000', name: 'XP Collector II', desc: 'צבירת 5,000 XP', xp: 0, icon: 'zap', category: 'productivity', rarity: 'epic', check: function (c) { return c.totalXP >= 5000; }, progress: function (c) { return { cur: Math.min(c.totalXP, 5000), max: 5000 }; } },
+    { id: 'xp_10000', name: 'XP Collector III', desc: 'צבירת 10,000 XP', xp: 0, icon: 'zap', category: 'productivity', rarity: 'legendary', check: function (c) { return c.totalXP >= 10000; }, progress: function (c) { return { cur: Math.min(c.totalXP, 10000), max: 10000 }; } }
   ];
   var BAR_COLORS = [
     { id: 'default', label: 'ברירת מחדל', unlockLevel: 1, css: 'linear-gradient(90deg, var(--accent), var(--accent-2))' },
@@ -1369,6 +1416,12 @@
     { id: 'violet', label: 'סגול', unlockLevel: 10, css: 'linear-gradient(90deg, #a78bfa, #7c3aed)' },
     { id: 'gold', label: 'זהב', unlockLevel: 20, css: 'linear-gradient(90deg, #fbbf24, #f59e0b)' },
     { id: 'inferno', label: 'אינפרנו', unlockLevel: 35, css: 'linear-gradient(90deg, #fb923c, #ef4444)' }
+  ];
+  var FRAMES = [
+    { id: 'default', label: 'רגיל', unlockLevel: 1, cls: '' },
+    { id: 'neon', label: 'מסגרת נאון', unlockLevel: 8, cls: 'frame-neon' },
+    { id: 'gold', label: 'מסגרת זהב', unlockLevel: 15, cls: 'frame-gold' },
+    { id: 'cosmic', label: 'מסגרת קוסמית', unlockLevel: 30, cls: 'frame-cosmic' }
   ];
   function gamCheckAchievements() {
     var ctx = gamAchievementContext();
@@ -1525,7 +1578,16 @@
       if (state.gam.settings.sound) gamPlayTone(784, 0.16);
     }
   }
+  var levelUpOverlayOpen = false;
+  var pendingLevelUpOverlay = null;
   function gamShowLevelUpOverlay(fromLevel, toLevel, allLevels, totalXP, xpGained) {
+    if (levelUpOverlayOpen) {
+      pendingLevelUpOverlay = pendingLevelUpOverlay
+        ? { fromLevel: pendingLevelUpOverlay.fromLevel, toLevel: toLevel, allLevels: pendingLevelUpOverlay.allLevels.concat(allLevels), totalXP: totalXP, xpGained: pendingLevelUpOverlay.xpGained + (xpGained || 0) }
+        : { fromLevel: fromLevel, toLevel: toLevel, allLevels: allLevels, totalXP: totalXP, xpGained: xpGained };
+      return;
+    }
+    levelUpOverlayOpen = true;
     var wrap = document.createElement('div');
     wrap.className = 'levelup-overlay';
     var title = levelTitleFor(toLevel);
@@ -1543,9 +1605,17 @@
         '<div class="levelup-xp num" dir="ltr">סה״כ <span id="levelup-xp-num">' + totalXP + '</span> XP</div>' +
         '<button class="btn btn-primary btn-block" id="levelup-continue">' + icon('check') + 'המשך' + '</button>' +
       '</div>';
-    wrap.addEventListener('click', function (e) { if (e.target === wrap) wrap.remove(); });
+    function closeOverlay() {
+      wrap.remove();
+      levelUpOverlayOpen = false;
+      if (pendingLevelUpOverlay) {
+        var p = pendingLevelUpOverlay; pendingLevelUpOverlay = null;
+        gamShowLevelUpOverlay(p.fromLevel, p.toLevel, p.allLevels, p.totalXP, p.xpGained);
+      }
+    }
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeOverlay(); });
     document.body.appendChild(wrap);
-    wrap.querySelector('#levelup-continue').addEventListener('click', function () { wrap.remove(); });
+    wrap.querySelector('#levelup-continue').addEventListener('click', closeOverlay);
     gamSpawnParticles(wrap, 18);
     var xpNumEl = wrap.querySelector('#levelup-xp-num');
     var startXP = Math.max(0, totalXP - (xpGained || 0));
@@ -1572,6 +1642,57 @@
       var last = levelupEvents[levelupEvents.length - 1];
       gamShowLevelUpOverlay(levelupEvents[0].from, last.to, allLevels, last.totalXP, totalXPGained);
     }
+  }
+
+  /* ================= session summary (opt-in end-of-day recap) ================= */
+  function gamSessionSummaryData() {
+    var todayKey = dkey(todayDate());
+    var list = todayTasks();
+    var doneToday = list.filter(function (t) { return t.done; }).length;
+    var successPct = list.length ? Math.round(doneToday / list.length * 100) : 0;
+    var xpToday = 0;
+    Object.keys(state.gam.xpEvents).forEach(function (id) {
+      var ev = state.gam.xpEvents[id];
+      if (dkey(new Date(ev.at)) === todayKey) xpToday += ev.xp;
+    });
+    var levelsToday = state.gam.levelUps.filter(function (l) { return dkey(new Date(l.at)) === todayKey; }).map(function (l) { return l.level; });
+    var achToday = ACHIEVEMENTS.filter(function (a) { var u = state.gam.achievements[a.id]; return u && dkey(new Date(u.at)) === todayKey; });
+    var stats7 = gamStatsForRange(7);
+    var avg7 = stats7.totalLoggedDays ? Math.round(stats7.successDays / stats7.totalLoggedDays * 100) : null;
+    var funFact;
+    if (avg7 !== null) {
+      var diff = successPct - avg7;
+      if (diff > 0) funFact = 'היום השלמת ' + diff + '% יותר מהממוצע השבועי שלך 🔥';
+      else if (diff < 0) funFact = 'קצת מתחת לממוצע השבועי שלך (' + avg7 + '%) - מחר יום חדש!';
+      else funFact = 'היום בדיוק כמו הממוצע השבועי שלך - ' + avg7 + '%.';
+    } else {
+      funFact = 'רצף נוכחי: ' + state.gam.streak.current + ' ימים 🔥';
+    }
+    return { doneToday: doneToday, total: list.length, successPct: successPct, xpToday: xpToday, levelsToday: levelsToday, achToday: achToday, streak: state.gam.streak.current, funFact: funFact };
+  }
+  function openSessionSummaryModal() {
+    var s = gamSessionSummaryData();
+    var root = document.getElementById('modal-root');
+    var wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.innerHTML =
+      '<div class="modal session-summary-modal" role="dialog" aria-modal="true">' +
+        '<h3>' + icon('chart') + 'סיכום היום' + '</h3>' +
+        '<div class="ss-grid">' +
+          '<div class="ss-tile"><div class="ss-val num" dir="ltr">' + s.doneToday + '/' + s.total + '</div><div class="ss-lbl">משימות הושלמו</div></div>' +
+          '<div class="ss-tile"><div class="ss-val num" dir="ltr">+' + s.xpToday + '</div><div class="ss-lbl">XP היום</div></div>' +
+          '<div class="ss-tile"><div class="ss-val num">' + s.successPct + '%</div><div class="ss-lbl">אחוז הצלחה</div></div>' +
+          '<div class="ss-tile"><div class="ss-val num">' + s.streak + ' 🔥</div><div class="ss-lbl">רצף ימים</div></div>' +
+        '</div>' +
+        (s.levelsToday.length ? '<div class="ss-row">' + icon('trophy') + '<span>עלית לרמה ' + s.levelsToday[s.levelsToday.length - 1] + ' היום!</span></div>' : '') +
+        (s.achToday.length ? '<div class="ss-row">' + icon('star') + '<span>הישגים חדשים: ' + s.achToday.map(function (a) { return escapeAttr(a.name); }).join(', ') + '</span></div>' : '') +
+        '<div class="ss-fact">' + escapeAttr(s.funFact) + '</div>' +
+        '<div class="modal-actions"><button class="btn btn-primary btn-block" id="ss-close">' + icon('check') + 'סגור' + '</button></div>' +
+      '</div>';
+    root.innerHTML = '';
+    root.appendChild(wrap);
+    document.getElementById('ss-close').addEventListener('click', closeModal);
   }
 
   /* ================= progress page (achievements / stats / challenges) ================= */
@@ -1673,11 +1794,18 @@
           return '<button class="cosm-opt' + (active ? ' active' : '') + '" data-card-style="' + p[0] + '">' + p[1] + '</button>';
         }).join('') +
       '</div></div>' +
-      '<div class="card"><h3 style="margin-bottom:10px;">צבע פס ההתקדמות</h3><div class="cosm-grid">' +
+      '<div class="card" style="margin-bottom:16px;"><h3 style="margin-bottom:10px;">צבע פס ההתקדמות</h3><div class="cosm-grid">' +
         BAR_COLORS.map(function (b) {
           var unlocked = info.level >= b.unlockLevel;
           var active = (state.gam.cosmetics.equipped.barColor || 'default') === b.id;
           return '<button class="cosm-opt' + (active ? ' active' : '') + (unlocked ? '' : ' locked') + '"' + (unlocked ? ' data-bar-color="' + b.id + '"' : ' disabled') + '>' + b.label + (unlocked ? '' : ' 🔒 Lv.' + b.unlockLevel) + '</button>';
+        }).join('') +
+      '</div></div>' +
+      '<div class="card"><h3 style="margin-bottom:10px;">מסגרת תג רמה</h3><div class="cosm-grid">' +
+        FRAMES.map(function (f) {
+          var unlocked = info.level >= f.unlockLevel;
+          var active = (state.gam.cosmetics.equipped.frame || 'default') === f.id;
+          return '<button class="cosm-opt' + (active ? ' active' : '') + (unlocked ? '' : ' locked') + '"' + (unlocked ? ' data-frame="' + f.id + '"' : ' disabled') + '>' + f.label + (unlocked ? '' : ' 🔒 Lv.' + f.unlockLevel) + '</button>';
         }).join('') +
       '</div></div>';
   }
@@ -1706,17 +1834,31 @@
       '<div class="xp-chart-wrap"><h3 style="margin-bottom:10px;">XP יומי</h3>' + gamSparklineSVG(series) + '</div>' +
       '<div class="card"><h3 style="margin-bottom:10px;">משימות שהושלמו לפי קטגוריה</h3>' + catRows + '</div>';
   }
+  var achSearch = '';
+  var achCategoryFilter = 'all';
   function progressAchievementsHtml() {
-    return '<div class="ach-grid">' + ACHIEVEMENTS.map(function (a) {
-      var unlocked = state.gam.achievements[a.id];
-      var dateStr = unlocked ? new Date(unlocked.at).toLocaleDateString('he-IL') : '';
-      return '<div class="ach-card ' + (unlocked ? 'unlocked' : 'locked') + '">' +
-        '<div class="ach-icn">' + icon(unlocked ? a.icon : 'lock') + '</div>' +
-        '<div class="ach-name">' + escapeAttr(a.name) + '</div>' +
-        '<div class="ach-desc">' + escapeAttr(a.desc) + '</div>' +
-        (unlocked ? '<div class="ach-date num">' + dateStr + '</div>' : '') +
-      '</div>';
-    }).join('') + '</div>';
+    var ctx = gamAchievementContext();
+    var cats = [['all', 'הכל']].concat(Object.keys(ACH_CATEGORIES).map(function (k) { return [k, ACH_CATEGORIES[k]]; }));
+    var searchLower = achSearch.trim().toLowerCase();
+    var filtered = ACHIEVEMENTS.filter(function (a) {
+      if (achCategoryFilter !== 'all' && a.category !== achCategoryFilter) return false;
+      if (searchLower && a.name.toLowerCase().indexOf(searchLower) === -1 && a.desc.indexOf(achSearch.trim()) === -1) return false;
+      return true;
+    });
+    return '<div class="ach-toolbar"><input type="text" class="ach-search" id="ach-search-input" placeholder="חיפוש הישג..." value="' + escapeAttr(achSearch) + '"></div>' +
+      '<div class="ach-cat-tabs">' + cats.map(function (c) { return '<button data-ach-cat="' + c[0] + '" class="' + (achCategoryFilter === c[0] ? 'active' : '') + '">' + c[1] + '</button>'; }).join('') + '</div>' +
+      (filtered.length ? '<div class="ach-grid">' + filtered.map(function (a) {
+        var unlocked = state.gam.achievements[a.id];
+        var dateStr = unlocked ? new Date(unlocked.at).toLocaleDateString('he-IL') : '';
+        var prog = a.progress ? a.progress(ctx) : null;
+        return '<div class="ach-card ' + (unlocked ? 'unlocked' : 'locked') + '">' +
+          '<div class="ach-rarity ' + a.rarity + '">' + ACH_RARITY_LABEL[a.rarity] + '</div>' +
+          '<div class="ach-icn">' + icon(unlocked ? a.icon : 'lock') + '</div>' +
+          '<div class="ach-name">' + escapeAttr(a.name) + '</div>' +
+          '<div class="ach-desc">' + escapeAttr(a.desc) + '</div>' +
+          (unlocked ? '<div class="ach-date num">' + dateStr + '</div>' : (prog ? '<div class="ach-prog num" dir="ltr">' + prog.cur + ' / ' + prog.max + '</div>' : '')) +
+        '</div>';
+      }).join('') + '</div>' : '<p class="page-sub" style="padding:20px 0;text-align:center;">לא נמצאו הישגים תואמים.</p>');
   }
   function progressChallengesHtml() {
     gamEnsureChallenges();
@@ -1765,8 +1907,24 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-bar-color]'), function (b) {
       b.addEventListener('click', function () { state.gam.cosmetics.equipped.barColor = b.dataset.barColor; saveState(); renderProgressBody(); });
     });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-frame]'), function (b) {
+      b.addEventListener('click', function () { state.gam.cosmetics.equipped.frame = b.dataset.frame; saveState(); renderProgressBody(); });
+    });
     Array.prototype.forEach.call(document.querySelectorAll('[data-prange]'), function (b) {
       b.addEventListener('click', function () { var v = b.dataset.prange; progressRange = v === 'all' ? 'all' : +v; renderProgressBody(); });
+    });
+    var achSearchInput = document.getElementById('ach-search-input');
+    if (achSearchInput) {
+      achSearchInput.addEventListener('input', function () {
+        achSearch = achSearchInput.value;
+        var start = achSearchInput.selectionStart, end = achSearchInput.selectionEnd;
+        renderProgressBody();
+        var refocused = document.getElementById('ach-search-input');
+        if (refocused) { refocused.focus(); try { refocused.setSelectionRange(start, end); } catch (e) {} }
+      });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ach-cat]'), function (b) {
+      b.addEventListener('click', function () { achCategoryFilter = b.dataset.achCat; renderProgressBody(); });
     });
   }
 
@@ -2052,19 +2210,96 @@
 
   function catColor(cat) { return CATS[cat] ? CATS[cat].color : 'var(--accent)'; }
 
+  /* ================= daily score (0-100, separate from XP) ================= */
+  var IMPORTANCE_WEIGHT = { small: 1, regular: 1, important: 1.5, challenging: 2 };
+  var lastDailyScoreShown = null;
+  function gamDailyScore() {
+    var list = todayTasks();
+    var now = new Date();
+    var nowMin = now.getHours() * 60 + now.getMinutes();
+    var required = list.filter(function (t) { return !t.optional; });
+    var doneCount = 0, pendingCount = 0, overdueCount = 0, totalWeight = 0, earned = 0;
+    required.forEach(function (t) {
+      var w = IMPORTANCE_WEIGHT[t.importance] || 1;
+      var dueMin = timeToMin(t.time);
+      if (t.done) {
+        doneCount++;
+        totalWeight += w;
+        var compMin = dueMin;
+        if (t.completedAt) { var cd = new Date(t.completedAt); compMin = cd.getHours() * 60 + cd.getMinutes(); }
+        var lateBy = compMin - dueMin;
+        var credit = lateBy <= 15 ? 1 : (lateBy <= 60 ? 0.8 : 0.6);
+        earned += w * credit;
+      } else if (dueMin < nowMin) {
+        overdueCount++;
+        totalWeight += w;
+      } else {
+        pendingCount++;
+      }
+    });
+    var score = totalWeight > 0 ? Math.round(earned / totalWeight * 100) : 100;
+    return { score: score, doneCount: doneCount, pendingCount: pendingCount, overdueCount: overdueCount, total: required.length };
+  }
+  function dailyScoreLabel(score) {
+    if (score >= 90) return 'מצוין';
+    if (score >= 70) return 'טוב';
+    if (score >= 50) return 'סביר';
+    return 'דורש תשומת לב';
+  }
+  function dailyScoreCardHtml() {
+    if (!state.gam.settings.showStatsOnHome) return '';
+    var ds = gamDailyScore();
+    var c = 2 * Math.PI * 36;
+    return '<div class="card ds-card">' +
+      '<div class="ds-head"><h3>ציון יומי</h3><span class="ds-badge ds-badge-' + (ds.score >= 90 ? 'great' : ds.score >= 70 ? 'good' : ds.score >= 50 ? 'ok' : 'low') + '">' + dailyScoreLabel(ds.score) + '</span></div>' +
+      '<div class="ds-main">' +
+        '<div class="ds-ring-wrap">' +
+          '<svg width="84" height="84" viewBox="0 0 84 84">' +
+            '<circle class="ds-ring-track" cx="42" cy="42" r="36" stroke-width="8" fill="none"/>' +
+            '<circle class="ds-ring-fill" id="ds-ring-fill" cx="42" cy="42" r="36" stroke-width="8" fill="none" stroke-dasharray="' + c + '" stroke-dashoffset="' + c + '" data-ds-pct="' + ds.score + '"/>' +
+          '</svg>' +
+          '<div class="ds-num num" id="ds-score-num">0</div>' +
+        '</div>' +
+        '<div class="ds-breakdown">' +
+          '<div class="ds-row"><span class="ds-dot ds-dot-done"></span><span>הושלמו</span><b class="num" dir="ltr">' + ds.doneCount + '</b></div>' +
+          '<div class="ds-row"><span class="ds-dot ds-dot-pending"></span><span>ממתינות</span><b class="num" dir="ltr">' + ds.pendingCount + '</b></div>' +
+          '<div class="ds-row"><span class="ds-dot ds-dot-overdue"></span><span>פיגור</span><b class="num" dir="ltr">' + ds.overdueCount + '</b></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  function gamAnimateDailyScore(root) {
+    var ringEl = root.querySelector('#ds-ring-fill');
+    var numEl = root.querySelector('#ds-score-num');
+    if (!ringEl || !numEl) return;
+    var pct = +ringEl.dataset.dsPct;
+    var c = 2 * Math.PI * 36;
+    var offset = c - (pct / 100) * c;
+    var from = lastDailyScoreShown === null ? 0 : lastDailyScoreShown;
+    if (prefersReducedMotion()) {
+      ringEl.style.strokeDashoffset = offset;
+    } else {
+      requestAnimationFrame(function () { ringEl.style.strokeDashoffset = offset; });
+    }
+    gamAnimateCountUp(numEl, from, pct, 700);
+    lastDailyScoreShown = pct;
+  }
+
   function gamerCardHtml() {
     var info = levelInfoFromXP(state.gam.totalXP);
     var title = levelTitleFor(info.level);
     var style = state.gam.cosmetics.equipped.cardStyle || 'premium';
     var barColorId = state.gam.cosmetics.equipped.barColor || 'default';
     var barColorObj = BAR_COLORS.filter(function (b) { return b.id === barColorId; })[0] || BAR_COLORS[0];
+    var frameId = state.gam.cosmetics.equipped.frame || 'default';
+    var frameObj = FRAMES.filter(function (f) { return f.id === frameId; })[0] || FRAMES[0];
     var list = todayTasks();
     var doneToday = list.filter(function (t) { return t.done; }).length;
     var pctToday = list.length ? Math.round(doneToday / list.length * 100) : 0;
     return '<div class="gamer-card style-' + style + '" style="--gc-pct:' + info.pct + ';">' +
       '<div class="gc-top">' +
         '<div class="gc-level-badge">' +
-          '<div class="gc-level-ring"><div class="gc-level-num">' + info.level + '</div></div>' +
+          '<div class="gc-level-ring' + (frameObj.cls ? ' ' + frameObj.cls : '') + '"><div class="gc-level-num">' + info.level + '</div></div>' +
           '<div class="gc-title-col"><div class="gc-title" style="color:' + title.color + ';">' + title.label + '</div><div class="gc-sub num" dir="ltr">' + info.xpIntoLevel + ' / ' + info.xpForNext + ' XP</div></div>' +
         '</div>' +
         '<div class="gc-date">' + new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'short' }) + '</div>' +
@@ -2106,7 +2341,12 @@
 
       gamerCardHtml() +
 
-      '<button class="btn btn-ghost btn-sm" id="free-time-btn" style="margin-bottom:16px;">' + icon('target') + 'מצא זמן פנוי' + '</button>' +
+      (dailyScoreCardHtml() ? '<div style="margin-bottom:16px;">' + dailyScoreCardHtml() + '</div>' : '') +
+
+      '<div style="display:flex;gap:8px;margin-bottom:16px;">' +
+        '<button class="btn btn-ghost btn-sm" id="free-time-btn">' + icon('target') + 'מצא זמן פנוי' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="session-summary-btn">' + icon('chart') + 'סיכום היום' + '</button>' +
+      '</div>' +
 
       '<div class="grid-2" style="margin-bottom:16px;">' +
         '<div class="now-card">' + renderNowCard(nnl) + '</div>' +
@@ -2144,9 +2384,11 @@
       b.addEventListener('click', function () { toggleHabit(b.dataset.habitToggle); renderDashboard(); });
     });
     document.getElementById('free-time-btn').addEventListener('click', function () { openFreeTimeModal(); });
+    document.getElementById('session-summary-btn').addEventListener('click', function () { openSessionSummaryModal(); });
     var gcOpenBtn = document.getElementById('gc-open-progress');
     if (gcOpenBtn) gcOpenBtn.addEventListener('click', function () { showPanel('progress'); });
     gamAnimateFillBars(el);
+    gamAnimateDailyScore(el);
     wireNowCard(el, nnl);
     tickClock();
   }
@@ -2302,6 +2544,7 @@
     var newVal = val !== undefined ? val : !t.done;
     var wasAlreadyDone = t.done;
     t.done = newVal;
+    t.completedAt = newVal ? Date.now() : null;
     saveState();
     if (newVal && !wasAlreadyDone) gamOnTaskCompleted(t);
   }
@@ -2328,12 +2571,14 @@
       }).join('') + '<button type="button" class="day-pill day-pill-add" id="add-day-type-btn">+ סוג יום</button></div>' +
       (list.length ?
         '<div class="timeline" id="t-timeline">' + list.map(function (t) {
+          var xpBadge = (state.gam.settings.showXPOnTasks && !t.done) ? '<span class="t-xp-badge num" dir="ltr">+' + gamTaskXP(t, list) + '</span>' : '';
           return '<div class="t-item' + (t.done ? ' done' : '') + '" style="--cat:' + catColor(t.category) + '" data-id="' + t.id + '">' +
             '<div class="t-row' + (t.id === nowId ? ' now' : '') + (t.done ? ' done' : '') + '" data-open="' + t.id + '">' +
               '<button class="drag-handle" data-drag="' + t.id + '" aria-label="גרור כדי לשנות שעה">' + icon('grip') + '</button>' +
               '<button class="t-check' + (t.done ? ' done' : '') + '" data-check="' + t.id + '" aria-label="סמן כבוצע"></button>' +
               '<span class="t-time num">' + t.time + '</span>' +
               '<span class="t-title">' + escapeAttr(t.title) + '</span>' +
+              xpBadge +
               '<span class="t-cat-dot" title="' + CATS[t.category].label + '"></span>' +
             '</div></div>';
         }).join('') + '</div>'
@@ -3616,8 +3861,20 @@
         '<button class="btn btn-ghost btn-sm" id="xpval-reset" style="margin-top:12px;">איפוס לערכי ברירת מחדל</button>' +
       '</div>' +
       '<div class="card" style="margin-top:16px;">' +
-        '<div class="settings-row" style="border:none;padding:0;"><div><div class="lbl">צליל בעת XP / הישג</div><div class="desc">צליל עדין קצר, כבוי כברירת מחדל</div></div>' +
+        '<div class="settings-row"><div><div class="lbl">צליל בעת XP / הישג</div><div class="desc">צליל עדין קצר, כבוי כברירת מחדל</div></div>' +
           '<label class="switch"><input type="checkbox" id="set-sound"' + (state.gam.settings.sound ? ' checked' : '') + '><span></span></label></div>' +
+        '<div class="settings-row"><div><div class="lbl">אנימציות</div><div class="desc">אנימציות XP, Level Up והישגים</div></div>' +
+          '<label class="switch"><input type="checkbox" id="set-anim"' + (state.gam.settings.animations ? ' checked' : '') + '><span></span></label></div>' +
+        '<div class="settings-row"><div><div class="lbl">חלקיקים (Particles)</div><div class="desc">אפקט פיצוץ חלקיקים ברגעים מיוחדים</div></div>' +
+          '<label class="switch"><input type="checkbox" id="set-particles"' + (state.gam.settings.particles ? ' checked' : '') + '><span></span></label></div>' +
+        '<div class="settings-row"><div><div class="lbl">הצג XP על משימות</div><div class="desc">תג XP קטן לצד כל פעילות בלוח היומי</div></div>' +
+          '<label class="switch"><input type="checkbox" id="set-xpontasks"' + (state.gam.settings.showXPOnTasks ? ' checked' : '') + '><span></span></label></div>' +
+        '<div class="settings-row" style="border:none;padding-bottom:0;"><div><div class="lbl">הצג ציון יומי בבית</div><div class="desc">כרטיס ה"ציון היומי" בעמוד הבית</div></div>' +
+          '<label class="switch"><input type="checkbox" id="set-statshome"' + (state.gam.settings.showStatsOnHome ? ' checked' : '') + '><span></span></label></div>' +
+      '</div>' +
+      '<div class="card" style="margin-top:16px;">' +
+        '<div class="settings-row" style="border:none;padding:0;"><div><div class="lbl">איפוס נתוני גיימיפיקציה</div><div class="desc">מוחק XP, רמה, רצפים, הישגים ואתגרים - לא נוגע במשימות וביעדים</div></div>' +
+          '<button class="btn btn-danger btn-sm" id="reset-gam-data">' + icon('trash') + 'איפוס' + '</button></div>' +
       '</div>';
     document.getElementById('set-name').addEventListener('change', function (e) { state.userName = e.target.value.trim(); saveState(); renderDashboard(); });
     document.getElementById('export-text-btn').addEventListener('click', openExportTextModal);
@@ -3651,6 +3908,41 @@
     document.getElementById('set-sound').addEventListener('change', function (e) {
       state.gam.settings.sound = e.target.checked;
       saveState();
+    });
+    document.getElementById('set-anim').addEventListener('change', function (e) {
+      state.gam.settings.animations = e.target.checked;
+      saveState();
+    });
+    document.getElementById('set-particles').addEventListener('change', function (e) {
+      state.gam.settings.particles = e.target.checked;
+      saveState();
+    });
+    document.getElementById('set-xpontasks').addEventListener('change', function (e) {
+      state.gam.settings.showXPOnTasks = e.target.checked;
+      saveState();
+      renderSchedule();
+    });
+    document.getElementById('set-statshome').addEventListener('change', function (e) {
+      state.gam.settings.showStatsOnHome = e.target.checked;
+      saveState();
+      renderDashboard();
+    });
+    document.getElementById('reset-gam-data').addEventListener('click', function () {
+      openConfirmModal('זה ימחק לצמיתות XP, רמה, רצפים, הישגים ואתגרים (המשימות והיעדים שלך יישארו). האם להמשיך?', function () {
+        openConfirmModal('אישור אחרון: אין דרך לשחזר את נתוני הגיימיפיקציה לאחר האיפוס. למחוק עכשיו?', function () {
+          var keepSettings = state.gam.settings;
+          state.gam = {
+            totalXP: 0, xpEvents: {}, levelUps: [], dailyBonuses: {}, daySnapshots: {},
+            achievements: {}, streak: { current: 0, longest: 0, lastDate: null, log: {} },
+            combo: { count: 0, dateKey: null }, challenges: { dayKey: null, weekKey: null, daily: [], weekly: [] },
+            cosmetics: { unlocked: [], equipped: { cardStyle: 'premium', barColor: 'default', frame: 'default', title: null } },
+            settings: keepSettings
+          };
+          saveState();
+          showPanel('dashboard');
+          toast('נתוני הגיימיפיקציה אופסו');
+        }, { title: 'אישור אחרון', confirmLabel: 'מחק לצמיתות' });
+      }, { title: 'איפוס נתוני גיימיפיקציה', confirmLabel: 'המשך' });
     });
   }
 
