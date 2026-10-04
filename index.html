@@ -637,10 +637,12 @@
   .exam-meta { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--surface-2); color: var(--text-faint); white-space: nowrap; }
   .exam-meta.soon { background: color-mix(in srgb, var(--warning) 22%, transparent); color: var(--warning); }
   .exam-meta.urgent { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
-  .exam-add-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .exam-add-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .exam-add-row .ms-input { flex: 1; min-width: 140px; }
-  .exam-add-row input[type="date"] { padding: 8px 10px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 13px; }
-  .exam-add-row input[type="date"]:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .exam-add-row input[type="date"], .exam-add-row input[type="time"], .exam-add-row input[type="number"], .exam-add-row select { padding: 8px 10px; border-radius: var(--radius-s); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 13px; }
+  .exam-add-row input[type="date"]:focus, .exam-add-row input[type="time"]:focus, .exam-add-row input[type="number"]:focus, .exam-add-row select:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .exam-add-row input[type="number"] { width: 84px; }
+  .exam-add-row input[type="time"] { width: 100px; }
   .goal-manual-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-soft); }
   .goal-manual-row input[type="range"] { flex: 1; accent-color: var(--accent); }
 
@@ -939,6 +941,31 @@
   .shop-tree-ic { color: var(--accent); }
   .shop-tree-lock { font-size: 10px; color: var(--text-faint); }
   .shop-tree-arrow { color: var(--text-faint); font-size: 14px; }
+
+  /* ================= apps hub / nutrition / timetable / weekly reminder ================= */
+  .app-link-card { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; text-decoration: none; color: inherit; }
+  .app-link-card.app-link-disabled { opacity: 0.55; cursor: default; }
+  .app-link-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--surface-3); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .app-link-info { flex: 1; min-width: 0; }
+  .app-link-title { font-weight: 700; font-size: 14.5px; }
+  .nut-tabs { overflow-x: auto; flex-wrap: nowrap; }
+  .nut-meal { margin-bottom: 14px; }
+  .nut-meal:last-child { margin-bottom: 0; }
+  .nut-meal-name { font-weight: 700; font-size: 13px; color: var(--accent); margin-bottom: 4px; }
+  .nut-item-list { list-style: none; margin: 0; padding: 0; }
+  .nut-item-list li { font-size: 13.5px; padding: 3px 0 3px 0; color: var(--text); position: relative; padding-inline-start: 14px; }
+  .nut-item-list li::before { content: ''; position: absolute; inline-size: 5px; block-size: 5px; border-radius: 50%; background: var(--text-faint); inset-inline-start: 0; top: 10px; }
+  .tt-day { margin-bottom: 12px; }
+  .tt-day:last-child { margin-bottom: 0; }
+  .tt-day-name { font-weight: 700; font-size: 13px; color: var(--accent); margin-bottom: 6px; }
+  .tt-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--border); }
+  .tt-day .tt-row:first-of-type { border-top: none; }
+  .tt-time { font-size: 12.5px; color: var(--text-soft); flex-shrink: 0; min-width: 90px; }
+  .tt-subject { flex: 1; font-size: 13.5px; }
+  .weekly-reminder-card { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 14%, var(--surface-2)), var(--surface-2)); }
+  .weekly-reminder-ic { font-size: 22px; flex-shrink: 0; }
+  .weekly-reminder-info { flex: 1; min-width: 0; }
+  .weekly-reminder-title { font-weight: 700; font-size: 14px; }
   @media (prefers-reduced-motion: reduce) { .shop-upgrade-card, .shop-purchase-pop { transition: none !important; animation: none !important; } }
   .streak-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .streak-day { aspect-ratio: 1; border-radius: 5px; background: var(--surface-3); font-size: 9.5px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
@@ -1021,6 +1048,8 @@
     <section class="panel" id="panel-progress" hidden></section>
     <section class="panel" id="panel-glowup" hidden></section>
     <section class="panel" id="panel-upgrades" hidden></section>
+    <section class="panel" id="panel-nutrition" hidden></section>
+    <section class="panel" id="panel-apps" hidden></section>
   </main>
 
   <nav class="bottom-nav" id="nav-mobile"></nav>
@@ -1066,6 +1095,9 @@
     download: '<path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 20h16"/>',
     grid: '<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
     list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1" fill="currentColor" stroke="none"/>',
+    alarm: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M5 4 2.5 6.5M19 4l2.5 2.5"/><path d="M9 2.5h6"/>',
+    bowl: '<path d="M3 11h18a9 7 0 0 1-18 0z"/><path d="M12 11V5"/><path d="M8.5 7 10 5M15.5 7 14 5"/><path d="M5 16l-.6 2.2a2 2 0 0 0 1.9 2.8h11.4a2 2 0 0 0 1.9-2.8L19 16"/>',
+    apps: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="17.5" r="3.5"/>',
     upload: '<path d="M12 21V9M8 13l4-4 4 4"/><path d="M4 20h16"/>',
     send: '<path d="M4 12 20 4l-6 16-2.5-7L4 12z"/>',
     speaker: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>',
@@ -1306,8 +1338,11 @@
       var raw = JSON.parse(localStorage.getItem(STORE_KEY));
       var merged = raw ? Object.assign(def, raw) : def;
       merged.money = Object.assign({ entries: [], savingsGoals: [], ideas: [] }, merged.money || {});
-      merged.learning = Object.assign({ homework: [], methods: [], exams: [] }, merged.learning || {});
+      merged.learning = Object.assign({ homework: [], methods: [], exams: [], timetable: [] }, merged.learning || {});
       if (!Array.isArray(merged.learning.exams)) merged.learning.exams = [];
+      if (!Array.isArray(merged.learning.timetable)) merged.learning.timetable = [];
+      merged.workoutLog = Array.isArray(merged.workoutLog) ? merged.workoutLog : [];
+      merged.weeklyReminder = merged.weeklyReminder && typeof merged.weeklyReminder === 'object' ? merged.weeklyReminder : { ackWeekKey: null };
       if (!Array.isArray(merged.money.savingsGoals)) merged.money.savingsGoals = [];
       if (merged.money.savingsGoal && typeof merged.money.savingsGoal === 'object') {
         merged.money.savingsGoals.push(Object.assign({ id: uid() }, merged.money.savingsGoal));
@@ -4654,9 +4689,11 @@
     { id: 'upgrades', label: 'Upgrades', icon: 'crown' },
     { id: 'focus', label: 'פוקוס', icon: 'target' },
     { id: 'fitness', label: 'כושר', icon: 'dumbbell' },
+    { id: 'nutrition', label: 'תזונה', icon: 'bowl' },
     { id: 'goals', label: 'יעדים', icon: 'flag' },
     { id: 'money', label: 'כסף', icon: 'wallet' },
     { id: 'learning', label: 'למידה', icon: 'book' },
+    { id: 'apps', label: 'אפליקציות', icon: 'apps' },
     { id: 'settings', label: 'הגדרות', icon: 'settings' }
   ];
   var activePanel = 'dashboard';
@@ -4725,6 +4762,8 @@
     if (id === 'progress') renderProgress();
     if (id === 'glowup') renderGlowUp();
     if (id === 'upgrades') renderUpgrades();
+    if (id === 'nutrition') renderNutrition();
+    if (id === 'apps') renderApps();
     window.scrollTo(0, 0);
     var activeEl = document.getElementById('panel-' + id);
     activeEl.classList.remove('panel-enter');
@@ -4828,6 +4867,15 @@
     lastDailyScoreShown = pct;
   }
 
+  function weeklyReminderCardHtml() {
+    var wk = isoWeekKey(todayDate());
+    if (state.weeklyReminder.ackWeekKey === wk) return '';
+    return '<div class="card weekly-reminder-card">' +
+      '<span class="weekly-reminder-ic">💪</span>' +
+      '<div class="weekly-reminder-info"><div class="weekly-reminder-title">תזכורת שבועית</div><div class="page-sub">נסה להעלות קצת משקל במכון השבוע, או לשפר טכניקה - ממש.</div></div>' +
+      '<button class="btn-icon" id="weekly-reminder-ack" aria-label="הבנתי">' + icon('check') + '</button>' +
+    '</div>';
+  }
   function gamerCardHtml() {
     var info = levelInfoFromXP(state.gam.totalXP);
     var title = levelTitleFor(info.level);
@@ -4884,6 +4932,8 @@
 
       gamerCardHtml() +
 
+      weeklyReminderCardHtml() +
+
       (dailyScoreCardHtml() ? '<div style="margin-bottom:16px;">' + dailyScoreCardHtml() + '</div>' : '') +
 
       '<div style="display:flex;gap:8px;margin-bottom:16px;">' +
@@ -4928,6 +4978,8 @@
     });
     document.getElementById('free-time-btn').addEventListener('click', function () { openFreeTimeModal(); });
     document.getElementById('session-summary-btn').addEventListener('click', function () { openSessionSummaryModal(); });
+    var wrAckBtn = document.getElementById('weekly-reminder-ack');
+    if (wrAckBtn) wrAckBtn.addEventListener('click', function () { state.weeklyReminder.ackWeekKey = isoWeekKey(todayDate()); saveState(); renderDashboard(); });
     var gcOpenBtn = document.getElementById('gc-open-progress');
     if (gcOpenBtn) gcOpenBtn.addEventListener('click', function () { showPanel('progress'); });
     gamAnimateFillBars(el);
@@ -5925,6 +5977,7 @@
         return '<div class="split-card"><div class="k">' + s[0] + '</div><div class="v">' + s[1] + '</div></div>';
       }).join('') + '</div>' +
       '<p class="page-sub" style="margin:-6px 0 18px;">קליסטניקס: <bdi dir="ltr">2</bdi> סטים של <bdi dir="ltr">6-8</bdi> חזרות עד כישלון, <bdi dir="ltr">2-2.5</bdi> דק׳ מנוחה. אימון ביתי משלים: קליסטניקס / צוואר / תרגילים ביתיים.</p>' +
+      workoutLogCardHtml() +
       '<div class="grid-2" style="margin-bottom:18px;">' + EX_LIBRARY.map(function (g) {
         return '<div class="card card-tight"><h3 style="margin-bottom:8px;">' + g.group + '</h3><ul class="ex-list">' +
           g.items.map(function (it) {
@@ -5937,6 +5990,160 @@
       '<div class="card card-tight"><h3 style="margin-bottom:10px;">טיפים לאימון ולשריפת שומן</h3><div class="tip-row">' +
         TIP_LINKS.map(function (l) { return '<a class="tip-chip" href="' + l[1] + '" target="_blank" rel="noopener">' + l[0] + ' ↗</a>'; }).join('') +
       '</div><p class="page-sub" style="margin-top:12px;margin-bottom:0;">מקורות אלו נשמרו כפי שסופקו, לא כהמלצה רפואית. שריפת שומן בשינה - חדר קר, כ-65°F. מיקוד עיקרי: בטן וחזה. יעד חלבון מקובל לגילי <bdi dir="ltr">12-18</bdi>: כ-<bdi dir="ltr">1.3-1.8</bdi> גרם לק״ג ליום, מפוזר לאורך היום.</p></div>';
+    wireWorkoutLogSection(el);
+  }
+
+  /* ================= workout log (machines / kg / reps) ================= */
+  function workoutLogCardHtml() {
+    var entries = state.workoutLog.slice().sort(function (a, b) { return b.at - a.at; });
+    return '<div class="card" style="margin-bottom:16px;">' +
+      '<h3 style="margin-bottom:10px;">📝 יומן אימון - מכונות ומשקלים</h3>' +
+      '<div class="exam-add-row" style="margin-bottom:12px;">' +
+        '<input type="text" class="ms-input" id="wl-machine-input" maxlength="40" placeholder="שם המכונה / תרגיל">' +
+        '<input type="number" id="wl-kg-input" min="0" step="0.5" placeholder="ק&quot;ג">' +
+        '<input type="number" id="wl-reps-input" min="0" placeholder="חזרות">' +
+        '<button class="btn btn-primary btn-sm" id="wl-add-btn">' + icon('plus') + 'הוסף' + '</button>' +
+      '</div>' +
+      (entries.length ? '<ul class="ms-list">' + entries.slice(0, 40).map(function (e) {
+        return '<li class="ms-item"><span class="ms-title">' + escapeAttr(e.machine) + ' <span class="num" dir="ltr" style="color:var(--text-soft);">· ' + e.kg + ' ק"ג × ' + e.reps + ' (עד כשל)</span></span>' +
+          '<span class="page-sub num" dir="ltr" style="flex-shrink:0;">' + new Date(e.at).toLocaleDateString('he-IL') + '</span>' +
+          '<button class="ms-del" data-wl-del="' + e.id + '" aria-label="מחק">' + icon('x') + '</button></li>';
+      }).join('') + '</ul>' : '<p class="page-sub">עדיין ריק - תוסיף את הסט הראשון שלך.</p>');
+  }
+  function wireWorkoutLogSection(el) {
+    var addBtn = document.getElementById('wl-add-btn');
+    if (!addBtn) return;
+    var machineInput = document.getElementById('wl-machine-input');
+    var kgInput = document.getElementById('wl-kg-input');
+    var repsInput = document.getElementById('wl-reps-input');
+    var add = function () {
+      var machine = machineInput.value.trim();
+      if (!machine) { machineInput.focus(); return; }
+      state.workoutLog.push({ id: uid(), machine: machine, kg: +kgInput.value || 0, reps: +repsInput.value || 0, date: dkey(todayDate()), at: Date.now() });
+      saveState();
+      renderFitness();
+    };
+    addBtn.addEventListener('click', add);
+    repsInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-wl-del]'), function (b) {
+      b.addEventListener('click', function () {
+        state.workoutLog = state.workoutLog.filter(function (x) { return x.id !== b.dataset.wlDel; });
+        saveState();
+        renderFitness();
+      });
+    });
+  }
+
+  /* ================= apps hub ================= */
+  var EXTERNAL_APPS = [
+    { title: 'אימונים', desc: 'מעקב אימונים ותוכנית כושר', url: EXTERNAL_FITNESS_APP, icon: 'dumbbell' },
+    { title: 'תזונה', desc: 'מעקב קלוריות ותזונה', url: 'https://avihihaviv-bit.github.io/cals-app/', icon: 'bowl' },
+    { title: 'שעון מעורר', desc: 'בינתיים אין קישור', url: null, icon: 'alarm' }
+  ];
+  function renderApps() {
+    var el = document.getElementById('panel-apps');
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">אפליקציות</h2><p class="page-sub">קישורים לאפליקציות חיצוניות שמשלימות את מסלול</p></div></div>' +
+      EXTERNAL_APPS.map(function (a) {
+        return a.url
+          ? '<a href="' + a.url + '" target="_blank" rel="noopener" class="card card-tight app-link-card">' +
+              '<span class="app-link-ic">' + icon(a.icon) + '</span>' +
+              '<div class="app-link-info"><div class="app-link-title">' + escapeAttr(a.title) + '</div><div class="page-sub">' + escapeAttr(a.desc) + '</div></div>' +
+              '<span class="btn btn-ghost btn-sm" style="pointer-events:none;flex-shrink:0;">פתיחה ↗</span>' +
+            '</a>'
+          : '<div class="card card-tight app-link-card app-link-disabled">' +
+              '<span class="app-link-ic">' + icon(a.icon) + '</span>' +
+              '<div class="app-link-info"><div class="app-link-title">' + escapeAttr(a.title) + '</div><div class="page-sub">' + escapeAttr(a.desc) + '</div></div>' +
+            '</div>';
+      }).join('');
+  }
+
+  /* ================= nutrition plan ================= */
+  var NUTRITION_PLAN = [
+    { emoji: '🍳', title: 'יום 1 — Upper', meals: [
+      { name: 'בוקר', items: ['2 ביצים', '3 פרוסות לחם חלבון', 'כוס חלב 250 מ"ל', 'בננה בינונית', 'קינמון'] },
+      { name: 'צהריים — 2–3 שעות לפני אימון', items: ['2 כוסות אורז מבושל', 'חזה עוף בגודל כף יד גדולה', 'עגבנייה', 'מלפפון', '¼–½ בצל', '1 כפית שמן זית', 'מעט פלפל חריף'] },
+      { name: '30–60 דק׳ לפני — רק אם רעב', items: ['בננה', 'פרוסת לחם', 'פרוסת גבינה צהובה'] },
+      { name: 'אחרי אימון', items: ['משקה/מעדן חלבון אחד, בערך 20–25 גרם חלבון', 'תפוח או בננה'] },
+      { name: 'ערב', items: ['3 תפוחי אדמה בינוניים', '2 ביצים או קופסת טונה', 'סלט ירקות', 'פרי'] }
+    ]},
+    { emoji: '🦵', title: 'יום 2 — Lower', meals: [
+      { name: 'בוקר', items: ['2 ביצים', '3 פרוסות לחם', 'כוס חלב', 'בננה'] },
+      { name: 'ביניים', items: ['גביע יוגורט', 'כוס קורנפלקס', 'תפוח'] },
+      { name: 'צהריים', items: ['2 כוסות אורז מבושל', 'חזה עוף בגודל כף יד גדולה', '½ כוס תירס', 'עגבנייה + מלפפון + בצל'] },
+      { name: 'אחרי אימון', items: ['מעדן חלבון', 'בננה'] },
+      { name: 'ערב', items: ['3 תפוחי אדמה בינוניים', 'קופסת טונה', '2 פרוסות לחם', 'ירקות'] }
+    ]},
+    { emoji: '⚽', title: 'יום 3 — ספורט', meals: [
+      { name: 'בוקר', items: ['חביתה מ-2 ביצים', '3 פרוסות לחם', 'כוס חלב', 'בננה + קינמון'] },
+      { name: 'ביניים', items: ['גביע יוגורט', 'כוס קורנפלקס', 'פרי'] },
+      { name: 'צהריים', items: ['2 כוסות אורז', 'חזה עוף בגודל כף יד גדולה', 'עגבנייה + מלפפון + בצל', '1 כפית שמן זית'] },
+      { name: 'לפני הספורט', items: ['בננה', '2 פרוסות לחם'] },
+      { name: 'אחרי', items: ['משקה חלבון', 'פרי'] },
+      { name: 'ערב', items: ['3 תפוחי אדמה', '2 ביצים', 'ירקות'] }
+    ]},
+    { emoji: '🏋️', title: 'יום 4 — Upper', meals: [
+      { name: 'בוקר', items: ['2 ביצים', '3 פרוסות לחם', 'כוס חלב', 'בננה + קינמון'] },
+      { name: 'צהריים', items: ['2 כוסות אורז', 'חזה עוף בגודל כף יד גדולה', '½ כוס תירס', 'בצל + ירקות'] },
+      { name: 'לפני אימון', items: ['בננה', '2 פרוסות לחם'] },
+      { name: 'אחרי אימון', items: ['משקה חלבון', 'פרי'] },
+      { name: 'ערב', items: ['3 תפוחי אדמה', 'קופסת טונה', 'ירקות', 'פרי'] }
+    ]},
+    { emoji: '🦵', title: 'יום 5 — Lower', meals: [
+      { name: 'בוקר', items: ['2 ביצים', '3 פרוסות לחם', 'כוס חלב', 'בננה'] },
+      { name: 'ביניים', items: ['גביע יוגורט', 'כוס קורנפלקס', 'תפוח'] },
+      { name: 'צהריים', items: ['2 כוסות אורז', 'חזה עוף בגודל כף יד גדולה', 'בצל', 'עגבנייה + מלפפון', 'מעט פלפל חריף'] },
+      { name: 'אחרי אימון', items: ['מעדן חלבון', 'בננה'] },
+      { name: 'ערב', items: ['3 תפוחי אדמה', '2 ביצים', '2 פרוסות לחם', 'ירקות'] }
+    ]},
+    { emoji: '⚽', title: 'יום 6 — ספורט / אימון ביתי', meals: [
+      { name: 'בוקר', items: ['חביתה מ-2 ביצים', '3 פרוסות לחם', 'כוס חלב', 'בננה + קינמון'] },
+      { name: 'ביניים', items: ['גביע יוגורט', 'כוס קורנפלקס', 'פרי'] },
+      { name: 'צהריים', items: ['2 כוסות אורז', 'חזה עוף בגודל כף יד גדולה', 'עגבנייה + מלפפון + בצל'] },
+      { name: 'לפני פעילות', items: ['בננה', '2 פרוסות לחם'] },
+      { name: 'אחרי', items: ['משקה חלבון', 'פרי'] },
+      { name: 'ערב', items: ['3 תפוחי אדמה', 'קופסת טונה', 'ירקות'] }
+    ]},
+    { emoji: '😴', title: 'יום 7 — מנוחה', meals: [
+      { name: 'בוקר', items: ['2 ביצים', '3 פרוסות לחם', 'כוס חלב', 'בננה'] },
+      { name: 'ביניים', items: ['גביע יוגורט', 'פרי'] },
+      { name: 'צהריים', items: ['2 כוסות אורז', 'חזה עוף בגודל כף יד גדולה', 'עגבנייה + מלפפון + בצל', '1 כפית שמן זית'] },
+      { name: 'ביניים', items: ['פרי', 'כוס חלב'] },
+      { name: 'ערב', items: ['3 תפוחי אדמה', 'קופסת טונה או 2 ביצים', 'ירקות'] }
+    ]}
+  ];
+  var NUTRITION_QUANTITY_RULE = ['🍚 אורז: 2 כוסות אחרי בישול', '🍗 עוף: חתיכה בערך בגודל כף היד שלך ובעובי סביר', '🥔 תפוחי אדמה: 3 בינוניים', '🍌 פרי: בדרך כלל 1 יחידה', '🥛 חלב: כוס = כ-250 מ"ל', '🥚 ביצים: 2 בכל פעם', '🥗 ירקות: אפשר להוסיף יותר לפי רעב'];
+  var nutritionTab = 0;
+  function renderNutrition() {
+    var el = document.getElementById('panel-nutrition');
+    var day = NUTRITION_PLAN[nutritionTab];
+    el.innerHTML =
+      '<div class="page-head"><div><h2 class="page-title">תזונה</h2><p class="page-sub">תוכנית אכילה שבועית</p></div></div>' +
+      '<a href="https://avihihaviv-bit.github.io/cals-app/" target="_blank" rel="noopener" class="card card-tight app-link-card" style="margin-bottom:16px;">' +
+        '<span class="app-link-ic">' + icon('bowl') + '</span>' +
+        '<div class="app-link-info"><div class="app-link-title">אפליקציית מעקב קלוריות</div><div class="page-sub">קישור שמור - נפתח בכרטיסייה חדשה</div></div>' +
+        '<span class="btn btn-ghost btn-sm" style="pointer-events:none;flex-shrink:0;">פתיחה ↗</span>' +
+      '</a>' +
+      '<div class="range-tabs nut-tabs">' + NUTRITION_PLAN.map(function (d, i) {
+        return '<button data-nut-tab="' + i + '" class="' + (nutritionTab === i ? 'active' : '') + '">' + d.emoji + ' יום ' + (i + 1) + '</button>';
+      }).join('') + '</div>' +
+      '<div class="card" style="margin-bottom:16px;">' +
+        '<h3 style="margin-bottom:12px;">' + day.emoji + ' ' + escapeAttr(day.title) + '</h3>' +
+        day.meals.map(function (m) {
+          return '<div class="nut-meal"><div class="nut-meal-name">' + escapeAttr(m.name) + '</div><ul class="nut-item-list">' +
+            m.items.map(function (it) { return '<li>' + escapeAttr(it) + '</li>'; }).join('') +
+          '</ul></div>';
+        }).join('') +
+      '</div>' +
+      '<div class="card card-tight">' +
+        '<h3 style="margin-bottom:10px;">⚖️ כלל פשוט לכמויות</h3>' +
+        '<p class="page-sub" style="margin-bottom:10px;">כדי שלא תצטרך להתעסק עם משקל:</p>' +
+        '<ul class="nut-item-list">' + NUTRITION_QUANTITY_RULE.map(function (r) { return '<li>' + escapeAttr(r) + '</li>'; }).join('') + '</ul>' +
+        '<p class="page-sub" style="margin-top:10px;margin-bottom:0;">ובימים שאתה עדיין רעב אחרי הארוחות - לא צריך להיצמד בכוח לכמויות האלה. בגיל שלך, במיוחד עם 4 אימונים בשבוע, רעב הוא גם סימן שיכול להיות שאתה צריך יותר אוכל.</p>' +
+      '</div>';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-nut-tab]'), function (b) {
+      b.addEventListener('click', function () { nutritionTab = +b.dataset.nutTab; renderNutrition(); });
+    });
   }
 
   /* ================= goals ================= */
@@ -6361,13 +6568,82 @@
       });
     });
   }
+  var EXAM_TIPS = [
+    'תתחיל להתכונן כמה ימים מראש - לא בלילה שלפני.',
+    'תחלק את החומר לחלקים קטנים ותסמן מה כבר עבר ומה נשאר.',
+    'תפתור מבחנים או תרגילים ישנים בתנאי זמן אמיתי.',
+    'תסביר את החומר בקול רם או למישהו אחר - אם אתה לא מצליח להסביר, כנראה שלא הבנת מספיק.',
+    'תישן טוב בלילה שלפני - זה משפיע על הזיכרון יותר מעוד שעת לימוד.',
+    'תאכל לפני המבחן, אל תגיע רעב.',
+    'בזמן המבחן - תעבור על כל השאלות קודם ותתחיל מהקלות.',
+    'אם נתקעת בשאלה - תמשיך הלאה ותחזור אליה בסוף, אל תתקע עליה.'
+  ];
+  function examTipsCardHtml() {
+    return '<div class="card" style="margin-bottom:16px;">' +
+      '<h3 style="margin-bottom:10px;">💡 טיפים לפני מבחן</h3>' +
+      '<ul class="nut-item-list">' + EXAM_TIPS.map(function (t) { return '<li>' + escapeAttr(t) + '</li>'; }).join('') + '</ul>' +
+    '</div>';
+  }
+  var TT_DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  function timetableCardHtml() {
+    var entries = state.learning.timetable;
+    var byDay = {};
+    entries.forEach(function (e) { (byDay[e.day] = byDay[e.day] || []).push(e); });
+    Object.keys(byDay).forEach(function (d) { byDay[d].sort(function (a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); }); });
+    var daysHtml = TT_DAY_NAMES.map(function (name, idx) {
+      var dayEntries = byDay[idx] || [];
+      if (!dayEntries.length) return '';
+      return '<div class="tt-day"><div class="tt-day-name">' + name + '</div>' +
+        dayEntries.map(function (e) {
+          return '<div class="tt-row"><span class="tt-time num" dir="ltr">' + (e.startTime || '--:--') + '–' + (e.endTime || '--:--') + '</span><span class="tt-subject">' + escapeAttr(e.subject) + '</span><button class="ms-del" data-tt-del="' + e.id + '" aria-label="מחק">' + icon('x') + '</button></div>';
+        }).join('') +
+      '</div>';
+    }).join('');
+    return '<div class="card" style="margin-bottom:16px;">' +
+      '<h3 style="margin-bottom:10px;">🗓️ מערכת שעות</h3>' +
+      (entries.length ? daysHtml : '<p class="page-sub" style="margin-bottom:10px;">עדיין ריקה - תוסיף את השיעור הראשון (אפשר להוסיף גם הפסקות כפריט נפרד).</p>') +
+      '<div class="exam-add-row" style="margin-top:10px;">' +
+        '<select id="tt-day-input">' + TT_DAY_NAMES.map(function (n, i) { return '<option value="' + i + '"' + (i === new Date().getDay() ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' +
+        '<input type="text" class="ms-input" id="tt-subject-input" maxlength="40" placeholder="מקצוע / הפסקה">' +
+        '<input type="time" id="tt-start-input">' +
+        '<input type="time" id="tt-end-input">' +
+        '<button class="btn btn-ghost btn-sm" id="tt-add-btn">' + icon('plus') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+  function wireTimetableSection(el) {
+    var addBtn = document.getElementById('tt-add-btn');
+    var dayInput = document.getElementById('tt-day-input');
+    var subjectInput = document.getElementById('tt-subject-input');
+    var startInput = document.getElementById('tt-start-input');
+    var endInput = document.getElementById('tt-end-input');
+    var add = function () {
+      var subject = subjectInput.value.trim();
+      if (!subject) { subjectInput.focus(); return; }
+      state.learning.timetable.push({ id: uid(), day: +dayInput.value, subject: subject, startTime: startInput.value || null, endTime: endInput.value || null });
+      saveState();
+      renderLearning();
+    };
+    addBtn.addEventListener('click', add);
+    subjectInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-tt-del]'), function (b) {
+      b.addEventListener('click', function () {
+        state.learning.timetable = state.learning.timetable.filter(function (x) { return x.id !== b.dataset.ttDel; });
+        saveState();
+        renderLearning();
+      });
+    });
+  }
   function renderLearning() {
     var el = document.getElementById('panel-learning');
     el.innerHTML =
-      '<div class="page-head"><div><h2 class="page-title">למידה</h2><p class="page-sub">שיעורי בית, שיטות למידה ולוח מבחנים</p></div></div>' +
+      '<div class="page-head"><div><h2 class="page-title">למידה</h2><p class="page-sub">מערכת שעות, שיעורי בית, שיטות למידה וטיפים</p></div></div>' +
+      examTipsCardHtml() +
+      timetableCardHtml() +
       examCardHtml(state.learning.exams) +
       simpleListCardHtml('שיעורי בית', '📚', state.learning.homework, 'hw', 'למשל: תרגילים במתמטיקה עמ׳ 12') +
       simpleListCardHtml('שיטות למידה', '🧠', state.learning.methods, 'method', 'למשל: כרטיסיות זיכרון, פומודורו 25 דק׳');
+    wireTimetableSection(el);
     wireExamSection(el);
     wireSimpleListSection(el, 'hw', state.learning, 'homework');
     wireSimpleListSection(el, 'method', state.learning, 'methods');
