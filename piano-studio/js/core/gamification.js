@@ -74,7 +74,7 @@
     if (!amount) return null;
     var before = info();
     var ev = PS.store.putRaw('xp', { id: U.uid('xp'), key: 'manual:' + U.uid(), amount: amount, reason: reason || 'תיקון ידני', at: U.nowISO(), kind: 'manual' });
-    PS.store.log('xp', 'תיקון XP ידני: ' + (amount > 0 ? '+' : '') + amount + ' · ' + (reason || ''));
+    PS.store.log('xp', 'תיקון XP ידני: ' + U.xp(amount) + ' · ' + (reason || ''));
     afterChange(before, amount, reason, true);
     return ev;
   }

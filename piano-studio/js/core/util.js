@@ -2,6 +2,8 @@
 (function () {
   'use strict';
   var PS = (window.PS = window.PS || {});
+  PS.act = PS.act || {};     // action registry (data-act handlers)
+  PS.views = PS.views || {}; // route -> view registry
 
   var U = {};
 
@@ -226,6 +228,8 @@
     if (pref === 'off') return false;
     return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   };
+  U.ltr = function (s) { return '\u2066' + s + '\u2069'; };
+  U.xp = function (n) { return U.ltr((n > 0 ? '+' : '') + n + ' XP'); };
   U.plural = function (n, one, many) { return n === 1 ? one : n + ' ' + many; };
 
   PS.util = U;

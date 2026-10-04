@@ -5,6 +5,6 @@
   "description": "Piano Studio — personal piano learning management app (static, local-first PWA).",
   "scripts": {
     "start": "npx http-server . -p 5173 -c-1",
-    "test": "node tests/smoke.mjs"
+    "test": "node tests/smoke.cjs"
   }
 }

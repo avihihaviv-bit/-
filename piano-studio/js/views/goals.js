@@ -76,7 +76,7 @@
       (g.status === 'active' ? '<div class="row" style="margin-top:4px">' +
         (!auto ? '<button type="button" class="btn btn-ghost btn-sm" data-act="goal-step" data-id="' + g.id + '" data-d="-1" aria-label="הפחתה">−</button><button type="button" class="btn btn-ghost btn-sm" data-act="goal-step" data-id="' + g.id + '" data-d="1" aria-label="הוספה">+1</button><button type="button" class="btn btn-ghost btn-sm" data-act="goal-set" data-id="' + g.id + '">עדכון</button>' : '') +
         '<span class="spacer"></span><button type="button" class="btn btn-sm btn-primary" data-act="goal-complete" data-id="' + g.id + '">' + I('check') + 'הושג</button></div>'
-        : g.completedAt ? '<div class="small gold">' + I('sparkle') + ' הושג ב-' + esc(U.fmtDate(g.completedAt)) + (g.reward ? ' · +' + g.reward + ' XP' : '') + '</div>' : '') +
+        : g.completedAt ? '<div class="small gold">' + I('sparkle') + ' הושג ב-' + esc(U.fmtDate(g.completedAt)) + (g.reward ? ' · ' + U.xp(g.reward) : '') + '</div>' : '') +
     '</article>';
   }
 

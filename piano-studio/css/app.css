@@ -480,6 +480,7 @@ input[type=file].input { padding: 8px; height: auto; }
 .list-row .title { font-weight: 600; font-size: 14.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
 .list-row .sub { font-size: 13px; color: var(--text-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 .list-row .trail { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.list-row .trail .pbar { flex: 1; min-width: 50px; }
 .date-badge { width: 50px; flex-shrink: 0; text-align: center; border-radius: 12px; padding: 6px 0; background: var(--surface-2); border: 1px solid var(--border); }
 .date-badge b { display: block; font-size: 18px; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .date-badge small { display: block; font-size: 11px; color: var(--text-soft); }
@@ -694,7 +695,7 @@ input[type=file].input { padding: 8px; height: auto; }
 .hero-week b { display: block; font-size: 14px; }
 .hero-week small { color: var(--text-soft); font-size: 12.5px; }
 
-.today-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.today-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; }
 .today-card { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 132px; }
 .today-card .label { display: flex; align-items: center; gap: 8px; color: var(--text-soft); font-size: 12.5px; font-weight: 500; }
 .today-card .label svg { width: 16px; height: 16px; color: var(--gold); }

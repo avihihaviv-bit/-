@@ -140,8 +140,8 @@
           '<p class="lvl-kicker">רמה חדשה נפתחה</p>' +
           '<div class="lvl-num num" aria-label="רמה ' + level + '">' + level + '</div>' +
           '<h3 class="lvl-title">' + esc(title) + '</h3>' +
-          (xp > 0 ? '<p class="lvl-xp">' + I('sparkle') + '+' + xp + ' XP באירוע האחרון</p>' : '') +
-          '<p class="lvl-next muted">הרמה הבאה: ' + esc(PS.game.titleFor(level + 1)) + ' · ' + PS.game.xpToNext(level) + ' XP</p>' +
+          (xp > 0 ? '<p class="lvl-xp">' + I('sparkle') + U.xp(xp) + ' באירוע האחרון</p>' : '') +
+          '<p class="lvl-next muted">הרמה הבאה: ' + esc(PS.game.titleFor(level + 1)) + ' · ' + U.ltr(PS.game.xpToNext(level) + ' XP') + '</p>' +
           '<button type="button" class="btn btn-primary btn-lg" data-close autofocus>המשך</button>' +
           '</div>',
         onOpen: function (api) { stop = sparkles(api.el.querySelector('.modal')); },
@@ -174,7 +174,7 @@
     if (!host) return;
     var el = document.createElement('div');
     el.className = 'xp-pop';
-    el.innerHTML = '<b class="num">+' + amount + ' XP</b><span>' + esc(reason || '') + '</span>';
+    el.innerHTML = '<b class="num">' + U.xp(amount) + '</b><span>' + esc(reason || '') + '</span>';
     host.appendChild(el);
     setTimeout(function () { el.remove(); }, 2600);
     var bar = document.querySelector('.side-xp');
@@ -184,7 +184,7 @@
   /* ---------------- celebration (song learned, course/goal completed) ---------------- */
   fx.celebrate = function (headline, title, xp) {
     fx.confetti();
-    PS.ui.toast(headline + ' ' + (title || '') + (xp ? ' · +' + xp + ' XP' : ''), 'gold', { duration: 5000 });
+    PS.ui.toast(headline + ' ' + (title || '') + (xp ? ' · ' + U.xp(xp) : ''), 'gold', { duration: 5000 });
   };
 
   PS.fx = fx;

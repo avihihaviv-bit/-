@@ -60,7 +60,7 @@
         '<div class="hero-kicker">' + I('sparkle') + 'רמה ' + g.level + ' · ' + esc(g.title) + '</div>' +
         '<h1>' + esc(U.greeting()) + (name ? ', <em>' + esc(name) + '</em>' : '') + '</h1>' +
         '<p class="hero-sub">המסע המוזיקלי שלך ממשיך כאן</p>' +
-        '<div class="hero-xp"><div class="hero-xp-row"><span>התקדמות לרמה ' + (g.level + 1) + '</span><span class="num">' + U.num(g.into) + ' / ' + U.num(g.need) + ' XP</span></div>' + ui.bar(g.pct, 'pbar-l') + '</div>' +
+        '<div class="hero-xp"><div class="hero-xp-row"><span>התקדמות לרמה ' + (g.level + 1) + '</span><span class="num">' + U.ltr(U.num(g.into) + ' / ' + U.num(g.need) + ' XP') + '</span></div>' + ui.bar(g.pct, 'pbar-l') + '</div>' +
         '<div class="hero-stats">' +
           '<div class="hero-stat"><small>שירים שנלמדו</small><b class="num">' + c.songsLearned + '</b></div>' +
           '<div class="hero-stat"><small>שיעורים שהתקיימו</small><b class="num">' + c.lessonsDone + '</b></div>' +
@@ -70,7 +70,7 @@
       '</div>' +
       '<div class="hero-side">' + viz +
         '<div class="hero-week">' + ui.ring(w.pct, 58, w.done + '/' + w.target) +
-          '<div><b>' + (w.reached ? 'היעד השבועי הושג ✦' : 'היעד השבועי') + '</b><small>' + (w.reached ? 'כל הכבוד! +' + PS.game.XP.weekly + ' XP' : 'עוד ' + (w.target - w.done) + ' פעולות למידה השבוע') + '</small></div></div>' +
+          '<div><b>' + (w.reached ? 'היעד השבועי הושג ✦' : 'היעד השבועי') + '</b><small>' + (w.reached ? 'כל הכבוד! ' + U.xp(PS.game.XP.weekly) : 'עוד ' + (w.target - w.done) + ' פעולות למידה השבוע') + '</small></div></div>' +
       '</div>' +
     '</section>';
   }

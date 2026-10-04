@@ -34,7 +34,7 @@
         if (PS.game.lifetimeXP() + a < 0) { ui.toast('אי אפשר לרדת מתחת ל-0 XP', 'error'); return; }
         PS.game.adjust(a, r);
         m.close();
-        ui.toast('נרשם תיקון של ' + (a > 0 ? '+' : '') + a + ' XP', 'success');
+        ui.toast('נרשם תיקון של ' + U.xp(a), 'success');
       };
     }
   });
@@ -42,9 +42,9 @@
   function levelCard() {
     var g = PS.game.info();
     return '<div class="card level-card">' +
-      '<div class="level-badge" aria-label="רמה ' + g.level + '"><b class="num">' + g.level + '</b><small>LEVEL</small></div>' +
+      '<div class="level-badge" aria-label="רמה ' + g.level + '"><b class="num">' + g.level + '</b><small>רמה</small></div>' +
       '<div><p class="small gold" style="font-weight:600;letter-spacing:.04em">הרמה הנוכחית</p><h2>' + esc(g.title) + '</h2>' +
-        '<div style="margin-top:14px;max-width:520px"><div class="hero-xp-row"><span>' + U.num(g.into) + ' / ' + U.num(g.need) + ' XP לרמה ' + (g.level + 1) + '</span><span>עוד ' + U.num(g.remaining) + '</span></div>' + ui.bar(g.pct, 'pbar-l') + '</div></div>' +
+        '<div style="margin-top:14px;max-width:520px"><div class="hero-xp-row"><span>' + U.ltr(U.num(g.into) + ' / ' + U.num(g.need) + ' XP') + ' לרמה ' + (g.level + 1) + '</span><span>עוד ' + U.num(g.remaining) + '</span></div>' + ui.bar(g.pct, 'pbar-l') + '</div></div>' +
       '<div class="stack" style="gap:10px;min-width:200px">' +
         '<div><small class="muted">XP מצטבר (לכל הזמנים)</small><div class="goal-val num">' + U.num(g.lifetime) + '</div></div>' +
         '<div><small class="muted">פרס הרמה הבאה</small><div style="font-weight:600">' + I('crown') + ' התואר "' + esc(g.nextTitle) + '"</div></div></div></div>';
@@ -94,7 +94,7 @@
       html += '<div class="table-wrap"><table class="xp-table"><thead><tr><th>תאריך</th><th>פעולה</th><th>סוג</th><th>XP</th><th><span class="sr-only">פעולות</span></th></tr></thead><tbody>' +
         shown.map(function (e) {
           return '<tr class="' + (e.revoked ? 'revoked' : '') + '"><td class="num small">' + esc(U.fmtDateTime(e.at)) + '</td><td>' + U.bidi(e.reason) + '</td><td>' + (e.kind === 'manual' ? '<span class="chip chip-blue">ידני</span>' : '<span class="chip chip-muted">אוטומטי</span>') + (e.revoked ? ' <span class="chip chip-red">בוטל</span>' : '') + '</td>' +
-            '<td class="xp-amt' + (e.amount < 0 ? ' neg' : '') + '">' + (e.amount > 0 ? '+' : '') + e.amount + '</td>' +
+            '<td class="xp-amt' + (e.amount < 0 ? ' neg' : '') + '">' + U.ltr((e.amount > 0 ? '+' : '') + e.amount) + '</td>' +
             '<td>' + (e.revoked ? '<button type="button" class="btn btn-ghost btn-sm" data-act="xp-restore" data-id="' + e.id + '">שחזור</button>' : '<button type="button" class="btn btn-ghost btn-sm" data-act="xp-revoke" data-id="' + e.id + '">ביטול</button>') + '</td></tr>';
         }).join('') + '</tbody></table></div>' +
         (!state.showAll && evs.length > 40 ? '<p class="center" style="padding:12px"><button type="button" class="btn btn-ghost btn-sm" data-act="xp-more">הצגת הכל</button></p>' : '');
