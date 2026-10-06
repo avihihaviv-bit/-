@@ -15,7 +15,8 @@
     module: 20,
     course: 100,
     song: 75,
-    weekly: 50
+    weekly: 50,
+    practiceDay: 15
   };
 
   var TITLES = [
@@ -125,7 +126,10 @@
       monthlyGoalsDone: goals.filter(function (g) { return g.status === 'completed' && g.period === 'monthly'; }).length,
       milestonesDone: goals.filter(function (g) { return g.status === 'completed' && g.category === 'milestone'; }).length,
       weeklyGoalsHit: PS.store.list('xp').filter(function (e) { return e.key && e.key.indexOf('weekly-goal:') === 0 && !e.revoked; }).length,
-      level: info().level
+      level: info().level,
+      practiceSessions: real('practice').length,
+      practiceHours: Math.floor(real('practice').reduce(function (s, p) { return s + (+p.minutes || 0); }, 0) / 60),
+      practiceBestStreak: PS.practice ? PS.practice.streak().best : 0
     };
   }
 
@@ -146,6 +150,12 @@
     A('first-module', 'courses', 'common', 'layers', 'מודול ראשון', 'השלמת מודול ראשון בקורס', 'modulesDone', 1),
     A('first-course-done', 'courses', 'epic', 'graduation', 'בוגר קורס', 'השלמת את הקורס הראשון', 'coursesDone', 1),
     A('five-courses-done', 'courses', 'legendary', 'crown', 'חמישה קורסים', 'השלמת 5 קורסים', 'coursesDone', 5),
+    A('first-practice', 'practice', 'common', 'clock', 'אימון ראשון נרשם', 'רשמת את האימון הראשון שלך', 'practiceSessions', 1),
+    A('streak-3', 'practice', 'common', 'bolt', 'שלושה ימים ברצף', 'התאמנת 3 ימים רצופים', 'practiceBestStreak', 3),
+    A('streak-7', 'practice', 'rare', 'flag', 'שבוע ברצף', 'התאמנת 7 ימים רצופים', 'practiceBestStreak', 7),
+    A('streak-30', 'practice', 'legendary', 'crown', 'חודש ברצף', 'התאמנת 30 ימים רצופים', 'practiceBestStreak', 30),
+    A('hours-10', 'practice', 'rare', 'clock', '10 שעות אימון', 'צברת 10 שעות אימון רשומות', 'practiceHours', 10),
+    A('hours-50', 'practice', 'epic', 'medal', '50 שעות אימון', 'צברת 50 שעות אימון רשומות', 'practiceHours', 50),
     A('ten-tasks', 'organization', 'common', 'list', 'מסודר', 'השלמת 10 משימות', 'tasksDone', 10),
     A('fifty-tasks', 'organization', 'rare', 'list', 'מכונת ארגון', 'השלמת 50 משימות', 'tasksDone', 50),
     A('organized-week', 'organization', 'rare', 'sparkle', 'שבוע מאורגן', 'עמדת ביעד השבועי שלך', 'weeklyGoalsHit', 1),
@@ -159,7 +169,7 @@
     A('level-5', 'goals', 'rare', 'bolt', 'רמה 5', 'הגעת לרמה 5', 'level', 5),
     A('level-10', 'goals', 'legendary', 'bolt', 'רמה 10', 'הגעת לרמה 10', 'level', 10)
   ];
-  var ACH_CATS = { lessons: 'שיעורים', songs: 'שירים', courses: 'קורסים', organization: 'ארגון', goals: 'יעדים ורמות' };
+  var ACH_CATS = { practice: 'אימון', lessons: 'שיעורים', songs: 'שירים', courses: 'קורסים', organization: 'ארגון', goals: 'יעדים ורמות' };
   var RARITY = { common: 'נפוץ', rare: 'נדיר', epic: 'אפי', legendary: 'אגדי' };
 
   function achievementState() {
@@ -184,7 +194,7 @@
   }
 
   /* ---------------- weekly learning goal ---------------- */
-  /* Learning actions = completed tasks + completed lessons + completed modules + learned songs. */
+  /* Learning actions = completed tasks + completed lessons + completed modules + learned songs + practice days. */
   function actionsInRange(from, to) {
     var n = 0;
     function inR(iso) { var d = U.toDate(iso); return d && d >= from && d < to; }
@@ -192,6 +202,7 @@
     PS.store.list('lessons').forEach(function (l) { if (l.status === 'completed' && inR(l.completedAt)) n++; });
     PS.store.list('songs').forEach(function (s) { if (s.status === 'learned' && inR(s.learnedAt)) n++; });
     PS.store.list('courses').forEach(function (c) { (c.modules || []).forEach(function (m) { if (m.done && inR(m.doneAt)) n++; }); });
+    if (PS.practice) n += PS.practice.daysInRange(from, to);
     return n;
   }
   function weekly() {

@@ -99,6 +99,7 @@
     return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
   }
   var CSV = {
+    practice: [['date', 'תאריך'], ['minutes', 'דקות'], ['focus', 'מיקוד'], ['feel', 'תחושה', 'practiceFeel'], ['notes', 'הערות']],
     songs: [['title', 'שם'], ['artist', 'אמן/מלחין'], ['genre', 'ז׳אנר'], ['status', 'סטטוס', 'songStatus'], ['difficulty', 'קושי'], ['progress', 'התקדמות %'], ['targetDate', 'יעד'], ['learnedAt', 'נלמד בתאריך'], ['favorite', 'מועדף'], ['tags', 'תגיות'], ['sheetUrl', 'תווים'], ['youtubeUrl', 'יוטיוב']],
     lessons: [['title', 'כותרת'], ['date', 'תאריך'], ['time', 'שעה'], ['duration', 'משך'], ['status', 'סטטוס', 'lessonStatus'], ['teacher', 'מורה'], ['location', 'מיקום'], ['topics', 'נושאים'], ['homework', 'שיעורי בית'], ['cost', 'עלות']],
     tasks: [['title', 'כותרת'], ['dueDate', 'תאריך יעד'], ['priority', 'עדיפות', 'priority'], ['category', 'קטגוריה', 'taskCategory'], ['done', 'הושלמה'], ['completedAt', 'הושלמה בתאריך'], ['estimate', 'משך משוער'], ['description', 'תיאור']]
@@ -129,14 +130,14 @@
       var s2 = PS.store.create('songs', { demo: true, title: 'Comptine d\'un autre été', artist: 'Yann Tiersen', genre: 'פסקולי סרטים ומשחקים', status: 'planned', difficulty: '3', progress: 0 });
       PS.store.create('songs', { demo: true, title: 'River Flows in You', artist: 'Yiruma', genre: 'ניו אייג׳', status: 'wishlist', difficulty: '3' });
       PS.store.create('songs', { demo: true, title: 'ירושלים של זהב', artist: 'נעמי שמר', genre: 'ישראלי', status: 'wishlist', difficulty: '2' });
-      var l1 = PS.store.create('lessons', { demo: true, title: 'שיעור שבועי', date: d(2), time: '17:30', duration: 45, teacher: 'המורה שלי', location: 'סטודיו', status: 'upcoming', topics: ['פדאל', 'דינמיקה'], songIds: [s1.id], nextPrep: 'להביא שאלות על הפדאל בתיבות 15–20' });
-      PS.store.create('lessons', { demo: true, title: 'שיעור שבועי', date: d(9), time: '17:30', duration: 45, teacher: 'המורה שלי', location: 'סטודיו', status: 'upcoming' });
+      var l1 = !PS.prefs.lessons() ? { id: '' } : PS.store.create('lessons', { demo: true, title: 'שיעור שבועי', date: d(2), time: '17:30', duration: 45, teacher: 'המורה שלי', location: 'סטודיו', status: 'upcoming', topics: ['פדאל', 'דינמיקה'], songIds: [s1.id], nextPrep: 'להביא שאלות על הפדאל בתיבות 15–20' });
+      if (PS.prefs.lessons()) PS.store.create('lessons', { demo: true, title: 'שיעור שבועי', date: d(9), time: '17:30', duration: 45, teacher: 'המורה שלי', location: 'סטודיו', status: 'upcoming' });
       var c1 = PS.store.create('courses', { demo: true, title: 'Piano Fundamentals', instructor: 'פלטפורמה מקוונת', status: 'planned', moduleCount: 8, estimatedHours: 12, targetDate: d(60), description: 'קורס יסודות: קריאת תווים, אקורדים ומקצב.' });
       PS.store.create('tasks', { demo: true, title: 'לחפש תווים ל-Comptine', dueDate: t, priority: 'medium', category: 'sheet', songId: s2.id });
-      PS.store.create('tasks', { demo: true, title: 'להכין שאלות לשיעור הבא', dueDate: d(1), priority: 'high', category: 'prep', lessonId: l1.id, subtasks: [{ title: 'שאלה על פדאל' }, { title: 'שאלה על אצבוע' }] });
+      PS.store.create('tasks', { demo: true, title: 'לנסות את תיבות 9–16 בקצב איטי', dueDate: d(1), priority: 'high', category: 'practice', lessonId: l1.id, subtasks: [{ title: 'יד ימין לבד' }, { title: 'שתי ידיים במטרונום 60' }] });
       PS.store.create('tasks', { demo: true, title: 'לסדר את תיקיית התווים', dueDate: d(4), priority: 'low', category: 'organize', recurrence: 'monthly' });
       PS.store.create('tasks', { demo: true, title: 'להאזין לביצוע ייחוס של Clair de Lune', dueDate: d(3), category: 'listen', songId: s1.id, courseId: c1.id });
-      PS.store.create('notes', { demo: true, title: 'פדאל — עקרונות', type: 'teacher', lessonId: '', body: '## מה המורה הסבירה\n- להחליף פדאל **אחרי** הצליל החדש\n- להקשיב לטשטוש\n\n## לזכור\n- [ ] לנסות בתיבות 1–8\n- [ ] לשאול על חצי-פדאל', tags: ['פדאל'], songIds: [s1.id], pinned: true });
+      PS.store.create('notes', { demo: true, title: 'פדאל — עקרונות', type: 'concept', lessonId: '', body: '## מה למדתי מהמדריך\n- להחליף פדאל **אחרי** הצליל החדש\n- להקשיב לטשטוש\n\n## לזכור\n- [ ] לנסות בתיבות 1–8\n- [ ] לשאול על חצי-פדאל', tags: ['פדאל'], songIds: [s1.id], pinned: true });
       PS.store.create('goals', { demo: true, title: 'ללמוד 3 שירים עד סוף השנה', period: 'long', category: 'songs', metric: 'songs_learned', target: 3, startDate: t, deadline: U.dkey(new Date(new Date().getFullYear(), 11, 31)), reward: 60 });
     });
     PS.prefs.set('hasDemo', true);

@@ -11,6 +11,8 @@
 
   var WIDGETS = {
     hero: { label: 'כרטיס פתיחה', render: hero },
+    notify: { label: 'הפעלת התראות', render: notifyCard },
+    week: { label: 'השבוע שלי', render: weekCard },
     today: { label: 'סקירת היום', render: today },
     quick: { label: 'פעולות מהירות', render: quick },
     progress: { label: 'התקדמות', render: progress },
@@ -63,7 +65,8 @@
         '<div class="hero-xp"><div class="hero-xp-row"><span>התקדמות לרמה ' + (g.level + 1) + '</span><span class="num">' + U.ltr(U.num(g.into) + ' / ' + U.num(g.need) + ' XP') + '</span></div>' + ui.bar(g.pct, 'pbar-l') + '</div>' +
         '<div class="hero-stats">' +
           '<div class="hero-stat"><small>שירים שנלמדו</small><b class="num">' + c.songsLearned + '</b></div>' +
-          '<div class="hero-stat"><small>שיעורים שהתקיימו</small><b class="num">' + c.lessonsDone + '</b></div>' +
+          (PS.prefs.lessons() ? '<div class="hero-stat"><small>שיעורים שהתקיימו</small><b class="num">' + c.lessonsDone + '</b></div>'
+            : '<div class="hero-stat"><small>רצף אימונים</small><b class="num">' + PS.practice.streak().current + ' <span class="gold">ימים</span></b></div>') +
           '<div class="hero-stat"><small>קורסים שהושלמו</small><b class="num">' + c.coursesDone + '</b></div>' +
           '<div class="hero-stat"><small>XP מצטבר</small><b class="num">' + U.num(g.lifetime) + '</b></div>' +
         '</div>' +
@@ -87,8 +90,13 @@
         '<div class="label">' + I(icon) + esc(label) + '</div><div class="big">' + body + '</div><div class="foot">' + (foot || '') + '</div></div>';
     }
     var start = nl && U.combine(nl.date, nl.time);
+    var goal = Math.max(5, +PS.prefs.get('dailyPracticeGoal') || 20);
+    var pm = PS.practice.today(), pst = PS.practice.streak();
+    var practiceCard = card('bolt', 'אימון היום', pm ? U.fmtMinutes(pm) + (pm >= goal ? ' · היעד הושג ✦' : ' מתוך ' + goal + ' דק׳') : 'עוד לא נרשם אימון',
+      '<span style="flex:1;min-width:60px">' + ui.bar(Math.min(1, pm / goal), 'pbar-xs') + '</span>' + (pst.current ? '<span class="countdown">' + I('bolt') + ' ' + pst.current + ' ימים ברצף</span>' : '<button type="button" class="btn btn-sm btn-ghost" data-act="practice-quick" data-m="' + goal + '">+' + goal + ' דק׳</button>'), '#/practice');
     return '<section aria-label="סקירת היום"><div class="section-head"><h2>' + I('sparkle') + 'היום שלך</h2></div><div class="today-grid stagger">' +
-      (nl ? card('clock', 'השיעור הבא', U.bidi(nl.title), '<span class="countdown">' + (start > new Date() ? 'בעוד ' + esc(U.countdown(start)) : 'מתקיים עכשיו') + '</span><span>' + esc(U.relDay(nl.date)) + (nl.time ? ' · ' + esc(nl.time) : '') + '</span>', '#/lessons/' + nl.id)
+      practiceCard +
+      (!PS.prefs.lessons() ? '' : nl ? card('clock', 'השיעור הבא', U.bidi(nl.title), '<span class="countdown">' + (start > new Date() ? 'בעוד ' + esc(U.countdown(start)) : 'מתקיים עכשיו') + '</span><span>' + esc(U.relDay(nl.date)) + (nl.time ? ' · ' + esc(nl.time) : '') + '</span>', '#/lessons/' + nl.id)
         : card('clock', 'השיעור הבא', 'אין שיעור מתוכנן', '<button type="button" class="btn btn-sm btn-ghost" data-act="add-lesson">' + I('plus') + 'קביעת שיעור</button>', null, true)) +
       (tasksToday.length ? card('list', 'משימות להיום', tasksToday.length + ' ' + (tasksToday.length === 1 ? 'משימה' : 'משימות') + ' · ' + U.bidi(tasksToday[0].title), tasksToday.some(function (x) { return x.dueDate < t; }) ? '<span class="chip chip-red">יש משימות באיחור</span>' : '<span>מתוכננות להיום</span>', '#/tasks?view=today')
         : card('list', 'משימות להיום', 'אין משימות להיום', '<button type="button" class="btn btn-sm btn-ghost" data-act="add-task">' + I('plus') + 'משימה חדשה</button>', null, true)) +
@@ -102,7 +110,7 @@
   }
 
   function quick() {
-    var items = [['add-lesson', 'שיעור', 'clock'], ['add-song', 'שיר', 'music'], ['add-course', 'קורס', 'book'], ['add-task', 'משימה', 'list'], ['add-note', 'פתק', 'note'], ['add-goal', 'יעד', 'target']];
+    var items = [[PS.prefs.lessons() ? 'add-lesson' : 'add-practice', PS.prefs.lessons() ? 'שיעור' : 'אימון', PS.prefs.lessons() ? 'clock' : 'bolt'], ['add-song', 'שיר', 'music'], ['add-course', 'קורס', 'book'], ['add-task', 'משימה', 'list'], ['add-note', 'פתק', 'note'], ['add-goal', 'יעד', 'target']];
     return '<section aria-label="פעולות מהירות"><div class="section-head"><h2>' + I('plus') + 'הוספה מהירה</h2></div><div class="quick-grid">' +
       items.map(function (i) { return '<button type="button" class="quick-btn" data-act="' + i[0] + '"><span class="qi">' + I(i[2]) + '</span>' + esc(i[1]) + '</button>'; }).join('') + '</div></section>';
   }
@@ -120,7 +128,8 @@
     return '<section aria-label="התקדמות"><div class="section-head"><h2>' + I('chart') + 'התקדמות</h2><a href="#/stats">לסטטיסטיקה המלאה ' + I('chevronLeft') + '</a></div><div class="stat-tiles stagger">' +
       tile('target', 'השלמה שבועית', Math.round(w.pct * 100) + '%', w.done + ' מתוך ' + w.target + ' פעולות') +
       tile('music', 'שירים שנלמדו', c.songsLearned, c.songs + ' שירים בספרייה') +
-      tile('clock', 'שיעורים שהתקיימו', c.lessonsDone, lessonsMonth + ' החודש') +
+      (PS.prefs.lessons() ? tile('clock', 'שיעורים שהתקיימו', c.lessonsDone, lessonsMonth + ' החודש')
+        : tile('bolt', 'אימון השבוע', U.fmtMinutes(PS.practice.week().minutes), PS.practice.week().days + ' ימי אימון')) +
       tile('list', 'משימות שהושלמו', c.tasksDone, tasksMonth + ' החודש') +
     '</div></section>';
   }
@@ -177,6 +186,33 @@
       }).join('') + '</div></div>';
   }
 
+  function notifyCard() {
+    var st = PS.notify.status();
+    if (st === 'on' || st === 'unsupported' || st === 'denied' || PS.prefs.get('notifyPromptDismissed')) return '';
+    var ios = PS.notify.isIOS() && !PS.notify.standalone();
+    return '<div class="card notify-card" role="region" aria-label="התראות"><span class="ni">' + I('bell') + '</span><div class="grow"><b>להפעיל התראות?</b><p class="small muted">' +
+      (ios ? 'באייפון: לחצו על כפתור השיתוף ← "הוסף למסך הבית", פתחו משם את האפליקציה והפעילו התראות.' : 'תזכורת יומית לאימון, משימות להיום ומועדי יעדים — גם כשהלשונית ברקע.') + '</p></div>' +
+      (ios ? '' : '<button type="button" class="btn btn-primary" data-act="browser-notify">' + I('bell') + 'הפעלת התראות</button>') +
+      '<button type="button" class="btn btn-ghost btn-sm" data-act="notify-dismiss">לא עכשיו</button></div>';
+  }
+
+  function weekCard() {
+    var ws = U.startOfWeek(new Date());
+    var byDay = PS.practice.byDay();
+    var today = U.todayKey();
+    var tasksDone = PS.stats.inRange(PS.stats.D.tasksCompleted(), { from: ws, to: U.addDays(ws, 7) });
+    var w = PS.practice.week();
+    var xpWeek = PS.stats.xpPoints().filter(function (p) { return p.date >= ws; }).reduce(function (s, p) { return s + p.value; }, 0);
+    var strip = '';
+    for (var i = 0; i < 7; i++) {
+      var d = U.addDays(ws, i), k = U.dkey(d), m = byDay[k] || 0;
+      strip += '<div class="wday' + (m ? ' on' : '') + (k === today ? ' today' : '') + (k > today ? ' future' : '') + '" title="' + esc(U.fmtFull(d)) + '"><span>' + esc(U.fmtWeekdayShort(d)) + '</span><i class="dot"></i><b>' + (m ? m + '′' : '—') + '</b></div>';
+    }
+    return '<div class="card pad"><div class="card-head"><h3>' + I('calendar') + 'השבוע שלי</h3><a class="link" href="#/practice">ליומן האימונים</a></div>' +
+      '<div class="week-strip">' + strip + '</div>' +
+      '<div class="meta" style="margin-top:14px"><span>' + I('bolt') + U.fmtMinutes(w.minutes) + ' אימון · ' + w.days + ' ימים</span><span>' + I('check') + tasksDone + ' משימות הושלמו</span><span>' + I('sparkle') + U.xp(xpWeek) + ' השבוע</span></div></div>';
+  }
+
   /* ---------- render ---------- */
   function render(el) {
     var order = PS.prefs.get('dashboardOrder').filter(function (k) { return WIDGETS[k]; });
@@ -197,7 +233,8 @@
         html += '<div class="section grid grid-2">' + widget(visible[i], hidden) + widget(visible[i + 1], hidden) + '</div>';
         i += 2;
       } else {
-        html += '<div class="section">' + widget(k, hidden) + '</div>';
+        var w = widget(k, hidden);
+        if (w) html += '<div class="section">' + w + '</div>';
         i++;
       }
     }
@@ -215,10 +252,13 @@
       '<button type="button" class="icon-btn sm' + (isHidden ? '' : ' on') + '" data-act="dash-toggle" data-w="' + k + '" aria-pressed="' + !isHidden + '" aria-label="' + (isHidden ? 'הצגה' : 'הסתרה') + ': ' + esc(WIDGETS[k].label) + '">' + I(isHidden ? 'eyeOff' : 'eye') + '</button></div>';
     var body;
     try { body = WIDGETS[k].render(); } catch (e) { console.error(e); body = '<div class="card pad muted">שגיאה בטעינת הווידג׳ט</div>'; }
+    if (!body && !customizing) return '';
+    if (!body) body = '<div class="card pad muted small">' + esc(WIDGETS[k].label) + ' — מוצג רק כשרלוונטי</div>';
     return '<div class="widget' + (isHidden ? ' hidden-widget' : '') + '" data-widget="' + k + '">' + (customizing ? tools : '') + body + '</div>';
   }
 
   Object.assign(PS.act, {
+    'notify-dismiss': function () { PS.prefs.set('notifyPromptDismissed', true); },
     'dash-customize': function () { customizing = true; PS.refresh(); },
     'dash-done': function () { customizing = false; PS.refresh(); PS.ui.toast('הדשבורד עודכן', 'success'); },
     'dash-reset': function () { PS.prefs.set({ dashboardOrder: PS.prefs.DEFAULTS.dashboardOrder.slice(), dashboardHidden: [] }); },

@@ -9,6 +9,7 @@
   var ui = PS.ui;
 
   var KINDS = {
+    practice: { label: 'אימונים', icon: 'bolt' },
     lesson: { label: 'שיעורים', icon: 'clock' },
     task: { label: 'משימות', icon: 'list' },
     course: { label: 'קורסים', icon: 'book' },
@@ -24,7 +25,10 @@
   }
   function collect() {
     var items = [];
-    PS.store.list('lessons').forEach(function (l) { if (l.date) items.push(lessonItem(l)); });
+    if (PS.prefs.lessons()) PS.store.list('lessons').forEach(function (l) { if (l.date) items.push(lessonItem(l)); });
+    var pd = {};
+    PS.store.list('practice').forEach(function (p) { if (p.date) pd[p.date] = (pd[p.date] || 0) + (+p.minutes || 0); });
+    Object.keys(pd).forEach(function (k) { items.push({ kind: 'practice', id: k, title: 'אימון · ' + U.fmtMinutes(pd[k]), date: k, done: true, sub: 'יומן אימונים' }); });
     PS.store.list('tasks').forEach(function (t) { if (t.dueDate) items.push({ kind: 'task', id: t.id, title: t.title, date: t.dueDate, done: t.done, sub: 'מועד יעד למשימה' }); });
     PS.store.list('courses').forEach(function (c) {
       if (c.targetDate) items.push({ kind: 'course', id: c.id, title: 'יעד סיום: ' + c.title, date: c.targetDate, done: c.status === 'completed', sub: Math.round(PS.domain.courseProgress(c) * 100) + '% הושלם' });
@@ -86,7 +90,7 @@
     if (!any && !showEmpty) return '<div class="card">' + ui.empty({ icon: 'calendar', title: 'אין פריטים בתקופה הזו', text: 'שיעורים, מועדי משימות, יעדים ואירועים יופיעו כאן.' }) + '</div>';
     return html;
   }
-  var TONE = { lesson: 'tone-gold', task: 'tone-blue', course: 'tone-violet', goal: 'tone-green', event: 'tone-rose' };
+  var TONE = { practice: 'tone-green', lesson: 'tone-gold', task: 'tone-blue', course: 'tone-violet', goal: 'tone-green', event: 'tone-rose' };
   function agendaItem(it) {
     return '<div class="agenda-item" data-act="cal-open" data-kind="' + it.kind + '" data-id="' + esc(it.id) + '" tabindex="0" role="button">' +
       '<span class="time">' + (it.time ? esc(it.time) : 'כל היום') + '</span><span class="ai-icon ' + TONE[it.kind] + '">' + I(KINDS[it.kind].icon) + '</span>' +
@@ -144,7 +148,7 @@
     if (!state.view) state.view = PS.prefs.get('calendarView') || 'month';
     var items = collect();
     var html = '<div class="page"><div class="page-head"><div><h1>לוח שנה</h1><p class="sub">שיעורים, מועדים, יעדים ותזכורות — במבט אחד</p></div>' +
-      '<div class="page-actions"><button type="button" class="btn btn-ghost" data-act="add-lesson">' + I('clock') + 'שיעור</button><button type="button" class="btn btn-primary" data-act="add-event">' + I('plus') + 'אירוע חדש</button></div></div>';
+      '<div class="page-actions">' + (PS.prefs.lessons() ? '<button type="button" class="btn btn-ghost" data-act="add-lesson">' + I('clock') + 'שיעור</button>' : '<button type="button" class="btn btn-ghost" data-act="add-practice">' + I('bolt') + 'אימון</button>') + '<button type="button" class="btn btn-primary" data-act="add-event">' + I('plus') + 'אירוע חדש</button></div></div>';
     html += '<div class="cal-head"><div class="seg" role="tablist" aria-label="תצוגת לוח">' +
       [['day', 'יום'], ['week', 'שבוע'], ['month', 'חודש'], ['agenda', 'סדר יום']].map(function (v) { return '<button type="button" role="tab" aria-selected="' + (state.view === v[0]) + '" class="' + (state.view === v[0] ? 'on' : '') + '" data-act="cal-view" data-v="' + v[0] + '">' + v[1] + '</button>'; }).join('') + '</div>' +
       '<span class="spacer"></span>' +
@@ -152,7 +156,7 @@
       '<h2 aria-live="polite">' + esc(title()) + '</h2>' +
       '<button type="button" class="icon-btn" data-act="cal-nav" data-d="1" aria-label="התקופה הבאה">' + I('chevronLeft') + '</button>' +
       '<button type="button" class="btn btn-ghost btn-sm" data-act="cal-nav" data-d="0">היום</button></div>';
-    html += '<div class="cal-legend">' + Object.keys(KINDS).map(function (k) {
+    html += '<div class="cal-legend">' + Object.keys(KINDS).filter(function (k) { return k !== 'lesson' || PS.prefs.lessons(); }).map(function (k) {
       return '<button type="button" class="chip ' + (state.hide[k] ? 'chip-muted' : TONE[k].replace('tone', 'chip')) + '" data-act="cal-toggle" data-k="' + k + '" aria-pressed="' + !state.hide[k] + '">' + I(state.hide[k] ? 'eyeOff' : KINDS[k].icon) + esc(KINDS[k].label) + '</button>';
     }).join('') + '</div>';
     if (state.view === 'month') html += month(items, state.cursor);
@@ -168,7 +172,8 @@
   }
 
   function openItem(kind, id) {
-    if (kind === 'lesson') PS.navigate('#/lessons/' + id);
+    if (kind === 'practice') PS.navigate('#/practice');
+    else if (kind === 'lesson') PS.navigate('#/lessons/' + id);
     else if (kind === 'task') PS.act['task-edit']({ dataset: { id: id } });
     else if (kind === 'course') PS.navigate('#/courses/' + id);
     else if (kind === 'goal') PS.navigate('#/goals');
@@ -208,7 +213,8 @@
       var hour = Math.max(0, Math.min(23, Math.floor((e.clientY - r.top) / HOUR_H)));
       ui.menu(el, [
         { label: 'אירוע ב-' + String(hour).padStart(2, '0') + ':00', icon: 'calendar', fn: function () { openEvent({ date: el.dataset.date, time: String(hour).padStart(2, '0') + ':00' }); } },
-        { label: 'שיעור ב-' + String(hour).padStart(2, '0') + ':00', icon: 'clock', fn: function () { PS.act['add-lesson']({ dataset: { date: el.dataset.date } }); } }
+        PS.prefs.lessons() ? { label: 'שיעור ב-' + String(hour).padStart(2, '0') + ':00', icon: 'clock', fn: function () { PS.act['add-lesson']({ dataset: { date: el.dataset.date } }); } }
+          : { label: 'רישום אימון ביום הזה', icon: 'bolt', fn: function () { PS.act['add-practice'](null, { date: el.dataset.date }); } }
       ]);
     },
     'cal-open': function (el, e) { if (e) e.stopPropagation(); openItem(el.dataset.kind, el.dataset.id); }

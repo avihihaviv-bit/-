@@ -43,6 +43,10 @@
     var r = S.range(state.range);
     var prev = S.previous(r);
     var D = S.D;
+    var practicePts = PS.store.list('practice').map(function (p) { return { date: U.toDate(p.date), value: +p.minutes || 0 }; }).filter(function (p) { return p.date; });
+    var pIn = practicePts.filter(function (p) { return p.date >= r.from && p.date < r.to; }).reduce(function (s, p) { return s + p.value; }, 0);
+    var pPrev = practicePts.filter(function (p) { return p.date >= prev.from && p.date < prev.to; }).reduce(function (s, p) { return s + p.value; }, 0);
+    var lessonsOn = PS.prefs.lessons();
     var lessons = D.lessonsAttended(), songs = D.songsLearned(), courses = D.coursesCompleted(), tasks = D.tasksCompleted(), modules = D.modulesCompleted(), org = D.organization();
     var earliest = null;
     PS.db.COLLECTIONS.forEach(function (c) { if (c === 'notifications') return; PS.store.list(c).forEach(function (x) { var d = U.toDate(x.createdAt); if (d && (!earliest || d < earliest)) earliest = d; }); });
@@ -51,10 +55,10 @@
     var xpIn = xp.filter(function (p) { return p.date >= r.from && p.date < r.to; }).reduce(function (s, p) { return s + p.value; }, 0);
     var xpPrev = xp.filter(function (p) { return p.date >= prev.from && p.date < prev.to; }).reduce(function (s, p) { return s + p.value; }, 0);
     var gr = S.goalRate(r);
-    var anyData = lessons.length || songs.length || courses.length || tasks.length || xp.length || org.length;
+    var anyData = practicePts.length || lessons.length || songs.length || courses.length || tasks.length || xp.length || org.length;
 
     var html = '<div class="page"><div class="page-head"><div><h1>סטטיסטיקה</h1><p class="sub">' + esc(U.fmtDate(r.from)) + ' – ' + esc(U.fmtDate(U.addDays(r.to, -1))) + '</p></div>' +
-      '<div class="page-actions"><button type="button" class="btn btn-ghost btn-sm" data-act="export-csv" data-c="songs">' + I('download') + 'שירים CSV</button><button type="button" class="btn btn-ghost btn-sm" data-act="export-csv" data-c="lessons">' + I('download') + 'שיעורים CSV</button><button type="button" class="btn btn-ghost btn-sm" data-act="export-csv" data-c="tasks">' + I('download') + 'משימות CSV</button></div></div>';
+      '<div class="page-actions"><button type="button" class="btn btn-ghost btn-sm" data-act="export-csv" data-c="practice">' + I('download') + 'אימונים CSV</button><button type="button" class="btn btn-ghost btn-sm" data-act="export-csv" data-c="songs">' + I('download') + 'שירים CSV</button><button type="button" class="btn btn-ghost btn-sm" data-act="export-csv" data-c="lessons">' + I('download') + 'שיעורים CSV</button><button type="button" class="btn btn-ghost btn-sm" data-act="export-csv" data-c="tasks">' + I('download') + 'משימות CSV</button></div></div>';
     html += '<div class="toolbar"><div class="seg" role="group" aria-label="טווח תאריכים">' + PRESETS.map(function (p) { return '<button type="button" class="' + (state.range === p[0] ? 'on' : '') + '" data-act="stats-range" data-v="' + p[0] + '" aria-pressed="' + (state.range === p[0]) + '">' + p[1] + '</button>'; }).join('') + '</div>' +
       '<label class="field-check small muted"><input type="checkbox" class="check" data-change="stats-compare"' + (state.compare ? ' checked' : '') + '>השוואה לתקופה הקודמת</label></div>';
     if (!anyData) {
@@ -66,7 +70,7 @@
       return '<div class="card stat"><div class="stat-label">' + I(icon) + esc(label) + '</div><div class="stat-value">' + U.num(cur) + '</div><div class="stat-sub">' + delta(cur, prv, hasPrev) + '</div></div>';
     }
     html += '<div class="stat-tiles stagger">' +
-      tile('clock', 'שיעורים שהתקיימו', S.inRange(lessons, r), S.inRange(lessons, prev)) +
+      (lessonsOn ? tile('clock', 'שיעורים שהתקיימו', S.inRange(lessons, r), S.inRange(lessons, prev)) : tile('bolt', 'דקות אימון', pIn, pPrev)) +
       tile('music', 'שירים שנלמדו', S.inRange(songs, r), S.inRange(songs, prev)) +
       tile('list', 'משימות שהושלמו', S.inRange(tasks, r), S.inRange(tasks, prev)) +
       tile('sparkle', 'XP שנצבר', xpIn, xpPrev) + '</div>';
@@ -76,7 +80,9 @@
       '<div class="card stat"><div class="stat-label">' + I('target') + 'שיעור השגת יעדים</div><div class="stat-value">' + (gr.pct === null ? '—' : Math.round(gr.pct * 100) + '%') + '</div><div class="stat-sub">' + (gr.total ? gr.done + ' מתוך ' + gr.total + ' יעדים בטווח' : 'אין יעדים עם מועד בטווח') + '</div></div>' +
       tile('note', 'פעילות ארגונית', S.inRange(org, r), S.inRange(org, prev)) + '</div>';
     html += '<div class="grid grid-2 section">' +
-      chartCard('שיעורים שהתקיימו', 'clock', lessons, r, prev, 'שיעורים', 'bars', hasPrev) +
+      '<div class="card pad"><div class="card-head"><h3>' + I('bolt') + 'דקות אימון</h3><span class="small muted num">' + pIn + ' בתקופה</span></div>' +
+        (practicePts.length ? PS.chart.bars(S.sumSeries(practicePts, r), { unit: 'דקות', title: 'דקות אימון' }) : ui.empty({ icon: 'bolt', title: 'עוד אין אימונים רשומים' }).replace('class="empty"', 'class="empty compact"')) + '</div>' +
+      (lessonsOn ? chartCard('שיעורים שהתקיימו', 'clock', lessons, r, prev, 'שיעורים', 'bars', hasPrev) : '') +
       chartCard('שירים שנלמדו (מצטבר)', 'music', songs, r, prev, 'שירים', 'cumulative', hasPrev) +
       chartCard('משימות שהושלמו', 'list', tasks, r, prev, 'משימות', 'bars', hasPrev) +
       chartCard('קורסים שהושלמו (מצטבר)', 'graduation', courses, r, prev, 'קורסים', 'cumulative', hasPrev) +

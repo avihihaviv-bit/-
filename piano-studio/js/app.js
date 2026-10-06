@@ -16,8 +16,9 @@
       { id: 'stats', label: 'סטטיסטיקה', icon: 'chart', href: '#/stats' }
     ] },
     { group: 'למידה', items: [
-      { id: 'lessons', label: 'שיעורים', icon: 'clock', href: '#/lessons' },
-      { id: 'notes', label: 'מחברת שיעורים', icon: 'note', href: '#/notes' },
+      { id: 'practice', label: 'יומן אימונים', icon: 'bolt', href: '#/practice' },
+      { id: 'lessons', label: 'שיעורים', icon: 'clock', href: '#/lessons', lessons: true },
+      { id: 'notes', label: function () { return PS.prefs.lessons() ? 'מחברת שיעורים' : 'מחברת'; }, icon: 'note', href: '#/notes' },
       { id: 'songs', label: 'שירים', icon: 'music', href: '#/songs' },
       { id: 'courses', label: 'קורסים', icon: 'book', href: '#/courses' }
     ] },
@@ -33,9 +34,14 @@
     ] }
   ];
   var SETTINGS_ITEM = { id: 'settings', label: 'הגדרות', icon: 'settings', href: '#/settings' };
-  var BOTTOM = ['home', 'lessons', '__add', 'songs', '__more'];
+  function bottomItems() { return ['home', PS.prefs.lessons() ? 'lessons' : 'practice', '__add', 'songs', '__more']; }
 
-  function allNav() { var a = []; NAV.forEach(function (g) { a = a.concat(g.items); }); return a.concat([SETTINGS_ITEM]); }
+  function navItems(g) {
+    return g.items.filter(function (it) { return !it.lessons || PS.prefs.lessons(); }).map(function (it) {
+      return typeof it.label === 'function' ? Object.assign({}, it, { label: it.label() }) : it;
+    });
+  }
+  function allNav() { var a = []; NAV.forEach(function (g) { a = a.concat(navItems(g)); }); return a.concat([SETTINGS_ITEM]); }
 
   var current = { name: 'home', params: [], query: {} };
 
@@ -130,7 +136,7 @@
       '</div>' +
       '<button type="button" class="btn btn-primary side-add" data-act="quick-add" aria-haspopup="menu">' + I('plus') + '<span class="nav-label">הוספה מהירה</span></button>' +
       '<nav class="side-nav">' + NAV.map(function (grp) {
-        return '<div class="nav-group"><div class="nav-group-label">' + esc(grp.group) + '</div>' + grp.items.map(item).join('') + '</div>';
+        return '<div class="nav-group"><div class="nav-group-label">' + esc(grp.group) + '</div>' + navItems(grp).map(item).join('') + '</div>';
       }).join('') + '</nav>' +
       '<div class="side-foot">' + item(SETTINGS_ITEM) +
         '<a class="side-profile" href="#/achievements" title="רמה ' + g.level + ' · ' + esc(g.title) + '">' + avatarHTML() +
@@ -161,8 +167,9 @@
     var bn = document.getElementById('bottom-nav');
     var map = {};
     allNav().forEach(function (n) { map[n.id] = n; });
-    var primary = ['home', 'lessons', 'songs'];
-    bn.innerHTML = BOTTOM.map(function (id) {
+    var bottom = bottomItems();
+    var primary = bottom.filter(function (x) { return x.indexOf('__') !== 0; });
+    bn.innerHTML = bottom.map(function (id) {
       if (id === '__add') return '<button type="button" class="bn-add" data-act="quick-add" aria-label="הוספה מהירה">' + I('plus') + '</button>';
       if (id === '__more') {
         var on = primary.indexOf(current.name) < 0 && current.name !== 'home';
@@ -191,7 +198,7 @@
       var q = input.value.trim();
       if (!q) {
         items = allNav().map(function (n) { return { title: n.label, sub: 'מעבר לעמוד', icon: n.icon, href: n.href, label: 'עמוד' }; })
-          .concat(QUICK.map(function (a) { return { title: a.label, sub: 'הוספה מהירה', icon: 'plus', act: a.act, label: 'פעולה' }; }));
+          .concat(quickItems().map(function (a) { return { title: a.label, sub: 'הוספה מהירה', icon: 'plus', act: a.act, label: 'פעולה' }; }));
       } else {
         items = PS.search.query(q, 30);
         allNav().forEach(function (n) { if (U.normalize(n.label).indexOf(U.normalize(q)) >= 0) items.push({ title: n.label, sub: 'מעבר לעמוד', icon: n.icon, href: n.href, label: 'עמוד' }); });
@@ -221,8 +228,9 @@
   }
 
   /* ---------------- quick add ---------------- */
-  var QUICK = [
-    { label: 'שיעור פסנתר', icon: 'clock', act: 'add-lesson' },
+  var QUICK_ALL = [
+    { label: 'רישום אימון', icon: 'bolt', act: 'add-practice' },
+    { label: 'שיעור פסנתר', icon: 'clock', act: 'add-lesson', lessons: true },
     { label: 'שיר', icon: 'music', act: 'add-song' },
     { label: 'קורס', icon: 'book', act: 'add-course' },
     { label: 'משימה', icon: 'list', act: 'add-task' },
@@ -232,13 +240,14 @@
     { label: 'רשומת יומן', icon: 'pen', act: 'add-journal' },
     { label: 'משאב', icon: 'folder', act: 'add-resource' }
   ];
-  PS.QUICK = QUICK;
+  function quickItems() { return QUICK_ALL.filter(function (q) { return !q.lessons || PS.prefs.lessons(); }); }
+  PS.quickItems = quickItems;
   function quickAdd(anchor) {
-    PS.ui.menu(anchor || document.querySelector('.side-add') || document.body, QUICK.map(function (q) { return { label: q.label, icon: q.icon, fn: function () { PS.act[q.act](); } }; }));
+    PS.ui.menu(anchor || document.querySelector('.side-add') || document.body, quickItems().map(function (q) { return { label: q.label, icon: q.icon, fn: function () { PS.act[q.act](); } }; }));
   }
 
   /* ---------------- notifications ---------------- */
-  var NTF_ICON = { lesson: 'clock', task: 'list', goal: 'target', course: 'book', level: 'bolt', achievement: 'trophy', event: 'calendar' };
+  var NTF_ICON = { practice: 'bolt', lesson: 'clock', task: 'list', goal: 'target', course: 'book', level: 'bolt', achievement: 'trophy', event: 'calendar' };
   function openNotifications() {
     var list = PS.notify.list();
     var m = PS.ui.modal({
@@ -363,17 +372,18 @@
       body: '<div class="onboard"><p class="lead">המקום האישי שלך לנהל את המסע המוזיקלי: שיעורים, שירים, קורסים, משימות, יעדים והתקדמות — הכל במקום אחד, נשמר בדפדפן שלך.</p>' +
         '<form class="form" data-onboard><div class="field"><label for="ob-name"><span class="field-label">איך לקרוא לך?</span></label><input id="ob-name" class="input" type="text" maxlength="40" placeholder="השם שלך" autofocus></div>' +
         '<div class="field half"><label for="ob-goal"><span class="field-label">יעד שבועי (פעולות למידה)</span></label><input id="ob-goal" class="input" type="number" min="1" max="50" value="5"></div>' +
-        '<div class="field half"><label for="ob-dur"><span class="field-label">אורך שיעור רגיל (דקות)</span></label><input id="ob-dur" class="input" type="number" min="10" max="240" value="45"></div>' +
+        '<div class="field half"><label for="ob-dur"><span class="field-label">יעד אימון יומי (דקות)</span></label><input id="ob-dur" class="input" type="number" min="5" max="300" value="20"></div>' +
+        '<label class="field field-check"><input type="checkbox" class="check" id="ob-lessons"><span>אני לומד/ת עם מורה (מציג ניהול שיעורים)</span></label>' +
         '<label class="field field-check"><input type="checkbox" class="check" id="ob-demo"><span>טען נתוני דוגמה כדי להכיר את המערכת (אפשר להסיר בהגדרות)</span></label></form>' +
-        '<p class="muted small">פעולת למידה = משימה שהושלמה, שיעור שהתקיים, מודול שהושלם או שיר שנלמד.</p></div>',
+        '<p class="muted small">פעולת למידה = יום אימון, משימה שהושלמה, מודול שהושלם או שיר שנלמד.</p></div>',
       footer: '<button type="button" class="btn btn-ghost" data-close>אחר כך</button><button type="button" class="btn btn-primary" data-ob-go>' + I('sparkle') + 'בואו נתחיל</button>',
       onClose: function () { PS.prefs.set('onboarded', true); }
     });
     function go() {
       var name = m.el.querySelector('#ob-name').value.trim().slice(0, 40);
       var goal = U.clamp(parseInt(m.el.querySelector('#ob-goal').value, 10) || 5, 1, 50);
-      var dur = U.clamp(parseInt(m.el.querySelector('#ob-dur').value, 10) || 45, 10, 240);
-      PS.prefs.set({ name: name, weeklyGoal: goal, defaultLessonDuration: dur, onboarded: true });
+      var dur = U.clamp(parseInt(m.el.querySelector('#ob-dur').value, 10) || 20, 5, 300);
+      PS.prefs.set({ name: name, weeklyGoal: goal, dailyPracticeGoal: dur, lessonsEnabled: m.el.querySelector('#ob-lessons').checked, onboarded: true });
       if (m.el.querySelector('#ob-demo').checked) PS.backup.loadDemo();
       m.close();
       scheduleRender();

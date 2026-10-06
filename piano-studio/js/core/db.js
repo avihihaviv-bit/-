@@ -9,9 +9,9 @@
   var PS = window.PS;
 
   var DB_NAME = 'piano-studio';
-  var DB_VERSION = 1;
+  var DB_VERSION = 2; // v2: practice store
   var SCHEMA_VERSION = 1; // data-level migrations (see migrate())
-  var COLLECTIONS = ['lessons', 'notes', 'songs', 'collections', 'courses', 'tasks', 'goals', 'events', 'journal', 'resources', 'xp', 'achievements', 'notifications', 'activity'];
+  var COLLECTIONS = ['lessons', 'notes', 'songs', 'collections', 'courses', 'tasks', 'goals', 'events', 'journal', 'resources', 'practice', 'xp', 'achievements', 'notifications', 'activity'];
   var FALLBACK_KEY = 'ps.fallback.data';
 
   var idb = null;

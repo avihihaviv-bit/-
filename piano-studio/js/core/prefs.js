@@ -27,12 +27,17 @@
     notifyAchievements: true,
     browserNotifications: false,
     sidebarCollapsed: false,
-    dashboardOrder: ['hero', 'today', 'quick', 'progress', 'chart', 'learning', 'activity', 'milestones'],
+    dashboardOrder: ['hero', 'notify', 'today', 'quick', 'week', 'progress', 'chart', 'learning', 'activity', 'milestones'],
     dashboardHidden: [],
     genres: null,
     lessonTemplate: null,
     onboarded: false,
-    hasDemo: false
+    hasDemo: false,
+    lessonsEnabled: false,      // learning with a teacher? (lesson manager on/off)
+    practiceReminder: true,     // daily reminder to log practice
+    practiceReminderTime: '19:00',
+    dailyPracticeGoal: 20,      // minutes
+    notifyPromptDismissed: false
   };
 
   var state = {};
@@ -48,6 +53,8 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
   function get(k) { return state[k]; }
+  /* Lesson manager (learning with a teacher) is optional and off by default. */
+  function lessons() { return !!state.lessonsEnabled; }
   function set(k, v) {
     if (typeof k === 'object') { Object.assign(state, k); }
     else state[k] = v;
@@ -64,5 +71,5 @@
   function reset() { state = Object.assign({}, DEFAULTS); save(); }
 
   load();
-  PS.prefs = { get: get, set: set, all: all, replace: replace, reset: reset, DEFAULTS: DEFAULTS, on: function (fn) { subs.push(fn); } };
+  PS.prefs = { lessons: lessons, get: get, set: set, all: all, replace: replace, reset: reset, DEFAULTS: DEFAULTS, on: function (fn) { subs.push(fn); } };
 })();

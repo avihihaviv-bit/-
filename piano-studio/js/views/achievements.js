@@ -55,7 +55,7 @@
     var unlocked = st.filter(function (a) { return a.unlocked; }).length;
     var list = st.filter(function (a) { return state.filter === 'all' || (state.filter === 'unlocked' ? a.unlocked : !a.unlocked); });
     var html = '<div class="toolbar"><div class="seg">' + [['all', 'הכל (' + st.length + ')'], ['unlocked', 'נפתחו (' + unlocked + ')'], ['locked', 'נעולים (' + (st.length - unlocked) + ')']].map(function (f) { return '<button type="button" class="' + (state.filter === f[0] ? 'on' : '') + '" data-act="ach-filter" data-v="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '</div></div>';
-    Object.keys(PS.game.ACH_CATS).forEach(function (cat) {
+    Object.keys(PS.game.ACH_CATS).filter(function (c) { return c !== 'lessons' || PS.prefs.lessons(); }).forEach(function (cat) {
       var items = list.filter(function (a) { return a.cat === cat; });
       if (!items.length) return;
       html += '<div class="section"><div class="section-head"><h2>' + esc(PS.game.ACH_CATS[cat]) + '</h2><span class="small muted">' + items.filter(function (a) { return a.unlocked; }).length + '/' + items.length + '</span></div><div class="ach-grid stagger">' +
@@ -75,7 +75,7 @@
     var shown = state.showAll ? evs : evs.slice(0, 40);
     var X = PS.game.XP;
     var html = '<div class="grid grid-2" style="margin-bottom:18px"><div class="card pad"><div class="card-head"><h3>' + I('sparkle') + 'איך צוברים XP</h3></div><dl class="kv">' +
-      '<dt>השלמת משימה</dt><dd class="xp-amt">+' + X.task + '</dd><dt>שיעור שהתקיים</dt><dd class="xp-amt">+' + X.lesson + '</dd><dt>השלמת מודול בקורס</dt><dd class="xp-amt">+' + X.module + '</dd>' +
+      '<dt>יום אימון (פעם ביום)</dt><dd class="xp-amt">' + U.xp(X.practiceDay) + '</dd><dt>השלמת משימה</dt><dd class="xp-amt">+' + X.task + '</dd><dt>שיעור שהתקיים</dt><dd class="xp-amt">+' + X.lesson + '</dd><dt>השלמת מודול בקורס</dt><dd class="xp-amt">+' + X.module + '</dd>' +
       '<dt>סיום קורס</dt><dd class="xp-amt">+' + X.course + '</dd><dt>שיר שנלמד</dt><dd class="xp-amt">+' + X.song + '</dd><dt>עמידה ביעד השבועי</dt><dd class="xp-amt">+' + X.weekly + '</dd><dt>השגת יעד / אבן דרך</dt><dd class="xp-amt">לפי הגדרת היעד</dd></dl>' +
       '<p class="small faint" style="margin-top:12px">כל רשומה מתגמלת פעם אחת בלבד. ביטול השלמה וסימון מחדש לא מעניקים XP נוסף. XP מתגמל פעולות שנרשמו — לא מודד מיומנות נגינה.</p></div>' +
       '<div class="card pad"><div class="card-head"><h3>' + I('crown') + 'מפת הרמות</h3></div><div class="list" style="max-height:290px;overflow-y:auto">' +

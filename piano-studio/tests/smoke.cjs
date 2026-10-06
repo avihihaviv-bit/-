@@ -30,8 +30,33 @@ function check(name, ok, info) { results.push({ name, ok: !!ok, info }); console
   check('dashboard greeting uses name', /יואב/.test(hero), hero);
   await shot('01-dashboard-empty');
 
+  // lessons are optional and off by default
+  check('lesson manager hidden by default', !(await page.isVisible('.sidebar a[href="#/lessons"]')) && await page.isVisible('.sidebar a[href="#/practice"]'));
+
+  // practice reminder fires when nothing is logged after the reminder time
+  await page.evaluate(() => { PS.prefs.set('practiceReminderTime', '00:00'); PS.notify.scan(); });
+  check('daily practice reminder generated', await page.evaluate(() => PS.store.list('notifications').some((n) => n.type === 'practice')));
+
+  // practice log: quick log awards XP once per day, streak updates
+  await page.goto(BASE + '#/practice');
+  await page.waitForTimeout(200);
+  const p0 = await page.evaluate(() => PS.game.lifetimeXP());
+  await page.click('[data-act="practice-quick"][data-m="20"]');
+  await page.waitForTimeout(300);
+  await page.click('[data-act="practice-quick"][data-m="15"]');
+  await page.waitForTimeout(300);
+  const p1 = await page.evaluate(() => ({ xp: PS.game.lifetimeXP(), today: PS.practice.today(), streak: PS.practice.streak().current }));
+  check('practice log: +15 XP once per day, minutes summed, streak 1', p1.xp - p0 === 15 && p1.today === 35 && p1.streak === 1, JSON.stringify(p1));
+  await page.evaluate(() => { const y = PS.util.dkey(PS.util.addDays(new Date(), -1)); PS.store.create('practice', { date: y, minutes: 10 }); });
+  await page.waitForTimeout(200);
+  check('practice streak counts consecutive days', await page.evaluate(() => PS.practice.streak().current) === 2);
+  check('practice heatmap rendered', await page.$$eval('.heat .hc', (e) => e.length) >= 100);
+  check('first-practice achievement unlocked', await page.evaluate(() => !!PS.store.get('achievements', 'first-practice')));
+  await page.evaluate(() => PS.prefs.set('lessonsEnabled', true));
+  await page.waitForTimeout(200);
+
   // every nav page renders
-  const routes = ['', 'calendar', 'stats', 'lessons', 'notes', 'songs', 'courses', 'tasks', 'goals', 'resources', 'journal', 'journey', 'achievements', 'settings'];
+  const routes = ['practice', '', 'calendar', 'stats', 'lessons', 'notes', 'songs', 'courses', 'tasks', 'goals', 'resources', 'journal', 'journey', 'achievements', 'settings'];
   for (const r of routes) {
     await page.goto(BASE + '#/' + r);
     await page.waitForTimeout(150);
@@ -112,15 +137,16 @@ function check(name, ok, info) { results.push({ name, ok: !!ok, info }); console
   const cid = await page.evaluate(() => PS.store.create('courses', { title: 'Piano Fundamentals', moduleCount: 2, status: 'planned' }).id);
   await page.goto(BASE + '#/courses/' + cid);
   await page.waitForTimeout(200);
-  const x3 = await page.evaluate(() => PS.game.lifetimeXP());
+  const courseXP = () => page.evaluate(() => PS.store.list('xp').filter((e) => /^(module|course):/.test(e.key)).reduce((t, e) => t + e.amount, 0));
+  const x3 = await courseXP();
   await page.click('.module [data-act="module-toggle"] >> nth=0');
   await page.waitForTimeout(300);
-  check('module completion awards 20 XP and starts course', await page.evaluate((id) => PS.store.get('courses', id).status, cid) === 'in_progress' && await page.evaluate(() => PS.game.lifetimeXP()) - x3 === 20);
+  check('module completion awards 20 XP and starts course', await page.evaluate((id) => PS.store.get('courses', id).status, cid) === 'in_progress' && await courseXP() - x3 === 20);
   await dismiss();
   await page.click('.module [data-act="module-toggle"] >> nth=1');
   await page.waitForTimeout(800);
   const cst = await page.evaluate((id) => PS.store.get('courses', id).status, cid);
-  check('completing all modules completes course (+20 +100 XP)', cst === 'completed' && await page.evaluate(() => PS.game.lifetimeXP()) - x3 === 140, cst);
+  check('completing all modules completes course (+20 +100 XP)', cst === 'completed' && await courseXP() - x3 === 140, cst);
   await page.waitForTimeout(500);
   if (await page.isVisible('.modal-levelup')) await shot('05-levelup');
   await dismiss();

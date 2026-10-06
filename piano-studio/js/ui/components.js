@@ -348,7 +348,7 @@
         var hasVal = options.some(function (o) { return String(o.value) === String(v); });
         inner = '<select class="input" ' + attrs + '>' +
           (!f.req && f.def === undefined ? '<option value="">—</option>' : '') +
-          (!hasVal && v ? '<option value="' + esc(v) + '" selected>' + esc(v) + '</option>' : '') +
+          (!hasVal && v ? '<option value="' + esc(v) + '" selected>' + esc((f.k === 'type' && PS.schema.labels.noteType[v]) || v) + '</option>' : '') +
           options.map(function (o) { return '<option value="' + esc(o.value) + '"' + (String(o.value) === String(v) ? ' selected' : '') + '>' + esc(o.label) + '</option>'; }).join('') +
           (f.allowNew ? '<option value="__new__">+ הוספת ערך חדש…</option>' : '') +
           '</select>';
@@ -580,7 +580,7 @@
     var def = PS.schema.defs[o.coll];
     var isNew = !(o.record && o.record.id && PS.store.get(o.coll, o.record.id));
     var rec = Object.assign(PS.schema.defaults(o.coll), o.record || {});
-    var fields = def.fields.filter(function (f) { return !(f.createOnly && !isNew); });
+    var fields = def.fields.filter(function (f) { return !(f.createOnly && !isNew) && !(f.lessons && !PS.prefs.lessons()); });
     var draftKey = o.draft ? 'ps.draft.' + o.coll + '.' + (isNew ? 'new' : rec.id) : null;
     var draft = null;
     if (draftKey) {

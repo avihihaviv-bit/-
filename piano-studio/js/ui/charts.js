@@ -46,7 +46,7 @@
     var n = data.length;
     var slot = W / n;
     var bw = Math.min(opts.compare ? 12 : 22, slot * (opts.compare ? 0.32 : 0.56));
-    var every = opts.labelEvery || Math.ceil(n / 12);
+    var every = opts.labelEvery || Math.max(1, Math.ceil(n / 6));
     var y = function (v) { return padT + (H - padT - padB) * (1 - v / max); };
     var grid = [0, 0.5, 1].map(function (g) {
       var yy = y(max * g);
@@ -85,7 +85,7 @@
     var pts = data.map(function (d, i) { return [x(i), y(d.value)]; });
     var path = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join('');
     var area = path + 'L' + pts[n - 1][0].toFixed(1) + ',' + (H - padB) + 'L' + pts[0][0].toFixed(1) + ',' + (H - padB) + 'Z';
-    var every = Math.ceil(n / 10);
+    var every = Math.max(1, Math.ceil(n / 6));
     var gid = 'g' + Math.random().toString(36).slice(2, 7);
     var grid = [0.5, 1].map(function (g) { var yy = y(max * g); return '<line class="grid" x1="0" x2="' + W + '" y1="' + yy + '" y2="' + yy + '"/><text class="axis" x="' + (W - 2) + '" y="' + (yy - 4) + '" text-anchor="end">' + Math.round(max * g) + '</text>'; }).join('');
     var slot = n > 1 ? (W - 2 * padX) / (n - 1) : W;

@@ -51,16 +51,18 @@
 
   /* ---------------- particles / confetti ---------------- */
   var GOLDS = ['#e9d3a6', '#d4b37a', '#b8955b', '#f4efe6', '#c9a46a'];
-  function canvasLayer(z) {
+  /* Canvas sized to its host (the viewport, or a modal) so particles are never stretched. */
+  function canvasLayer(z, host) {
     var c = document.createElement('canvas');
     c.className = 'fx-canvas';
     c.style.zIndex = z || 120;
+    var w = host ? host.clientWidth : innerWidth, h = host ? host.clientHeight : innerHeight;
     var dpr = Math.min(2, window.devicePixelRatio || 1);
-    c.width = innerWidth * dpr; c.height = innerHeight * dpr;
-    document.body.appendChild(c);
+    c.width = Math.max(1, w * dpr); c.height = Math.max(1, h * dpr);
+    (host || document.body).appendChild(c);
     var ctx = c.getContext('2d');
     ctx.scale(dpr, dpr);
-    return { c: c, ctx: ctx };
+    return { c: c, ctx: ctx, w: w, h: h };
   }
   fx.confetti = function (opt) {
     if (reduced()) return;
@@ -94,18 +96,17 @@
 
   function sparkles(host) {
     if (reduced()) return function () {};
-    var L = canvasLayer(1);
+    var L = canvasLayer(1, host);
     L.c.style.position = 'absolute';
-    host.appendChild(L.c);
     var parts = [];
     for (var i = 0; i < 70; i++) parts.push(newP(true));
     function newP(initial) {
-      return { x: innerWidth / 2 + (Math.random() - 0.5) * 120, y: innerHeight / 2 + (Math.random() - 0.5) * 60, vx: (Math.random() - 0.5) * 3.2, vy: -Math.random() * 3 - (initial ? 2 : 0.5), s: Math.random() * 2.2 + 0.6, a: 1, c: GOLDS[Math.floor(Math.random() * GOLDS.length)] };
+      return { x: L.w / 2 + (Math.random() - 0.5) * 120, y: L.h * 0.38 + (Math.random() - 0.5) * 60, vx: (Math.random() - 0.5) * 3.2, vy: -Math.random() * 3 - (initial ? 2 : 0.5), s: Math.random() * 2.2 + 0.6, a: 1, c: GOLDS[Math.floor(Math.random() * GOLDS.length)] };
     }
     var alive = true;
     function tick() {
       if (!alive) return;
-      L.ctx.clearRect(0, 0, innerWidth, innerHeight);
+      L.ctx.clearRect(0, 0, L.w, L.h);
       parts.forEach(function (p, i) {
         p.x += p.vx; p.y += p.vy; p.vy += 0.015; p.a -= 0.006;
         if (p.a <= 0) parts[i] = newP(false);

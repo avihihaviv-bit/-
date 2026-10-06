@@ -1,6 +1,6 @@
 # Piano Studio
 
-A personal management app for real-world piano learning: lessons, a lesson notebook, songs, courses, tasks, goals, a calendar, a journal, resources, statistics, and an XP and achievements system. The interface is in Hebrew and right-to-left, with dark mode as the default.
+A personal management app for real-world piano learning: a practice log (streaks, heatmap), songs, optional lessons with a teacher, a notebook, courses, tasks, goals, a calendar, a journal, resources, statistics, and an XP and achievements system. The interface is in Hebrew and right-to-left, with dark mode as the default.
 
 > This is **not** a virtual piano and does not measure playing. It only tracks things you record yourself.
 
@@ -45,7 +45,7 @@ npx vercel --prod      # when prompted, create a new project (do not link it to 
 
 ## Known limitations
 
-- Reminders are generated only while the app is open, on load and then once a minute. With no push server, nothing fires while the app is fully closed. Browser notifications show only while a tab is open in the background.
+- Notifications (daily practice reminder, tasks, goals, events) are shown as system notifications through the service worker while the app is open or in the background, and are caught up when it is opened. With no push server, nothing fires while the app is fully closed. On iPhone, notifications require adding the app to the Home Screen first.
 - Data does not sync between devices. Use JSON export and import to move it.
 - Local files are not included in the JSON backup, which contains only their metadata.
 - The interface is available in Hebrew only.

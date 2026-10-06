@@ -30,6 +30,7 @@
 
   Object.assign(PS.act, {
     'add-song': function (el, preset) { openForm(null, preset && !preset.target ? preset : null); },
+    'song-practice': function (el) { PS.act['add-practice'](null, { songIds: [el.dataset.id] }); },
     'song-edit': function (el) { openForm(PS.store.get('songs', el.dataset.id)); },
     'song-fav': function (el) { var s = PS.store.get('songs', el.dataset.id); PS.store.update('songs', s.id, { favorite: !s.favorite }); },
     'song-status': function (el) { PS.store.update('songs', el.dataset.id, { status: el.value }); ui.toast('הסטטוס עודכן ל' + L.songStatus[el.value], 'success'); },
@@ -48,6 +49,7 @@
         { label: 'עריכה', icon: 'edit', fn: function () { openForm(s); } },
         { label: s.favorite ? 'הסרה ממועדפים' : 'הוספה למועדפים', icon: 'star', fn: function () { PS.store.update('songs', s.id, { favorite: !s.favorite }); } },
         { label: 'הוספה לאוסף…', icon: 'layers', fn: function () { pickCollection(s.id); } },
+        { label: 'רישום אימון על השיר', icon: 'bolt', fn: function () { PS.act['add-practice'](null, { songIds: [s.id] }); } },
         { label: 'משימה לשיר', icon: 'list', fn: function () { PS.act['add-task'](null, { songId: s.id }); } },
         { label: 'פתק לשיר', icon: 'note', fn: function () { PS.act['add-note'](null, { songIds: [s.id] }); } },
         { sep: true }
@@ -264,6 +266,7 @@
       sec('הערות אישיות', 'pen', s.personalNotes ? '<div class="textblock">' + U.bidi(s.personalNotes) + '</div>' : '<p class="faint small">אין הערות אישיות</p>') +
       (s.background ? sec('על היצירה והמלחין', 'book', '<div class="textblock muted">' + U.bidi(s.background) + '</div>') : '') +
     '</div><div class="stack">' +
+      sec('אימון על השיר', 'bolt', '<div class="goal-val">' + U.fmtMinutes(PS.practice.minutesForSong(s.id)) + '</div><p class="small muted">זמן אימון רשום על השיר</p><button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px" data-act="song-practice" data-id="' + s.id + '">' + I('plus') + 'רישום אימון על השיר</button>') +
       sec('פרטים', 'info', '<dl class="kv"><dt>נוסף</dt><dd>' + esc(U.fmtDate(s.createdAt)) + '</dd>' + (s.startedAt ? '<dt>התחלת למידה</dt><dd>' + esc(U.fmtDate(s.startedAt)) + '</dd>' : '') + (s.targetDate ? '<dt>יעד לסיום</dt><dd>' + esc(U.fmtDate(s.targetDate)) + '</dd>' : '') + (s.learnedAt ? '<dt>נלמד</dt><dd>' + esc(U.fmtDate(s.learnedAt)) + '</dd>' : '') + '<dt>תגיות</dt><dd>' + (s.tags && s.tags.length ? ui.tags(s.tags) : '—') + '</dd></dl>') +
       sec('אוספים', 'layers', (cols.length ? '<div class="stack" style="gap:6px">' + cols.map(function (c) { var on = c.songIds.indexOf(s.id) >= 0; return '<label class="field-check" style="padding:2px 0"><input type="checkbox" class="check" data-act="song-coll-toggle" data-c="' + c.id + '" data-id="' + s.id + '"' + (on ? ' checked' : '') + '><span>' + U.bidi(c.name) + '</span></label>'; }).join('') + '</div>' : '<p class="faint small">עוד אין אוספים אישיים</p>') + '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px" data-act="collection-add">' + I('plus') + 'אוסף חדש</button>') +
       sec('היסטוריה ואבני דרך', 'history', (s.history || []).length ? '<ul class="history">' + s.history.slice().reverse().map(function (h) {

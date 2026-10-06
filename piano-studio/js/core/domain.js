@@ -91,7 +91,7 @@
     var ref = { coll: coll, id: next.id };
     var isNew = !prev;
     if (isNew && !next.demo) {
-      var verb = { lessons: 'נוסף שיעור', notes: 'נכתב פתק', songs: 'נוסף שיר', courses: 'נוסף קורס', tasks: 'נוספה משימה', goals: 'הוגדר יעד', events: 'נוסף אירוע ליומן', journal: 'נכתבה רשומת יומן', resources: 'נשמר משאב', collections: 'נוצר אוסף' }[coll];
+      var verb = { practice: null, lessons: 'נוסף שיעור', notes: 'נכתב פתק', songs: 'נוסף שיר', courses: 'נוסף קורס', tasks: 'נוספה משימה', goals: 'הוגדר יעד', events: 'נוסף אירוע ליומן', journal: 'נכתבה רשומת יומן', resources: 'נשמר משאב', collections: 'נוצר אוסף' }[coll];
       if (verb) PS.store.log('create', verb + (title ? ': ' + title : ''), ref);
     }
 
@@ -142,6 +142,12 @@
       case 'goals':
         if (next.status === 'completed' && !(prev && prev.status === 'completed')) completeGoalEffects(next);
         break;
+      case 'practice':
+        if (next.demo) break;
+        if (isNew) PS.store.log('practice', 'אימון נרשם: ' + U.fmtMinutes(next.minutes) + (next.focus ? ' · ' + next.focus : ''), ref);
+        // one reward per practice day — logging several sessions on the same day pays once
+        PS.game.award('practice-day:' + next.date, XP().practiceDay, 'יום אימון · ' + U.fmtDate(next.date), ref);
+        break;
     }
     scheduleEvaluate();
   }
@@ -180,6 +186,8 @@
       case 'lessons_completed': return PS.store.list('lessons').filter(function (l) { return l.status === 'completed' && inR(l.completedAt); }).length;
       case 'courses_completed': return PS.store.list('courses').filter(function (c) { return c.status === 'completed' && inR(c.completedAt); }).length;
       case 'tasks_completed': return PS.store.list('tasks').filter(function (t) { return t.done && inR(t.completedAt); }).length;
+      case 'practice_minutes': return PS.store.list('practice').reduce(function (s, p) { return inR(p.date) ? s + (+p.minutes || 0) : s; }, 0);
+      case 'practice_days': var ds = {}; PS.store.list('practice').forEach(function (p) { if (inR(p.date)) ds[p.date] = 1; }); return Object.keys(ds).length;
       case 'notes_written': return PS.store.list('notes').filter(function (n) { return inR(n.createdAt); }).length;
       case 'favorite_songs': return PS.store.list('songs').filter(function (s) { return s.favorite; }).length;
       case 'modules_completed':

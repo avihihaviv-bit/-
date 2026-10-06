@@ -40,13 +40,22 @@
     'pref-color': function (el) { P.set('avatarColor', el.dataset.v); },
     'browser-notify': function () {
       PS.notify.requestBrowserPermission().then(function (r) {
-        if (r === 'granted') { P.set('browserNotifications', true); ui.toast('התראות דפדפן הופעלו', 'success'); }
+        if (r === 'granted') {
+          P.set('browserNotifications', true);
+          ui.toast('ההתראות הופעלו', 'success');
+          PS.notify.showSystem('Piano Studio', 'ההתראות פועלות. כך תיראה תזכורת.', 'welcome', '#/');
+        }
         else if (r === 'unsupported') ui.toast('הדפדפן הזה לא תומך בהתראות', 'error');
         else { P.set('browserNotifications', false); ui.toast('ההרשאה לא ניתנה — אפשר לשנות בהגדרות הדפדפן', 'error'); }
       });
     },
     'browser-notify-off': function () { P.set('browserNotifications', false); },
-    'test-notify': function () { PS.notify.push('event', 'בדיקת התראה', 'כך תיראה תזכורת ב-Piano Studio', { key: 'test:' + Date.now() }); ui.toast('נוספה התראת בדיקה למרכז ההתראות', 'success'); },
+    'test-notify': function () {
+      PS.notify.push('event', 'בדיקת התראה', 'כך תיראה תזכורת ב-Piano Studio', { key: 'test:' + Date.now() });
+      PS.notify.showSystem('בדיקת התראה', 'כך תיראה תזכורת ב-Piano Studio', 'test', '#/').then(function (shown) {
+        ui.toast(shown ? 'נשלחה התראת מערכת ונוספה למרכז ההתראות' : 'נוספה התראה למרכז ההתראות (התראות מערכת כבויות)', 'success');
+      });
+    },
     'genre-add': function () {
       ui.prompt({ title: 'ז׳אנר חדש', label: 'שם הז׳אנר' }).then(function (v) {
         if (!v) return;
@@ -141,14 +150,18 @@
       sw('sound', 'צלילי אפקט', 'צליל עדין בעלייה ברמה ובפתיחת הישג (כבוי כברירת מחדל)') + '</section>';
 
     html += '<section class="card set-section" id="set-learning"><h2>' + I('music') + 'למידה ולוח שנה</h2><p class="muted">פעולת למידה = משימה שהושלמה, שיעור שהתקיים, מודול שהושלם או שיר שנלמד.</p>' +
+      '<div class="set-row"><div class="lbl"><b id="l-lessonsEnabled">אני לומד/ת עם מורה</b><small>מציג את ניהול השיעורים, הערות מורה ושיעורי בית. כבוי = לימוד עצמאי.</small></div><div class="ctl"><label class="switch"><input type="checkbox" data-change="pref-set" data-k="lessonsEnabled" aria-labelledby="l-lessonsEnabled"' + (P.get('lessonsEnabled') ? ' checked' : '') + '><span></span></label></div></div>' +
+      num('dailyPracticeGoal', 'יעד אימון יומי (דקות)', 'משמש לטבעת היומית ולמפת האימונים', 5, 300) +
       num('weeklyGoal', 'יעד שבועי (פעולות למידה)', 'עמידה ביעד מעניקה ' + PS.game.XP.weekly + ' XP פעם אחת בשבוע', 1, 50) +
       num('defaultLessonDuration', 'אורך שיעור ברירת מחדל (דקות)', '', 10, 240) +
       sel('calendarView', 'תצוגת לוח שנה מועדפת', '', [['month', 'חודש'], ['week', 'שבוע'], ['day', 'יום'], ['agenda', 'סדר יום']]) +
       '<div class="set-row"><div class="lbl"><b>ז׳אנרים</b><small>מופיעים בבחירה בעת הוספת שיר</small></div><div class="ctl" style="max-width:420px">' + genres.map(function (g) { return '<span class="tag-chip"><bdi>' + esc(g) + '</bdi><button type="button" data-act="genre-del" data-g="' + esc(g) + '" aria-label="הסרת ' + esc(g) + '">' + I('x') + '</button></span>'; }).join('') + '<button type="button" class="btn btn-ghost btn-sm" data-act="genre-add">' + I('plus') + 'ז׳אנר</button></div></div>' +
       '<div class="set-row"><div class="lbl"><b>תבנית שיעור</b><small>' + (P.get('lessonTemplate') ? 'מוגדרת: ' + esc(P.get('lessonTemplate').title || '') : 'לא הוגדרה — שמרו שיעור כתבנית מתפריט השיעור') + '</small></div><div class="ctl">' + (P.get('lessonTemplate') ? '<button type="button" class="btn btn-ghost btn-sm" data-act="lesson-template-clear">מחיקת התבנית</button>' : '') + '</div></div></section>';
 
-    html += '<section class="card set-section" id="set-notifications"><h2>' + I('bell') + 'התראות ו-XP</h2><p class="muted">התזכורות נוצרות כשהאפליקציה פתוחה (בטעינה ובכל דקה). אין שרת התראות, ולכן <b>לא יגיעו תזכורות כשהאפליקציה סגורה לגמרי</b>. התראות דפדפן יוצגו כשהלשונית פתוחה ברקע.</p>' +
-      sw('notifyLessons', 'שיעורים ואירועים קרובים', 'לפי זמן התזכורת שהוגדר בכל שיעור') + sw('notifyTasks', 'מועדי משימות', 'משימות להיום ובאיחור') + sw('notifyGoals', 'מועדי יעדים', '3 ימים לפני המועד') + sw('notifyCourses', 'יעדי קורסים', 'שבוע לפני תאריך היעד') + sw('notifyLevel', 'עלייה ברמה') + sw('notifyAchievements', 'הישגים חדשים') +
+    html += '<section class="card set-section" id="set-notifications"><h2>' + I('bell') + 'התראות ו-XP</h2><p class="muted">התראות מערכת מוצגות כשהאפליקציה פתוחה או ברקע (גם כאפליקציה מותקנת בטלפון), ובפתיחה היא משלימה כל תזכורת שהגיע זמנה. אין שרת התראות, ולכן <b>כשהאפליקציה סגורה לגמרי תזכורות לא נשלחות</b>.</p>' +
+      sw('practiceReminder', 'תזכורת אימון יומית', 'אם עד השעה שנבחרה לא נרשם אימון באותו יום') +
+      '<div class="set-row"><div class="lbl"><b><label for="s-prt">שעת תזכורת האימון</label></b></div><div class="ctl"><input id="s-prt" class="input input-sm" style="width:130px" type="time" value="' + esc(P.get('practiceReminderTime') || '19:00') + '" data-change="pref-set" data-k="practiceReminderTime"></div></div>' +
+      sw('notifyLessons', P.get('lessonsEnabled') ? 'שיעורים ואירועים קרובים' : 'אירועים קרובים ביומן', 'לפי זמן התזכורת שהוגדר בכל פריט') + sw('notifyTasks', 'מועדי משימות', 'משימות להיום ובאיחור') + sw('notifyGoals', 'מועדי יעדים', '3 ימים לפני המועד') + sw('notifyCourses', 'יעדי קורסים', 'שבוע לפני תאריך היעד') + sw('notifyLevel', 'עלייה ברמה') + sw('notifyAchievements', 'הישגים חדשים') +
       '<div class="set-row"><div class="lbl"><b>התראות דפדפן</b><small>' + (perm === 'unsupported' ? 'הדפדפן הזה לא תומך בהתראות' : perm === 'denied' ? 'ההרשאה נחסמה בהגדרות הדפדפן' : P.get('browserNotifications') && perm === 'granted' ? 'פעילות' : 'דורש הרשאה — תתבקש רק אחרי לחיצה') + '</small></div><div class="ctl">' +
         (perm === 'unsupported' || perm === 'denied' ? '' : P.get('browserNotifications') && perm === 'granted' ? '<button type="button" class="btn btn-ghost btn-sm" data-act="browser-notify-off">כיבוי</button>' : '<button type="button" class="btn btn-ghost btn-sm" data-act="browser-notify">' + I('bell') + 'הפעלה</button>') +
         '<button type="button" class="btn btn-ghost btn-sm" data-act="test-notify">בדיקה</button></div></div>' +

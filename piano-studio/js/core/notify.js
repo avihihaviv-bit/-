@@ -8,7 +8,7 @@
   var PS = window.PS;
   var U = PS.util;
 
-  var TYPE_PREF = { lesson: 'notifyLessons', task: 'notifyTasks', goal: 'notifyGoals', course: 'notifyCourses', level: 'notifyLevel', achievement: 'notifyAchievements', event: 'notifyLessons' };
+  var TYPE_PREF = { lesson: 'notifyLessons', task: 'notifyTasks', goal: 'notifyGoals', course: 'notifyCourses', level: 'notifyLevel', achievement: 'notifyAchievements', event: 'notifyLessons', practice: 'practiceReminder' };
 
   function list() { return PS.store.list('notifications').sort(U.byKey('at', 'desc')); }
   function unread() { return PS.store.list('notifications').filter(function (n) { return !n.read; }).length; }
@@ -29,11 +29,31 @@
     return rec;
   }
 
+  var REMINDER_TYPES = ['lesson', 'event', 'task', 'goal', 'course', 'practice'];
   function maybeBrowser(rec) {
-    if (!PS.prefs.get('browserNotifications')) return;
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    if (document.visibilityState === 'visible' && document.hasFocus()) return; // in-app UI already shows it
-    try { new Notification(rec.title, { body: rec.body, icon: 'icons/icon-192.png', tag: rec.key || rec.id, lang: 'he', dir: 'rtl' }); } catch (e) {}
+    var visible = document.visibilityState === 'visible' && document.hasFocus();
+    // in-app: reminders also appear as a toast when the app is in front
+    if (visible && REMINDER_TYPES.indexOf(rec.type) >= 0 && PS.ui) {
+      PS.ui.toast(rec.title, 'gold', { duration: 6000, action: rec.href ? { label: 'פתיחה', fn: function () { markRead(rec.id); PS.navigate(rec.href); } } : null });
+      return;
+    }
+    if (visible) return;
+    showSystem(rec.title, rec.body, rec.key || rec.id, rec.href);
+  }
+  /* System notification. Service-worker notifications are required on Android Chrome,
+   * where `new Notification()` throws; fall back to the constructor on desktop. */
+  function showSystem(title, body, tag, href) {
+    if (!PS.prefs.get('browserNotifications')) return Promise.resolve(false);
+    if (!('Notification' in window) || Notification.permission !== 'granted') return Promise.resolve(false);
+    var opts = { body: body || '', icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: tag || String(Date.now()), lang: 'he', dir: 'rtl', data: { href: href || '#/' } };
+    var viaSW = navigator.serviceWorker && navigator.serviceWorker.getRegistration ? navigator.serviceWorker.getRegistration() : Promise.resolve(null);
+    return viaSW.then(function (reg) {
+      if (reg && reg.showNotification) return reg.showNotification(title, opts).then(function () { return true; });
+      new Notification(title, opts);
+      return true;
+    }).catch(function () {
+      try { new Notification(title, opts); return true; } catch (e) { return false; }
+    });
   }
 
   function markRead(id) {
@@ -53,7 +73,17 @@
   function scan() {
     var now = new Date();
     var today = U.todayKey();
-    PS.store.list('lessons').forEach(function (l) {
+    // daily practice reminder (after the chosen time, only if nothing was logged today)
+    if (PS.prefs.get('practiceReminder') && PS.practice) {
+      var at = U.combine(today, PS.prefs.get('practiceReminderTime') || '19:00');
+      if (at && now >= at && !PS.practice.today()) {
+        var st = PS.practice.streak();
+        push('practice', st.current >= 2 ? 'הרצף שלך בסכנה — ' + st.current + ' ימים' : 'עוד לא נרשם אימון היום',
+          st.current >= 2 ? 'רשמו אימון היום כדי לשמור על הרצף' : 'גם 10 דקות נחשבות. רשמו את האימון כשתסיימו.',
+          { key: 'practice-rem:' + today, href: '#/practice' });
+      }
+    }
+    if (PS.prefs.lessons()) PS.store.list('lessons').forEach(function (l) {
       if (l.status !== 'upcoming' && l.status !== 'rescheduled') return;
       var start = U.combine(l.date, l.time);
       if (!start) return;
@@ -87,7 +117,23 @@
   }
 
   var timer = null;
-  function start() { scan(); clearInterval(timer); timer = setInterval(scan, 60000); }
+  function start() {
+    scan();
+    clearInterval(timer);
+    timer = setInterval(scan, 60000);
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') scan(); });
+    // a notification tapped while the app was closed/backgrounded asks us to navigate
+    if (navigator.serviceWorker) navigator.serviceWorker.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'navigate' && e.data.href) PS.navigate(e.data.href);
+    });
+  }
+  function status() {
+    if (!('Notification' in window)) return 'unsupported';
+    if (Notification.permission === 'granted') return PS.prefs.get('browserNotifications') ? 'on' : 'off';
+    return Notification.permission; // default | denied
+  }
+  function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+  function standalone() { return window.matchMedia && matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }
 
   function requestBrowserPermission() {
     if (!('Notification' in window)) return Promise.resolve('unsupported');
@@ -95,5 +141,5 @@
     return Notification.requestPermission();
   }
 
-  PS.notify = { list: list, unread: unread, push: push, markRead: markRead, markAllRead: markAllRead, clearAll: clearAll, scan: scan, start: start, requestBrowserPermission: requestBrowserPermission };
+  PS.notify = { showSystem: showSystem, status: status, isIOS: isIOS, standalone: standalone, list: list, unread: unread, push: push, markRead: markRead, markAllRead: markAllRead, clearAll: clearAll, scan: scan, start: start, requestBrowserPermission: requestBrowserPermission };
 })();

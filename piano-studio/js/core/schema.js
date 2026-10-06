@@ -10,7 +10,7 @@
     courseStatus: { wishlist: 'רשימת משאלות', planned: 'מתוכנן', in_progress: 'בתהליך', paused: 'מושהה', completed: 'הושלם' },
     goalStatus: { active: 'פעיל', completed: 'הושג', paused: 'מושהה', abandoned: 'נזנח' },
     goalPeriod: { weekly: 'שבועי', monthly: 'חודשי', long: 'ארוך טווח' },
-    goalCategory: { songs: 'שירים', courses: 'קורסים', lessons: 'שיעורים', organization: 'ארגון', milestone: 'אבן דרך אישית', collection: 'אוסף', other: 'אחר' },
+    goalCategory: { songs: 'שירים', courses: 'קורסים', practice: 'אימון', lessons: 'שיעורים', organization: 'ארגון', milestone: 'אבן דרך אישית', collection: 'אוסף', other: 'אחר' },
     goalMetric: {
       manual: 'מעקב ידני',
       songs_learned: 'שירים שנלמדו',
@@ -18,16 +18,19 @@
       courses_completed: 'קורסים שהושלמו',
       modules_completed: 'מודולים שהושלמו',
       tasks_completed: 'משימות שהושלמו',
+      practice_minutes: 'דקות אימון',
+      practice_days: 'ימי אימון',
       notes_written: 'פתקים שנכתבו',
       favorite_songs: 'שירים מועדפים'
     },
     priority: { low: 'נמוכה', medium: 'בינונית', high: 'גבוהה' },
     difficulty: { 1: 'קל מאוד', 2: 'קל', 3: 'בינוני', 4: 'מאתגר', 5: 'מתקדם' },
-    taskCategory: { review: 'חזרה על חומר', sheet: 'תווים', course: 'קורס', teacher: 'שאלה למורה', organize: 'ארגון', listen: 'האזנה', prep: 'הכנה לשיעור', other: 'אחר' },
+    taskCategory: { review: 'חזרה על חומר', sheet: 'תווים', course: 'קורס', practice: 'אימון', teacher: 'שאלה למורה', organize: 'ארגון', listen: 'האזנה', prep: 'הכנה לשיעור', other: 'אחר' },
     recurrence: { none: 'ללא', daily: 'יומית', weekly: 'שבועית', monthly: 'חודשית' },
-    noteType: { teacher: 'הערות המורה', concept: 'מושג מוזיקלי', mistake: 'טעות לזכור', homework: 'הוראות שיעורי בית', question: 'שאלה לשיעור הבא', observation: 'תובנה אישית', recommendation: 'המלצת אימון מהמורה' },
+    noteType: { teacher: 'הערות המורה', concept: 'מושג מוזיקלי', mistake: 'טעות לזכור', homework: 'הוראות שיעורי בית', question: 'שאלה לבירור', observation: 'תובנה אישית', recommendation: 'המלצת אימון מהמורה', practice: 'הערה מאימון', resource: 'מקור / הסבר שמצאתי' },
     resourceKind: { sheet: 'תווים', pdf: 'PDF', youtube: 'יוטיוב', course: 'חומר קורס', article: 'מאמר', recording: 'הקלטת ייחוס', teacher: 'חומר מהמורה', image: 'תמונה', other: 'אחר' },
     eventKind: { reminder: 'תזכורת', recital: 'קונצרט / רסיטל', event: 'אירוע', deadline: 'מועד', other: 'אחר' },
+    practiceFeel: { great: 'מצוין', good: 'טוב', ok: 'סביר', hard: 'קשה' },
     reminder: { 0: 'ללא תזכורת', 15: '15 דקות לפני', 60: 'שעה לפני', 180: '3 שעות לפני', 1440: 'יום לפני' }
   };
 
@@ -65,8 +68,8 @@
       label: 'פתק', plural: 'פתקים',
       fields: [
         { k: 'title', label: 'כותרת', type: 'text', req: true, max: 140 },
-        { k: 'type', label: 'סוג הפתק', type: 'select', options: opts(LABELS.noteType), def: 'teacher', half: true },
-        { k: 'lessonId', label: 'שיעור מקושר', type: 'ref', ref: 'lessons', half: true },
+        { k: 'type', label: 'סוג הפתק', type: 'select', options: function () { return noteTypeOptions(); }, def: function () { return PS.prefs.lessons() ? 'teacher' : 'concept'; }, allValues: function () { return Object.keys(LABELS.noteType); }, half: true },
+        { k: 'lessonId', label: 'שיעור מקושר', type: 'ref', ref: 'lessons', half: true, lessons: true },
         { k: 'body', label: 'תוכן', type: 'markdown', max: 50000 },
         { k: 'songIds', label: 'שירים מקושרים', type: 'refs', ref: 'songs' },
         { k: 'tags', label: 'תגיות', type: 'tags' },
@@ -121,7 +124,7 @@
         { k: 'takeaways', label: 'תובנות מרכזיות', type: 'textarea', max: 6000 },
         { k: 'certificateUrl', label: 'קישור לתעודת סיום', type: 'url' },
         { k: 'songIds', label: 'שירים קשורים', type: 'refs', ref: 'songs' },
-        { k: 'lessonIds', label: 'שיעורים קשורים', type: 'refs', ref: 'lessons' }
+        { k: 'lessonIds', label: 'שיעורים קשורים', type: 'refs', ref: 'lessons', lessons: true }
       ]
     },
     tasks: {
@@ -135,7 +138,7 @@
         { k: 'estimate', label: 'משך משוער (דקות)', type: 'number', min: 0, max: 1440, half: true },
         { k: 'recurrence', label: 'חזרתיות', type: 'select', options: opts(LABELS.recurrence), def: 'none', half: true },
         { k: 'songId', label: 'שיר מקושר', type: 'ref', ref: 'songs', half: true },
-        { k: 'lessonId', label: 'שיעור מקושר', type: 'ref', ref: 'lessons', half: true },
+        { k: 'lessonId', label: 'שיעור מקושר', type: 'ref', ref: 'lessons', half: true, lessons: true },
         { k: 'courseId', label: 'קורס מקושר', type: 'ref', ref: 'courses', half: true },
         { k: 'subtasks', label: 'תתי-משימות', type: 'subtasks' },
         { k: 'notes', label: 'הערות', type: 'textarea', max: 4000 }
@@ -158,7 +161,7 @@
         { k: 'reward', label: 'תגמול XP בהשלמה', type: 'number', min: 0, max: 500, def: 40, half: true },
         { k: 'songIds', label: 'שירים קשורים', type: 'refs', ref: 'songs' },
         { k: 'courseIds', label: 'קורסים קשורים', type: 'refs', ref: 'courses' },
-        { k: 'lessonIds', label: 'שיעורים קשורים', type: 'refs', ref: 'lessons' }
+        { k: 'lessonIds', label: 'שיעורים קשורים', type: 'refs', ref: 'lessons', lessons: true }
       ]
     },
     events: {
@@ -184,6 +187,18 @@
         { k: 'favorite', label: 'מועדף', type: 'checkbox' }
       ]
     },
+    practice: {
+      label: 'אימון', plural: 'אימונים',
+      fields: [
+        { k: 'date', label: 'תאריך', type: 'date', req: true, half: true, def: function () { return U.todayKey(); } },
+        { k: 'minutes', label: 'משך (דקות)', type: 'number', req: true, min: 1, max: 600, half: true, def: 20 },
+        { k: 'songIds', label: 'על מה התאמנתי (שירים)', type: 'refs', ref: 'songs' },
+        { k: 'courseId', label: 'קורס', type: 'ref', ref: 'courses', half: true },
+        { k: 'feel', label: 'איך הרגיש', type: 'select', options: opts(LABELS.practiceFeel), def: 'good', half: true },
+        { k: 'focus', label: 'במה התמקדתי', type: 'text', max: 160, ph: 'למשל: יד שמאל בתיבות 9–16, סולמות' },
+        { k: 'notes', label: 'הערות', type: 'textarea', max: 2000 }
+      ]
+    },
     resources: {
       label: 'משאב', plural: 'משאבים',
       fields: [
@@ -200,6 +215,12 @@
       ]
     }
   };
+
+  /* Teacher-specific note types are hidden when the lesson manager is off. */
+  function noteTypeOptions() {
+    var teacherOnly = ['teacher', 'homework', 'recommendation'];
+    return opts(LABELS.noteType).filter(function (o) { return PS.prefs.lessons() || teacherOnly.indexOf(o.value) < 0; });
+  }
 
   function genreOptions() {
     var g = (PS.prefs.get('genres') || DEFAULT_GENRES).slice();
@@ -266,7 +287,7 @@
         case 'select':
           v = v === undefined || v === null ? '' : String(v);
           if (!f.allowNew && v) {
-            var allowed = resolve(f.options).map(function (o) { return String(o.value); });
+            var allowed = f.allValues ? resolve(f.allValues) : resolve(f.options).map(function (o) { return String(o.value); });
             if (allowed.indexOf(v) < 0) { if (opt.lenient) v = f.def !== undefined ? String(resolve(f.def)) : ''; else errors[f.k] = 'ערך לא חוקי'; }
           }
           if (v.length > 80) v = v.slice(0, 80);
