@@ -191,7 +191,7 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 18px 0; }
 .app.collapsed .side-profile { justify-content: center; }
 
 .topbar {
-  position: sticky; top: 0; z-index: 15;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 15;
   height: var(--top-h);
   display: flex; align-items: center; gap: 14px;
   padding: 0 28px;

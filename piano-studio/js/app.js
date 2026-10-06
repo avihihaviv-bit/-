@@ -294,7 +294,8 @@
     var t = PS.prefs.get('theme');
     if (t === 'system') t = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', t);
-    document.querySelector('meta[name=theme-color]').setAttribute('content', t === 'light' ? '#f6f3ee' : '#0b0b0d');
+    var tc = document.querySelector('meta[name=theme-color]');
+    if (tc) tc.setAttribute('content', t === 'light' ? '#f6f3ee' : '#0b0b0d');
     document.documentElement.classList.toggle('reduce-motion', U.prefersReducedMotion());
     document.documentElement.classList.toggle('motion-ok', PS.prefs.get('reducedMotion') === 'off');
   }
