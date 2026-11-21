@@ -114,7 +114,23 @@
 
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+  .modal-backdrop.sheet-backdrop { align-items: flex-end; padding: 0; }
+  .more-sheet { width: 100%; max-width: 520px; border-radius: 22px 22px 0 0; padding: 10px 18px calc(18px + env(safe-area-inset-bottom)); max-height: 85vh; overflow-y: auto; transform: translateY(100%); animation: sheetin .28s cubic-bezier(.2,.8,.2,1) forwards; opacity: 1; }
+  @keyframes sheetin { to { transform: translateY(0); } }
+  .sheet-handle { width: 40px; height: 5px; border-radius: 3px; background: var(--border-strong); margin: 0 auto 10px; }
+  .more-group-title { font-size: 12px; font-weight: 700; opacity: .6; margin: 12px 4px 8px; }
+  .more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .more-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 78px; padding: 10px 6px; border-radius: 14px; border: 1px solid var(--border, rgba(127,127,127,.2)); background: var(--surface-2, rgba(127,127,127,.08)); color: inherit; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: transform .12s; }
+  .more-tile:active { transform: scale(.96); }
+  .more-tile svg { width: 22px; height: 22px; }
+  .more-tile.active { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    /* elements that start hidden and rely on an entrance animation must jump straight to their end state */
+    .modal-backdrop, .modal, .more-sheet { opacity: 1 !important; transform: none !important; }
+    .toast { opacity: 1 !important; transform: translateX(-50%) !important; }
+  }
 
   body {
     margin: 0;
@@ -4724,20 +4740,33 @@
     var wrap = document.createElement('div');
     wrap.className = 'modal-backdrop';
     wrap.addEventListener('click', function (e) { if (e.target === wrap) closeModal(); });
+    wrap.classList.add('sheet-backdrop');
     var modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = '<h3>עוד</h3>';
-    var list = document.createElement('div');
-    list.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
-    items.forEach(function (n) {
-      var b = document.createElement('button');
-      b.className = 'nav-btn';
-      b.style.width = '100%';
-      b.innerHTML = icon(n.icon) + '<span>' + n.label + '</span>';
-      b.addEventListener('click', function () { closeModal(); showPanel(n.id); });
-      list.appendChild(b);
+    modal.className = 'modal more-sheet';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-label', 'עוד');
+    var groups = [
+      { title: 'גוף ובריאות', ids: ['fitness', 'nutrition', 'glowup'] },
+      { title: 'התקדמות ומטרות', ids: ['progress', 'upgrades', 'goals'] },
+      { title: 'יום-יום', ids: ['focus', 'learning', 'money'] },
+      { title: 'כלים', ids: ['apps', 'settings'] }
+    ];
+    var placed = {};
+    groups.forEach(function (g) { g.ids.forEach(function (id) { placed[id] = true; }); });
+    var leftovers = items.filter(function (n) { return !placed[n.id]; }).map(function (n) { return n.id; });
+    if (leftovers.length) groups[groups.length - 1].ids = groups[groups.length - 1].ids.concat(leftovers);
+    var byId = {};
+    items.forEach(function (n) { byId[n.id] = n; });
+    modal.innerHTML = '<div class="sheet-handle"></div>' + groups.map(function (g) {
+      var tiles = g.ids.filter(function (id) { return byId[id]; }).map(function (id) {
+        var n = byId[id];
+        return '<button class="more-tile' + (activePanel === id ? ' active' : '') + '" data-more-panel="' + id + '">' + icon(n.icon) + '<span>' + n.label + '</span></button>';
+      }).join('');
+      return tiles ? '<div class="more-group-title">' + g.title + '</div><div class="more-grid">' + tiles + '</div>' : '';
+    }).join('');
+    Array.prototype.forEach.call(modal.querySelectorAll('[data-more-panel]'), function (b) {
+      b.addEventListener('click', function () { closeModal(); showPanel(b.dataset.morePanel); });
     });
-    modal.appendChild(list);
     wrap.appendChild(modal);
     root.innerHTML = '';
     root.appendChild(wrap);
@@ -4930,17 +4959,6 @@
         '<div class="clock-chip"><div class="time num" id="live-clock">--:--</div><div class="zone">שעון מקומי</div></div>' +
       '</div>' +
 
-      gamerCardHtml() +
-
-      weeklyReminderCardHtml() +
-
-      (dailyScoreCardHtml() ? '<div style="margin-bottom:16px;">' + dailyScoreCardHtml() + '</div>' : '') +
-
-      '<div style="display:flex;gap:8px;margin-bottom:16px;">' +
-        '<button class="btn btn-ghost btn-sm" id="free-time-btn">' + icon('target') + 'מצא זמן פנוי' + '</button>' +
-        '<button class="btn btn-ghost btn-sm" id="session-summary-btn">' + icon('chart') + 'סיכום היום' + '</button>' +
-      '</div>' +
-
       '<div class="grid-2" style="margin-bottom:16px;">' +
         '<div class="now-card">' + renderNowCard(nnl) + '</div>' +
         '<div class="card">' +
@@ -4958,6 +4976,17 @@
             '</div>' +
           '</div>' +
         '</div>' +
+      '</div>' +
+
+      gamerCardHtml() +
+
+      weeklyReminderCardHtml() +
+
+      (dailyScoreCardHtml() ? '<div style="margin-bottom:16px;">' + dailyScoreCardHtml() + '</div>' : '') +
+
+      '<div style="display:flex;gap:8px;margin-bottom:16px;">' +
+        '<button class="btn btn-ghost btn-sm" id="free-time-btn">' + icon('target') + 'מצא זמן פנוי' + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="session-summary-btn">' + icon('chart') + 'סיכום היום' + '</button>' +
       '</div>' +
 
       '<div class="card" style="margin-bottom:16px;">' +
