@@ -638,6 +638,24 @@
   .goal-head h3 { font-size: 16px; margin: 0; }
   .goal-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   .ms-list { list-style: none; margin: 0 0 10px; padding: 0; }
+  .wl-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .wl-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wl-lbl { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-soft); font-weight: 600; }
+  .wl-lbl > input, .wl-step input { width: 100%; min-height: 44px; font-size: 16px; text-align: center; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface-2); color: inherit; }
+  .wl-step { display: flex; gap: 4px; }
+  .wl-step input { flex: 1; min-width: 0; }
+  .wl-step-btn { min-width: 44px; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface-3); color: inherit; font-size: 20px; font-weight: 700; cursor: pointer; }
+  .wl-step-btn:active { transform: scale(.94); }
+  .wl-group { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; }
+  .wl-group-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .wl-group-name { font-weight: 700; font-size: 15px; }
+  .wl-group-meta { font-size: 12px; color: var(--text-soft); display: flex; align-items: center; gap: 4px; }
+  .wl-group-meta svg { width: 13px; height: 13px; }
+  .wl-row { cursor: pointer; min-height: 44px; border-radius: 8px; padding-inline: 6px; }
+  .wl-row:active { background: var(--surface-2); }
+  .wl-edit-ic { color: var(--text-faint); display: inline-flex; }
+  .wl-edit-ic svg { width: 15px; height: 15px; }
+  .wl-edit { display: flex; flex-direction: column; gap: 8px; padding: 10px; margin: 6px 0; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--accent); list-style: none; }
   .ms-item { display: flex; align-items: center; gap: 9px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
   .ms-item:last-child { border-bottom: none; }
   .ms-item.done .ms-title { text-decoration: line-through; color: var(--text-faint); }
@@ -5998,6 +6016,7 @@
     var el = document.getElementById('panel-fitness');
     el.innerHTML =
       '<div class="page-head"><div><h2 class="page-title">כושר</h2><p class="page-sub">חלוקת אימונים, מאגר תרגילים וטיפים</p></div></div>' +
+      workoutLogCardHtml() +
       '<a href="' + EXTERNAL_FITNESS_APP + '" target="_blank" rel="noopener" class="card card-tight" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;text-decoration:none;color:inherit;">' +
         '<div><div style="font-weight:700;font-size:14.5px;">אפליקציית כושר חיצונית</div><div class="page-sub" style="margin-top:2px;">קישור שמור - נפתח בכרטיסייה חדשה</div></div>' +
         '<span class="btn btn-ghost btn-sm" style="pointer-events:none;">פתיחה ↗</span>' +
@@ -6006,7 +6025,6 @@
         return '<div class="split-card"><div class="k">' + s[0] + '</div><div class="v">' + s[1] + '</div></div>';
       }).join('') + '</div>' +
       '<p class="page-sub" style="margin:-6px 0 18px;">קליסטניקס: <bdi dir="ltr">2</bdi> סטים של <bdi dir="ltr">6-8</bdi> חזרות עד כישלון, <bdi dir="ltr">2-2.5</bdi> דק׳ מנוחה. אימון ביתי משלים: קליסטניקס / צוואר / תרגילים ביתיים.</p>' +
-      workoutLogCardHtml() +
       '<div class="grid-2" style="margin-bottom:18px;">' + EX_LIBRARY.map(function (g) {
         return '<div class="card card-tight"><h3 style="margin-bottom:8px;">' + g.group + '</h3><ul class="ex-list">' +
           g.items.map(function (it) {
@@ -6023,21 +6041,57 @@
   }
 
   /* ================= workout log (machines / kg / reps) ================= */
+  var wlEditId = null;
+  function wlFmtKg(n) { return (Math.round(n * 10) / 10).toString(); }
   function workoutLogCardHtml() {
     var entries = state.workoutLog.slice().sort(function (a, b) { return b.at - a.at; });
+    var groups = [], byName = {};
+    entries.forEach(function (e) {
+      var k = e.machine.trim();
+      if (!byName[k]) { byName[k] = { name: k, sets: [] }; groups.push(byName[k]); }
+      byName[k].sets.push(e);
+    });
+    var stepper = function (id, ph, step) {
+      return '<div class="wl-step"><button type="button" class="wl-step-btn" data-step="' + id + '" data-d="-' + step + '" aria-label="פחות">−</button>' +
+        '<input type="number" inputmode="decimal" id="' + id + '" min="0" step="' + step + '" placeholder="' + ph + '">' +
+        '<button type="button" class="wl-step-btn" data-step="' + id + '" data-d="' + step + '" aria-label="יותר">+</button></div>';
+    };
     return '<div class="card" style="margin-bottom:16px;">' +
       '<h3 style="margin-bottom:10px;">📝 יומן אימון - מכונות ומשקלים</h3>' +
-      '<div class="exam-add-row" style="margin-bottom:12px;">' +
-        '<input type="text" class="ms-input" id="wl-machine-input" maxlength="40" placeholder="שם המכונה / תרגיל">' +
-        '<input type="number" id="wl-kg-input" min="0" step="0.5" placeholder="ק&quot;ג">' +
-        '<input type="number" id="wl-reps-input" min="0" placeholder="חזרות">' +
-        '<button class="btn btn-primary btn-sm" id="wl-add-btn">' + icon('plus') + 'הוסף' + '</button>' +
+      '<div class="wl-form">' +
+        '<input type="text" class="ms-input" id="wl-machine-input" maxlength="40" placeholder="שם המכונה / תרגיל" list="wl-names">' +
+        '<datalist id="wl-names">' + groups.map(function (g) { return '<option value="' + escapeAttr(g.name) + '">'; }).join('') + '</datalist>' +
+        '<div class="wl-form-row">' +
+          '<label class="wl-lbl">ק"ג' + stepper('wl-kg-input', '0', 2.5) + '</label>' +
+          '<label class="wl-lbl">חזרות' + stepper('wl-reps-input', '0', 1) + '</label>' +
+        '</div>' +
+        '<button class="btn btn-primary" id="wl-add-btn" style="width:100%;justify-content:center;">' + icon('plus') + 'הוסף סט' + '</button>' +
       '</div>' +
-      (entries.length ? '<ul class="ms-list">' + entries.slice(0, 40).map(function (e) {
-        return '<li class="ms-item"><span class="ms-title">' + escapeAttr(e.machine) + ' <span class="num" dir="ltr" style="color:var(--text-soft);">· ' + e.kg + ' ק"ג × ' + e.reps + ' (עד כשל)</span></span>' +
-          '<span class="page-sub num" dir="ltr" style="flex-shrink:0;">' + new Date(e.at).toLocaleDateString('he-IL') + '</span>' +
-          '<button class="ms-del" data-wl-del="' + e.id + '" aria-label="מחק">' + icon('x') + '</button></li>';
-      }).join('') + '</ul>' : '<p class="page-sub">עדיין ריק - תוסיף את הסט הראשון שלך.</p>');
+      (groups.length ? groups.map(function (g) {
+        var last = g.sets[0];
+        var best = g.sets.reduce(function (m, x) { return x.kg > m.kg || (x.kg === m.kg && x.reps > m.reps) ? x : m; }, g.sets[0]);
+        return '<div class="wl-group">' +
+          '<div class="wl-group-head"><div><div class="wl-group-name">' + escapeAttr(g.name) + '</div>' +
+            '<div class="wl-group-meta num">' + icon('trophy') + ' שיא: <span>' + wlFmtKg(best.kg) + ' ק"ג · ' + best.reps + ' חזרות</span></div></div>' +
+            '<button class="btn btn-ghost btn-sm" data-wl-repeat="' + last.id + '">↻ עוד סט</button></div>' +
+          '<ul class="ms-list">' + g.sets.slice(0, 8).map(function (e) {
+            if (e.id === wlEditId) {
+              return '<li class="wl-edit">' +
+                '<input type="text" class="ms-input" data-wl-f="machine" maxlength="40" value="' + escapeAttr(e.machine) + '">' +
+                '<div class="wl-form-row">' +
+                  '<label class="wl-lbl">ק"ג<input type="number" inputmode="decimal" data-wl-f="kg" min="0" step="0.5" value="' + e.kg + '"></label>' +
+                  '<label class="wl-lbl">חזרות<input type="number" inputmode="numeric" data-wl-f="reps" min="0" value="' + e.reps + '"></label>' +
+                '</div>' +
+                '<div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" data-wl-save="' + e.id + '">' + icon('check') + 'שמור</button>' +
+                '<button class="btn btn-ghost btn-sm" data-wl-cancel="1">ביטול</button>' +
+                '<button class="btn btn-ghost btn-sm" data-wl-del="' + e.id + '" style="margin-inline-start:auto;color:var(--danger);">' + icon('x') + 'מחק</button></div></li>';
+            }
+            return '<li class="ms-item wl-row" data-wl-edit="' + e.id + '" role="button" tabindex="0" aria-label="ערוך סט">' +
+              '<span class="ms-title num"><b>' + wlFmtKg(e.kg) + '</b> ק"ג · <b>' + e.reps + '</b> חזרות</span>' +
+              '<span class="page-sub num" dir="ltr" style="margin-inline-start:auto;">' + new Date(e.at).toLocaleDateString('he-IL') + '</span>' +
+              '<span class="wl-edit-ic">' + icon('edit') + '</span></li>';
+          }).join('') + '</ul></div>';
+      }).join('') + '<p class="page-sub" style="margin-top:8px;">לחיצה על סט פותחת עריכה.</p>' : '<p class="page-sub">עדיין ריק - תוסיף את הסט הראשון שלך.</p>');
   }
   function wireWorkoutLogSection(el) {
     var addBtn = document.getElementById('wl-add-btn');
@@ -6045,20 +6099,65 @@
     var machineInput = document.getElementById('wl-machine-input');
     var kgInput = document.getElementById('wl-kg-input');
     var repsInput = document.getElementById('wl-reps-input');
+    var find = function (id) { return state.workoutLog.filter(function (x) { return x.id === id; })[0]; };
+    // typing a known exercise pre-fills its last weight/reps
+    machineInput.addEventListener('change', function () {
+      var name = machineInput.value.trim();
+      var prev = state.workoutLog.filter(function (x) { return x.machine.trim() === name; }).sort(function (a, b) { return b.at - a.at; })[0];
+      if (prev) { if (!kgInput.value) kgInput.value = prev.kg; if (!repsInput.value) repsInput.value = prev.reps; }
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-step]'), function (b) {
+      b.addEventListener('click', function () {
+        var inp = document.getElementById(b.dataset.step);
+        inp.value = wlFmtKg(Math.max(0, (+inp.value || 0) + (+b.dataset.d)));
+      });
+    });
     var add = function () {
       var machine = machineInput.value.trim();
       if (!machine) { machineInput.focus(); return; }
       state.workoutLog.push({ id: uid(), machine: machine, kg: +kgInput.value || 0, reps: +repsInput.value || 0, date: dkey(todayDate()), at: Date.now() });
       saveState();
       renderFitness();
+      var t = document.getElementById('wl-machine-input'); if (t) { t.value = machine; document.getElementById('wl-kg-input').value = kgInput.value; document.getElementById('wl-reps-input').value = repsInput.value; }
     };
     addBtn.addEventListener('click', add);
     repsInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-wl-repeat]'), function (b) {
+      b.addEventListener('click', function () {
+        var e = find(b.dataset.wlRepeat); if (!e) return;
+        machineInput.value = e.machine; kgInput.value = e.kg; repsInput.value = e.reps;
+        machineInput.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        repsInput.focus();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-wl-edit]'), function (r) {
+      var open = function () { wlEditId = r.dataset.wlEdit; renderFitness(); var f = document.querySelector('.wl-edit [data-wl-f="kg"]'); if (f) f.focus(); };
+      r.addEventListener('click', open);
+      r.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-wl-save]'), function (b) {
+      var row = b.closest('.wl-edit');
+      var save = function () {
+        var e = find(b.dataset.wlSave); if (!e) return;
+        var name = row.querySelector('[data-wl-f="machine"]').value.trim();
+        if (name) e.machine = name;
+        e.kg = Math.max(0, +row.querySelector('[data-wl-f="kg"]').value || 0);
+        e.reps = Math.max(0, Math.round(+row.querySelector('[data-wl-f="reps"]').value || 0));
+        wlEditId = null; saveState(); renderFitness();
+      };
+      b.addEventListener('click', save);
+      Array.prototype.forEach.call(row.querySelectorAll('input'), function (i) {
+        i.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); save(); } if (ev.key === 'Escape') { wlEditId = null; renderFitness(); } });
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-wl-cancel]'), function (b) {
+      b.addEventListener('click', function () { wlEditId = null; renderFitness(); });
+    });
     Array.prototype.forEach.call(el.querySelectorAll('[data-wl-del]'), function (b) {
       b.addEventListener('click', function () {
+        if (!confirm('למחוק את הסט הזה?')) return;
         state.workoutLog = state.workoutLog.filter(function (x) { return x.id !== b.dataset.wlDel; });
-        saveState();
-        renderFitness();
+        wlEditId = null; saveState(); renderFitness();
       });
     });
   }
