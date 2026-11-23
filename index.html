@@ -1022,6 +1022,7 @@
     .xp-toast, .task-xp-glow, .task-xp-glow::after, .combo-flash, .levelup-overlay, .levelup-card, .levelup-glow, .ach-toast, .ach-toast .ach-ic, .gam-particle, .gc-bar-fill, .chal-bar-fill, .cat-bar-fill, .bonus-toast, .bonus-toast .bt-ic, .bonus-toast.perfect .bt-ic, .ds-ring-fill { animation: none !important; transition: none !important; }
   }
 </style>
+<link rel="stylesheet" href="features.css">
 
 <script>
   window.addEventListener('error', function (e) {
@@ -1092,6 +1093,8 @@
 <div id="xp-toast-layer" class="xp-toast-layer"></div>
 <div id="toast-root"></div>
 
+<script src="core.js"></script>
+<script src="features.js"></script>
 <script>
 (function () {
   'use strict';
@@ -1258,6 +1261,12 @@
     { id: 'music', name: 'לשים מוזיקה', emoji: '🎵' }
   ];
 
+  var BUILTIN_HABIT_COUNT = HABITS.length;
+  function syncCustomHabits() {
+    HABITS.length = BUILTIN_HABIT_COUNT;
+    ((state && state.customHabits) || []).forEach(function (h) { HABITS.push({ id: h.id, name: h.name, emoji: h.emoji || '✨', custom: true }); });
+  }
+
   /* ================= tefillin/workout calendar-aware streaks =================
      Dates are Israel single-day Yom Tov, cross-checked against multiple sources
      for Hebrew years 5786-5789 (roughly Sept 2025 - May 2029). Chol HaMoed is
@@ -1364,12 +1373,13 @@
 
   /* ================= state ================= */
   var STORE_KEY = 'maslul_state_v1';
+  var loadInfo = { migratedFrom: null, recovered: false, lastSavedAt: 0 };
   var state = loadState();
 
-  function loadState() {
+  function loadState(skipStored) {
     var def = { theme: 'system', userName: '', tasksByDate: {}, dayOverride: {}, habitLog: {}, focusLog: {}, customTemplates: {}, goals: [], money: { entries: [], savingsGoals: [], ideas: [] }, advisorLog: [], learning: { homework: [], methods: [], exams: [] } };
     try {
-      var raw = JSON.parse(localStorage.getItem(STORE_KEY));
+      var raw = skipStored ? null : JSON.parse(localStorage.getItem(STORE_KEY));
       var merged = raw ? Object.assign(def, raw) : def;
       merged.money = Object.assign({ entries: [], savingsGoals: [], ideas: [] }, merged.money || {});
       merged.learning = Object.assign({ homework: [], methods: [], exams: [], timetable: [] }, merged.learning || {});
@@ -1439,10 +1449,34 @@
       sh.economy.coinRewards = Object.assign(defaultShopEconomy().coinRewards, sh.economy.coinRewards || {});
       merged.shop = sh;
 
+      if (window.MaslulCore) {
+        loadInfo.migratedFrom = (typeof merged.schemaVersion === 'number' ? merged.schemaVersion : 1) < window.MaslulCore.SCHEMA_VERSION ? (merged.schemaVersion || 1) : null;
+        merged = window.MaslulCore.migrate(merged);
+      }
       return merged;
-    } catch (e) { return def; }
+    } catch (e) {
+      // Never silently throw the user's data away: keep the raw copy under a separate key before falling back.
+      try {
+        var rawText = localStorage.getItem(STORE_KEY);
+        if (rawText) { localStorage.setItem('maslul_recovery_' + Date.now(), rawText); loadInfo.recovered = true; }
+      } catch (e2) {}
+      // rebuild a complete, valid default state (gamification, shop, glow-up...) instead of a bare object
+      if (!skipStored) return loadState(true);
+      return def;
+    }
   }
-  function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+  var lastSaveErrorToast = 0;
+  function saveState() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+      loadInfo.lastSavedAt = Date.now();
+    } catch (e) {
+      if (Date.now() - lastSaveErrorToast > 8000) {
+        lastSaveErrorToast = Date.now();
+        try { toast('השמירה נכשלה: ייתכן שהאחסון מלא. מומלץ לייצא גיבוי בהגדרות.', 'error'); } catch (e2) {}
+      }
+    }
+  }
 
   function dkey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function todayDate() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
@@ -4545,13 +4579,20 @@
   }
 
   /* ================= toast ================= */
-  function toast(msg) {
+  function toast(msg, type) {
     var root = document.getElementById('toast-root');
+    if (!root) return;
     var el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = msg;
+    el.className = 'toast' + (type ? ' toast-' + type : '');
+    el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    if (type === 'success') el.innerHTML = icon('check');
+    if (type === 'error') el.innerHTML = icon('x');
+    var span = document.createElement('span');
+    span.textContent = msg;
+    el.appendChild(span);
+    Array.prototype.forEach.call(root.querySelectorAll('.toast'), function (old) { old.remove(); });
     root.appendChild(el);
-    setTimeout(function () { el.remove(); }, 2200);
+    setTimeout(function () { el.remove(); }, type === 'error' ? 4200 : 2200);
   }
 
   /* ================= modal ================= */
@@ -4714,29 +4755,54 @@
 
   /* ================= nav ================= */
   var NAV_ITEMS = [
-    { id: 'dashboard', label: 'בית', icon: 'home', primary: true },
-    { id: 'schedule', label: 'לוח יומי', icon: 'calendar', primary: true },
-    { id: 'habits', label: 'הרגלים', icon: 'flame', primary: true },
-    { id: 'advisor', label: 'יועץ', icon: 'spark', primary: true },
-    { id: 'progress', label: 'התקדמות', icon: 'trophy' },
-    { id: 'glowup', label: 'Glow Up', icon: 'glow' },
-    { id: 'upgrades', label: 'Upgrades', icon: 'crown' },
-    { id: 'focus', label: 'פוקוס', icon: 'target' },
-    { id: 'fitness', label: 'כושר', icon: 'dumbbell' },
-    { id: 'nutrition', label: 'תזונה', icon: 'bowl' },
-    { id: 'goals', label: 'יעדים', icon: 'flag' },
-    { id: 'money', label: 'כסף', icon: 'wallet' },
-    { id: 'learning', label: 'למידה', icon: 'book' },
-    { id: 'apps', label: 'אפליקציות', icon: 'apps' },
-    { id: 'settings', label: 'הגדרות', icon: 'settings' }
+    { id: 'dashboard', label: 'בית', icon: 'home', primary: true, group: 'main' },
+    { id: 'tasks', label: 'משימות', icon: 'checklist', primary: true, group: 'main' },
+    { id: 'schedule', label: 'שגרה יומית', short: 'שגרה', icon: 'calendar', primary: true, group: 'main' },
+    { id: 'habits', label: 'הרגלים', icon: 'flame', primary: true, group: 'main' },
+    { id: 'calendar', label: 'לוח שנה', icon: 'calendarMonth', group: 'plan' },
+    { id: 'focus', label: 'פוקוס', icon: 'target', group: 'plan' },
+    { id: 'notes', label: 'מחברת', icon: 'note', group: 'plan' },
+    { id: 'review', label: 'סקירות', icon: 'review', group: 'plan' },
+    { id: 'goals', label: 'מטרות', icon: 'flag', group: 'growth' },
+    { id: 'analytics', label: 'נתונים', icon: 'chart', group: 'growth' },
+    { id: 'coach', label: 'מאמן AI', icon: 'spark', group: 'growth' },
+    { id: 'advisor', label: 'יועץ יומי', icon: 'bookmark', group: 'growth' },
+    { id: 'progress', label: 'הישגים ורמות', icon: 'trophy', group: 'growth' },
+    { id: 'upgrades', label: 'Upgrades', icon: 'crown', group: 'growth' },
+    { id: 'fitness', label: 'כושר', icon: 'dumbbell', group: 'body' },
+    { id: 'nutrition', label: 'תזונה', icon: 'bowl', group: 'body' },
+    { id: 'glowup', label: 'Glow Up', icon: 'glow', group: 'body' },
+    { id: 'speech', label: 'דיבור ס/ש', icon: 'mic', group: 'body' },
+    { id: 'learning', label: 'למידה', icon: 'book', group: 'life' },
+    { id: 'money', label: 'כסף', icon: 'wallet', group: 'life' },
+    { id: 'apps', label: 'אפליקציות', icon: 'apps', group: 'life' },
+    { id: 'settings', label: 'הגדרות', icon: 'settings', group: 'life' }
   ];
+  var NAV_GROUPS = [['main', ''], ['plan', 'תכנון וריכוז'], ['growth', 'התקדמות'], ['body', 'גוף ובריאות'], ['life', 'חיים וכלים']];
+  var FX_MODULES = {};
+  (window.MaslulFeatures ? window.MaslulFeatures.modules : []).forEach(function (m) { FX_MODULES[m.id] = m; });
+  // keep only nav items that have a renderer (built-in or module) so a missing module never leaves a dead button
+  NAV_ITEMS = NAV_ITEMS.filter(function (n) { return ['tasks', 'calendar', 'notes', 'review', 'analytics', 'coach', 'speech'].indexOf(n.id) < 0 || FX_MODULES[n.id]; });
+  (function ensurePanels() {
+    var main = document.querySelector('main.main');
+    NAV_ITEMS.forEach(function (n) {
+      if (!document.getElementById('panel-' + n.id)) { var sec = document.createElement('section'); sec.className = 'panel'; sec.id = 'panel-' + n.id; sec.hidden = true; main.appendChild(sec); }
+    });
+  })();
   var activePanel = 'dashboard';
 
   function renderNav() {
     var d = document.getElementById('nav-desktop');
-    d.innerHTML = NAV_ITEMS.map(function (n) {
-      return '<button class="nav-btn' + (activePanel === n.id ? ' active' : '') + '" data-panel="' + n.id + '">' + icon(n.icon) + '<span>' + n.label + '</span></button>';
-    }).join('');
+    d.innerHTML = '<button class="sb-search" id="sb-search" title="חיפוש (Ctrl+K)">' + icon('search') + '<span>חיפוש</span><kbd>Ctrl K</kbd></button>' +
+      NAV_GROUPS.map(function (g) {
+        var items = NAV_ITEMS.filter(function (n) { return n.group === g[0]; });
+        if (!items.length) return '';
+        return (g[1] ? '<div class="nav-group-title">' + g[1] + '</div>' : '') + items.map(function (n) {
+          return '<button class="nav-btn' + (activePanel === n.id ? ' active' : '') + '" data-panel="' + n.id + '" title="' + n.label + '"' + (activePanel === n.id ? ' aria-current="page"' : '') + '>' + icon(n.icon) + '<span>' + n.label + '</span></button>';
+        }).join('');
+      }).join('');
+    var sbs = document.getElementById('sb-search');
+    if (sbs) sbs.addEventListener('click', function () { if (window.MaslulFeatures) window.MaslulFeatures.openSearch(); });
     Array.prototype.forEach.call(d.querySelectorAll('.nav-btn'), function (b) {
       b.addEventListener('click', function () { showPanel(b.dataset.panel); });
     });
@@ -4745,7 +4811,7 @@
     var moreItems = NAV_ITEMS.filter(function (n) { return !n.primary; });
     var moreActive = moreItems.some(function (n) { return n.id === activePanel; });
     m.innerHTML = primaryItems.map(function (n) {
-      return '<button class="' + (activePanel === n.id ? 'active' : '') + '" data-panel="' + n.id + '">' + icon(n.icon) + '<span>' + n.label + '</span></button>';
+      return '<button class="' + (activePanel === n.id ? 'active' : '') + '" data-panel="' + n.id + '">' + icon(n.icon) + '<span>' + (n.short || n.label) + '</span></button>';
     }).join('') + '<button class="' + (moreActive ? 'active' : '') + '" id="nav-more-btn">' + icon('more') + '<span>עוד</span></button>';
     Array.prototype.forEach.call(m.querySelectorAll('[data-panel]'), function (b) {
       b.addEventListener('click', function () { showPanel(b.dataset.panel); });
@@ -4763,25 +4829,26 @@
     modal.className = 'modal more-sheet';
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-label', 'עוד');
-    var groups = [
-      { title: 'גוף ובריאות', ids: ['fitness', 'nutrition', 'glowup'] },
-      { title: 'התקדמות ומטרות', ids: ['progress', 'upgrades', 'goals'] },
-      { title: 'יום-יום', ids: ['focus', 'learning', 'money'] },
-      { title: 'כלים', ids: ['apps', 'settings'] }
-    ];
+    var groups = NAV_GROUPS.filter(function (g) { return g[0] !== 'main'; }).map(function (g) {
+      return { title: g[1], ids: NAV_ITEMS.filter(function (n) { return n.group === g[0] && !n.primary; }).map(function (n) { return n.id; }) };
+    });
     var placed = {};
     groups.forEach(function (g) { g.ids.forEach(function (id) { placed[id] = true; }); });
     var leftovers = items.filter(function (n) { return !placed[n.id]; }).map(function (n) { return n.id; });
     if (leftovers.length) groups[groups.length - 1].ids = groups[groups.length - 1].ids.concat(leftovers);
     var byId = {};
     items.forEach(function (n) { byId[n.id] = n; });
-    modal.innerHTML = '<div class="sheet-handle"></div>' + groups.map(function (g) {
+    modal.innerHTML = '<div class="sheet-handle"></div>' +
+      (window.MaslulFeatures ? '<button class="sb-search" id="more-search">' + icon('search') + '<span>חיפוש בכל האפליקציה</span></button>' : '') +
+      groups.map(function (g) {
       var tiles = g.ids.filter(function (id) { return byId[id]; }).map(function (id) {
         var n = byId[id];
         return '<button class="more-tile' + (activePanel === id ? ' active' : '') + '" data-more-panel="' + id + '">' + icon(n.icon) + '<span>' + n.label + '</span></button>';
       }).join('');
       return tiles ? '<div class="more-group-title">' + g.title + '</div><div class="more-grid">' + tiles + '</div>' : '';
     }).join('');
+    var ms = modal.querySelector('#more-search');
+    if (ms) ms.addEventListener('click', function () { closeModal(); window.MaslulFeatures.openSearch(); });
     Array.prototype.forEach.call(modal.querySelectorAll('[data-more-panel]'), function (b) {
       b.addEventListener('click', function () { closeModal(); showPanel(b.dataset.morePanel); });
     });
@@ -4791,34 +4858,59 @@
   }
 
   function showPanel(id) {
+    if (!document.getElementById('panel-' + id)) id = 'dashboard';
     activePanel = id;
+    try { history.replaceState(null, '', '#' + id); } catch (e) {}
     NAV_ITEMS.forEach(function (n) {
       document.getElementById('panel-' + n.id).hidden = n.id !== id;
     });
     renderNav();
-    if (id === 'dashboard') renderDashboard();
-    if (id === 'schedule') renderSchedule();
-    if (id === 'habits') renderHabits();
-    if (id === 'advisor') renderAdvisor();
-    if (id === 'focus') renderFocus();
-    if (id === 'fitness') renderFitness();
-    if (id === 'goals') renderGoals();
-    if (id === 'money') renderMoney();
-    if (id === 'learning') renderLearning();
-    if (id === 'settings') renderSettings();
-    if (id === 'progress') renderProgress();
-    if (id === 'glowup') renderGlowUp();
-    if (id === 'upgrades') renderUpgrades();
-    if (id === 'nutrition') renderNutrition();
-    if (id === 'apps') renderApps();
+    renderPanelContent(id);
     window.scrollTo(0, 0);
-    var activeEl = document.getElementById('panel-' + id);
-    activeEl.classList.remove('panel-enter');
-    void activeEl.offsetWidth;
-    activeEl.classList.add('panel-enter');
+    var activeEl0 = document.getElementById('panel-' + id);
+    activeEl0.classList.remove('panel-enter');
+    void activeEl0.offsetWidth;
+    activeEl0.classList.add('panel-enter');
   }
+  function renderPanelContent(id) {
+    if (id === 'dashboard') renderingDashboardViaPanel = true;
+    try { renderPanelContentInner(id); } finally { if (id === 'dashboard') renderingDashboardViaPanel = false; }
+  }
+  function renderPanelContentInner(id) {
+    var mod = FX_MODULES[id];
+    var el = document.getElementById('panel-' + id);
+    if (mod && (mod.override || !BUILTIN_RENDER[id])) {
+      try { mod.render(el); } catch (err) { reportModuleError(el, err); }
+    } else if (BUILTIN_RENDER[id]) {
+      BUILTIN_RENDER[id]();
+    }
+    var hook = window.MaslulFeatures && window.MaslulFeatures.hooks[id];
+    if (hook) { try { hook(el); } catch (err2) { console.error('hook ' + id, err2); } }
+  }
+  function reportModuleError(el, err) {
+    console.error(err);
+    el.innerHTML = '<div class="card"><h3>משהו השתבש במסך הזה</h3><p class="page-sub">הנתונים שלך בטוחים. נסה לרענן את הדף.</p></div>';
+  }
+  var BUILTIN_RENDER = {
+    dashboard: function () { renderDashboard(); },
+    schedule: function () { renderSchedule(); },
+    habits: function () { renderHabits(); },
+    advisor: function () { renderAdvisor(); },
+    focus: function () { renderFocus(); },
+    fitness: function () { renderFitness(); },
+    goals: function () { renderGoals(); },
+    money: function () { renderMoney(); },
+    learning: function () { renderLearning(); },
+    settings: function () { renderSettings(); },
+    progress: function () { renderProgress(); },
+    glowup: function () { renderGlowUp(); },
+    upgrades: function () { renderUpgrades(); },
+    nutrition: function () { renderNutrition(); },
+    apps: function () { renderApps(); }
+  };
 
   /* ================= dashboard ================= */
+  var renderingDashboardViaPanel = false;
   function greeting() {
     var h = new Date().getHours();
     if (h < 5) return 'לילה טוב';
@@ -4954,6 +5046,7 @@
     '</div>';
   }
   function renderDashboard() {
+    if (!renderingDashboardViaPanel && activePanel === 'dashboard' && window.MaslulFeatures) { renderingDashboardViaPanel = true; try { renderPanelContent('dashboard'); } finally { renderingDashboardViaPanel = false; } return; }
     var el = document.getElementById('panel-dashboard');
     var list = todayTasks();
     var doneCount = list.filter(function (t) { return t.done; }).length;
@@ -4977,7 +5070,7 @@
         '<div class="clock-chip"><div class="time num" id="live-clock">--:--</div><div class="zone">שעון מקומי</div></div>' +
       '</div>' +
 
-      '<div class="grid-2" style="margin-bottom:16px;">' +
+      '<div class="grid-2" data-w="now" style="margin-bottom:16px;">' +
         '<div class="now-card">' + renderNowCard(nnl) + '</div>' +
         '<div class="card">' +
           '<div class="ring-wrap">' +
@@ -4996,18 +5089,18 @@
         '</div>' +
       '</div>' +
 
-      gamerCardHtml() +
+      '<div data-w="gamer">' + gamerCardHtml() + '</div>' +
 
-      weeklyReminderCardHtml() +
+      (weeklyReminderCardHtml() ? '<div data-w="reminder">' + weeklyReminderCardHtml() + '</div>' : '') +
 
-      (dailyScoreCardHtml() ? '<div style="margin-bottom:16px;">' + dailyScoreCardHtml() + '</div>' : '') +
+      (dailyScoreCardHtml() ? '<div data-w="score" style="margin-bottom:16px;">' + dailyScoreCardHtml() + '</div>' : '') +
 
-      '<div style="display:flex;gap:8px;margin-bottom:16px;">' +
+      '<div data-w="actions" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">' +
         '<button class="btn btn-ghost btn-sm" id="free-time-btn">' + icon('target') + 'מצא זמן פנוי' + '</button>' +
         '<button class="btn btn-ghost btn-sm" id="session-summary-btn">' + icon('chart') + 'סיכום היום' + '</button>' +
       '</div>' +
 
-      '<div class="card" style="margin-bottom:16px;">' +
+      '<div class="card" data-w="balance" style="margin-bottom:16px;">' +
         '<h3 style="margin-bottom:14px;">איזון היום</h3>' +
         balances.map(function (b) {
           if (b.p === null) return '<div class="balance-row" style="opacity:.45;"><span class="balance-label"><span class="dot" style="background:' + catColor(b.key) + '"></span>' + CATS[b.key].label + '</span><div class="balance-track"></div><span class="balance-val">-</span></div>';
@@ -5015,7 +5108,7 @@
         }).join('') +
       '</div>' +
 
-      '<div class="card">' +
+      '<div class="card" data-w="habits">' +
         '<h3 style="margin-bottom:12px;">הרגלים</h3>' +
         '<div class="grid-3">' + HABITS.map(habitMiniHtml).join('') + '</div>' +
       '</div>';
@@ -6276,6 +6369,7 @@
 
   /* ================= goals ================= */
   function goalProgress(g) {
+    if (g.metric && g.metric.target) return Math.max(0, Math.min(100, Math.round((+g.metric.current || 0) / g.metric.target * 100)));
     if (g.milestones.length) {
       var done = g.milestones.filter(function (m) { return m.done; }).length;
       return Math.round(done / g.milestones.length * 100);
@@ -6900,18 +6994,91 @@
     if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     var map = { t: 'schedule', f: 'focus', h: 'habits', g: 'fitness' };
-    if (e.key === 'n') { e.preventDefault(); showPanel('schedule'); openTaskModal(null); }
-    else if (map[e.key]) { showPanel(map[e.key]); }
+    if (map[e.key]) { showPanel(map[e.key]); }
     else if (e.key === 'Escape') { closeModal(); }
   });
 
+  /* ================= preferences: accent colour, avatar, collapsible sidebar ================= */
+  function inkFor(hex) {
+    var m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex || '');
+    if (!m) return null;
+    var l = (0.299 * parseInt(m[1], 16) + 0.587 * parseInt(m[2], 16) + 0.114 * parseInt(m[3], 16)) / 255;
+    return l > 0.6 ? '#0b1a18' : '#ffffff';
+  }
+  function applyPrefs() {
+    var p = state.prefs || {};
+    var root = document.documentElement;
+    if (p.accent) { root.style.setProperty('--accent', p.accent); root.style.setProperty('--accent-ink', inkFor(p.accent) || '#04211d'); }
+    else { root.style.removeProperty('--accent'); root.style.removeProperty('--accent-ink'); }
+    var app = document.getElementById('app');
+    if (app) app.classList.toggle('sb-collapsed', !!p.sidebarCollapsed);
+    var u = document.getElementById('sb-user');
+    if (u) u.innerHTML = '<div class="fx-avatar">' + (p.avatar ? '<img src="' + p.avatar + '" alt="">' : escapeAttr((state.userName || 'מ').slice(0, 1))) + '</div><span>' + escapeAttr(state.userName || 'הפרופיל שלי') + '</span>';
+  }
+  (function buildShellExtras() {
+    var brand = document.querySelector('.sidebar .brand');
+    if (brand && !document.getElementById('sb-collapse')) {
+      var b = document.createElement('button');
+      b.className = 'sb-collapse'; b.id = 'sb-collapse'; b.setAttribute('aria-label', 'כווץ/הרחב תפריט'); b.title = 'כווץ/הרחב תפריט';
+      b.innerHTML = icon('collapse');
+      b.addEventListener('click', function () { state.prefs.sidebarCollapsed = !state.prefs.sidebarCollapsed; saveState(); applyPrefs(); });
+      brand.appendChild(b);
+    }
+    var foot = document.querySelector('.sidebar .nav-foot');
+    if (foot && !document.getElementById('sb-user')) {
+      var u = document.createElement('button');
+      u.className = 'sb-user nav-btn'; u.id = 'sb-user';
+      u.addEventListener('click', function () { showPanel('settings'); });
+      foot.parentNode.insertBefore(u, foot);
+    }
+  })();
+
+  var maslulBridge = {
+    state: function () { return state; },
+    save: saveState,
+    replaceState: function (next) {
+      // used by import / restore / reset. The caller has already written a backup snapshot.
+      var data = next ? window.MaslulCore.migrate(JSON.parse(JSON.stringify(next))) : null;
+      try {
+        if (data) localStorage.setItem(STORE_KEY, JSON.stringify(data)); else localStorage.removeItem(STORE_KEY);
+      } catch (e) { toast('השחזור נכשל: אין מקום באחסון', 'error'); return; }
+      setTimeout(function () { location.reload(); }, 600);
+    },
+    icon: icon, toast: toast, escapeAttr: escapeAttr, closeModal: closeModal, openConfirmModal: openConfirmModal,
+    showPanel: showPanel, activePanel: function () { return activePanel; },
+    rerender: function () { renderPanelContent(activePanel); },
+    navItems: function () { return NAV_ITEMS.slice(); },
+    uid: uid, timeToMin: timeToMin, nowNextLater: nowNextLater,
+    grantXPOnce: grantXPOnce, flushXP: function (anchor) { gamFlushEventQueue(anchor || null); },
+    level: function () { return levelInfoFromXP(state.gam.totalXP).level; },
+    habits: function () { return HABITS.slice(); },
+    habitDef: function (h) {
+      var c = (state.customHabits || []).filter(function (x) { return x.id === h.id; })[0];
+      return c || { id: h.id, name: h.name, emoji: h.emoji, freq: 'daily', target: null };
+    },
+    toggleHabit: function (id) { toggleHabit(id); },
+    syncHabits: syncCustomHabits,
+    goalProgress: goalProgress,
+    isoWeekKey: function () { return isoWeekKey(todayDate()); },
+    setRoutineDone: function (id, val) { setTaskDone(id, val); },
+    applyPrefs: applyPrefs,
+    migratedFrom: function () { return loadInfo.migratedFrom; }
+  };
+
   /* ================= init ================= */
+  if (window.MaslulFeatures) Object.keys(window.MaslulFeatures.icons).forEach(function (k) { ICONS[k] = window.MaslulFeatures.icons[k]; });
+  syncCustomHabits();
   applyTheme();
+  applyPrefs();
   renderNav();
   gamCheckLevelRewards();
   shopExpirePotions();
   saveState();
-  showPanel('dashboard');
+  if (window.MaslulFeatures) { try { window.MaslulFeatures.boot(maslulBridge); } catch (e) { console.error('features boot failed', e); } }
+  var startPanel = (location.hash || '').replace('#', '');
+  showPanel(startPanel && document.getElementById('panel-' + startPanel) ? startPanel : 'dashboard');
+  window.addEventListener('hashchange', function () { var h = location.hash.replace('#', ''); if (h && h !== activePanel && document.getElementById('panel-' + h)) showPanel(h); });
+  if (loadInfo.recovered) setTimeout(function () { toast('הנתונים השמורים היו פגומים, ונשמר עותק גולמי שלהם לשחזור. פנה להגדרות.', 'error'); }, 1200);
   gamFlushEventQueue(null);
   guCheckReminders();
   setInterval(guCheckReminders, 60000);

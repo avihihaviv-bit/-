@@ -1,0 +1,12 @@
+{
+  "name": "maslul",
+  "private": true,
+  "description": "Maslul - personal life OS (static PWA + one serverless AI coach endpoint)",
+  "scripts": {
+    "test": "node --test tests/core.test.js tests/api.test.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.12.0"
+  },
+  "engines": { "node": ">=18" }
+}

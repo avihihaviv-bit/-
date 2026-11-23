@@ -1,19 +1,27 @@
 {
-  "name": "מסלול",
+  "id": "./",
+  "name": "מסלול - מערכת החיים האישית",
   "short_name": "מסלול",
-  "description": "מערכת חיים אישית - לוח יומי, הרגלים, פוקוס וכושר, במקום אחד.",
+  "description": "שגרה יומית, משימות, הרגלים, מטרות, פוקוס ומאמן אישי, במקום אחד.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
   "background_color": "#0d121e",
   "theme_color": "#0d121e",
   "dir": "rtl",
   "lang": "he",
+  "categories": ["productivity", "lifestyle"],
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "משימות", "url": "./index.html#tasks", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "שגרה יומית", "url": "./index.html#schedule", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "פוקוס", "url": "./index.html#focus", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
   ]
 }
