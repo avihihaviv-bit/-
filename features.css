@@ -349,3 +349,51 @@ textarea.fx-note-body[data-rv], textarea.fx-note-body[data-rvw] { min-height: 90
 .fx-exam-t { font-weight: 600; font-size: 13.5px; }
 .fx-link { border: none; background: none; color: var(--accent); font: inherit; font-size: inherit; cursor: pointer; padding: 0; text-decoration: underline; }
 .app.sb-collapsed .nav-foot { display: none; }
+
+/* ---- fitness ---- */
+.ft-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.ft-hero-name { font-size: 26px; font-weight: 800; letter-spacing: -.01em; margin: 2px 0; }
+.ft-start { min-height: 48px; padding-inline: 22px; font-size: 15px; }
+.ft-daypick { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 4px; }
+.ft-preview { margin-top: 10px; display: flex; flex-direction: column; }
+.ft-prev-row { display: flex; align-items: center; gap: 8px; padding: 8px 2px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.ft-prev-row:last-child { border-bottom: none; }
+.ft-prev-name { flex: 1; font-weight: 600; }
+.ft-tip { margin: 16px 4px 0; line-height: 1.6; }
+.ft-live { position: sticky; top: 8px; z-index: 5; box-shadow: 0 10px 24px -14px var(--shadow); }
+.ft-live-stats { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--text-soft); margin: 8px 0 10px; }
+.ft-live-stats b { color: var(--text); font-size: 18px; margin-inline-end: 2px; }
+.ft-ex.done { border-color: color-mix(in srgb, var(--success) 45%, var(--border)); }
+.ft-ex-name { font-weight: 700; font-size: 16px; }
+.ft-count { font-size: 18px; font-weight: 800; color: var(--accent); }
+.ft-ex.done .ft-count { color: var(--success); }
+.ft-last { margin: 8px 0 0; font-size: 12.5px; }
+.ft-sug { margin-top: 8px; padding: 8px 10px; border-radius: 10px; font-size: 13px; font-weight: 600; background: var(--surface-2); }
+.ft-sug-up { background: color-mix(in srgb, var(--success) 16%, var(--surface-2)); color: var(--success); }
+.ft-sug-hold { background: color-mix(in srgb, var(--warning) 14%, var(--surface-2)); }
+.ft-sets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.ft-set { display: inline-flex; align-items: center; gap: 6px; padding: 4px 4px 4px 10px; border-radius: 99px; background: var(--surface-2); font-size: 13px; }
+.ft-set-x { border: none; background: none; color: var(--text-faint); cursor: pointer; font-size: 16px; padding: 0 6px; min-height: 28px; }
+.ft-input { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; margin-top: 12px; }
+@media (max-width: 480px) { .ft-input { grid-template-columns: 1fr 1fr; } .ft-log-btn { grid-column: 1 / -1; } }
+.ft-log-btn { min-height: 44px; justify-content: center; }
+.ft-finish-row { display: flex; gap: 8px; margin-top: 16px; }
+.ft-finish-row .btn-block { min-height: 50px; font-size: 16px; }
+.ft-rest { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 250; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--accent); box-shadow: 0 14px 34px -12px var(--shadow); width: min(440px, calc(100vw - 24px)); }
+@media (max-width: 860px) { .ft-rest { bottom: calc(86px + env(safe-area-inset-bottom)); } }
+.ft-rest-l { font-size: 12px; color: var(--text-soft); font-weight: 600; }
+.ft-rest b { font-size: 22px; min-width: 64px; }
+.ft-rest-bar { flex: 1; height: 6px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+.ft-rest-bar i { display: block; height: 100%; background: var(--accent); transition: width .25s linear; }
+.ft-rest.done { border-color: var(--success); }
+.ft-rest.done b { color: var(--success); }
+.ft-done-hero { font-size: 52px; text-align: center; }
+.ft-rank { width: 22px; font-weight: 800; color: var(--accent); }
+.ft-hist { margin-top: 8px; }
+.ft-plan-list { margin-top: 8px; }
+.ft-plan-ex { display: flex; align-items: center; gap: 8px; padding: 8px 2px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.ft-plan-ex:last-child { border-bottom: none; }
+.ft-plan-n { font-weight: 600; flex: 1; min-width: 120px; }
+.ft-plan-act { display: flex; gap: 4px; }
+.ft-ext { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-decoration: none; color: inherit; }
+@media (prefers-reduced-motion: reduce) { .ft-rest-bar i { transition: none; } }

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'maslul-v4';
-const CORE_ASSETS = ['./', './index.html', './core.js', './features.js', './extras.js', './features.css', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE_NAME = 'maslul-v5';
+const CORE_ASSETS = ['./', './index.html', './core.js', './features.js', './extras.js', './fitness.js', './features.css', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (event) {
   event.waitUntil(caches.open(CACHE_NAME).then(function (cache) { return cache.addAll(CORE_ASSETS); }).catch(function () {}));

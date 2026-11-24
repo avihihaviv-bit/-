@@ -52,6 +52,13 @@
       s.speech.log = obj(s.speech.log);
       s.speech.selfRatings = arr(s.speech.selfRatings);
       s.reviews = obj(s.reviews);
+      s.workoutLog = arr(s.workoutLog);
+      s.fitness = obj(s.fitness);
+      s.fitness.sessions = arr(s.fitness.sessions);
+      s.fitness.bodyweight = arr(s.fitness.bodyweight);
+      s.fitness.weeklyGoal = s.fitness.weeklyGoal || 4;
+      if (s.fitness.plan !== null && !isObj(s.fitness.plan)) s.fitness.plan = null;
+      if (s.fitness.active && !isObj(s.fitness.active)) s.fitness.active = null;
       arr(s.goals).forEach(function (g) {
         if (!isObj(g)) return;
         g.description = g.description || '';
@@ -331,7 +338,43 @@
     return days;
   }
 
+  /* ---------- fitness ---------- */
+  // Epley estimate of a one-rep max; reps<=1 means the weight itself
+  function e1rm(kg, reps) { kg = +kg || 0; reps = +reps || 0; if (!kg) return 0; return reps <= 1 ? kg : Math.round(kg * (1 + reps / 30) * 10) / 10; }
+  function parseRepRange(r) {
+    var m = String(r || '').match(/(\d+)\s*[-–]\s*(\d+)/);
+    if (m) return { min: +m[1], max: +m[2] };
+    var n = String(r || '').match(/\d+/);
+    return n ? { min: +n[0], max: +n[0] } : { min: 8, max: 12 };
+  }
+  /* Progressive overload: look at the most recent session's sets of one exercise.
+     every set reached the top of the range -> add weight; any set under the bottom -> stay;
+     otherwise stay and aim for one more rep. Bodyweight work progresses by reps. */
+  function suggestNext(lastSets, repRange, type, step) {
+    lastSets = arr(lastSets).filter(function (x) { return x && (+x.reps > 0); });
+    if (!lastSets.length) return null;
+    var rr = parseRepRange(repRange), topKg = Math.max.apply(null, lastSets.map(function (x) { return +x.kg || 0; }));
+    var atTop = lastSets.filter(function (x) { return (+x.kg || 0) === topKg; });
+    var minReps = Math.min.apply(null, atTop.map(function (x) { return +x.reps; }));
+    var maxReps = Math.max.apply(null, atTop.map(function (x) { return +x.reps; }));
+    if (type === 'bodyweight' || !topKg) return { kg: topKg, reps: maxReps + 1, action: 'reps', text: 'נסה ' + (maxReps + 1) + ' חזרות' };
+    step = step || (topKg < 20 ? 1 : 2.5);
+    if (minReps >= rr.max) return { kg: Math.round((topKg + step) * 10) / 10, reps: rr.min, action: 'up', text: 'הגעת לטווח העליון. נסה ' + (Math.round((topKg + step) * 10) / 10) + ' ק״ג × ' + rr.min };
+    if (minReps < rr.min) return { kg: topKg, reps: rr.min, action: 'hold', text: 'הישאר על ' + topKg + ' ק״ג ונסה להגיע ל-' + rr.min + ' חזרות בכל סט' };
+    return { kg: topKg, reps: Math.min(rr.max, maxReps + 1), action: 'rep', text: 'אותו משקל (' + topKg + ' ק״ג), נסה חזרה אחת יותר' };
+  }
+  // which split day comes next: the one after the most recently finished session's day
+  function nextSplitIndex(sessions, days) {
+    days = arr(days); if (!days.length) return 0;
+    var done = arr(sessions).filter(function (x) { return x.endedAt; }).sort(function (a, b) { return b.endedAt - a.endedAt; });
+    if (!done.length) return 0;
+    var i = days.map(function (d) { return d.id; }).indexOf(done[0].dayId);
+    return i < 0 ? 0 : (i + 1) % days.length;
+  }
+  function weekStartKey(k) { return addDays(k, -parseKey(k).getDay()); }
+
   return {
+    e1rm: e1rm, parseRepRange: parseRepRange, suggestNext: suggestNext, nextSplitIndex: nextSplitIndex, weekStartKey: weekStartKey,
     SCHEMA_VERSION: SCHEMA_VERSION, DEFAULT_WIDGETS: DEFAULT_WIDGETS, PRIORITY_RANK: PRIORITY_RANK, STATUSES: STATUSES,
     dkey: dkey, parseKey: parseKey, addDays: addDays,
     migrate: migrate, validateBackup: validateBackup, makeBackup: makeBackup,

@@ -109,5 +109,32 @@ test('version.json matches the version baked into extras.js (update checker reli
   const src = fs.readFileSync(path.join(__dirname, '..', 'extras.js'), 'utf8');
   assert.ok(src.includes("var APP_VERSION = '" + v + "'"), 'bump APP_VERSION in extras.js together with version.json');
   const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
-  ['core.js', 'features.js', 'extras.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
+  ['core.js', 'features.js', 'extras.js', 'fitness.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
+});
+
+test('fitness: e1rm, rep range parsing, progressive overload suggestion', () => {
+  assert.strictEqual(C.e1rm(100, 1), 100);
+  assert.strictEqual(C.e1rm(40, 10), 53.3);
+  assert.deepStrictEqual(C.parseRepRange('8-12'), { min: 8, max: 12 });
+  assert.deepStrictEqual(C.parseRepRange('עד כשל 6–8'), { min: 6, max: 8 });
+  assert.strictEqual(C.suggestNext([{ kg: 40, reps: 12 }, { kg: 40, reps: 12 }], '8-12', 'weight').action, 'up');
+  assert.strictEqual(C.suggestNext([{ kg: 40, reps: 12 }, { kg: 40, reps: 12 }], '8-12', 'weight').kg, 42.5);
+  assert.strictEqual(C.suggestNext([{ kg: 40, reps: 12 }, { kg: 40, reps: 6 }], '8-12', 'weight').action, 'hold');
+  assert.strictEqual(C.suggestNext([{ kg: 40, reps: 10 }, { kg: 40, reps: 9 }], '8-12', 'weight').action, 'rep');
+  assert.strictEqual(C.suggestNext([{ kg: 0, reps: 8 }], '6-8', 'bodyweight').reps, 9);
+  assert.strictEqual(C.suggestNext([], '8-12', 'weight'), null);
+});
+
+test('fitness: next split day rotates after the last finished session', () => {
+  const days = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  assert.strictEqual(C.nextSplitIndex([], days), 0);
+  assert.strictEqual(C.nextSplitIndex([{ dayId: 'a', endedAt: 1 }, { dayId: 'b', endedAt: 5 }], days), 2);
+  assert.strictEqual(C.nextSplitIndex([{ dayId: 'c', endedAt: 9 }], days), 0);
+  assert.strictEqual(C.nextSplitIndex([{ dayId: 'b', endedAt: null }], days), 0);
+});
+
+test('migrate adds fitness structures and keeps workout log', () => {
+  const s = C.migrate({ workoutLog: [{ id: 'w', kg: 50 }] });
+  assert.strictEqual(s.workoutLog.length, 1);
+  assert.ok(Array.isArray(s.fitness.sessions) && Array.isArray(s.fitness.bodyweight) && s.fitness.weeklyGoal === 4);
 });

@@ -5,8 +5,9 @@
   'use strict';
   var F = window.MaslulFeatures, C = window.MaslulCore;
   if (!F || !C) return;
-  var APP_VERSION = '2026.11.24.1';
+  var APP_VERSION = '2026.11.24.2';
   var CHANGELOG = [
+    { v: '2026.11.24.2', items: ['עמוד כושר חדש בלשוניות: אימון היום, התקדמות, תוכנית, יומן וספרייה', 'אימון לפי תוכנית: רישום סטים עם הצעה אוטומטית למשקל הבא (עומס מתקדם)', 'טיימר מנוחה שמתחיל לבד אחרי כל סט, וזיהוי שיאים חדשים', 'גרף התקדמות לכל תרגיל, נפח שבועי, איזון קבוצות שריר ומשקל גוף', 'עורך תוכנית: ימים, תרגילים, סטים, טווח חזרות ומנוחה', 'סיום אימון מסמן אוטומטית את הרגל "אימון"'] },
     { v: '2026.11.24.1', items: ['כפתור "בדוק עדכונים" בהגדרות ובתפריט, עם התראה כשיש גרסה חדשה', 'מטריצת אייזנהאואר, דחייה למחר ושכפול משימות', 'אירועים חוזרים וצבעים בלוח השנה, ותצוגת "סדר יום"', 'צלילי רקע ויעד יומי בפוקוס', 'מפת התמדה של 16 שבועות וייצוא CSV בנתונים', 'בכושר: טיימר מנוחה, נפח אימון שבועי ושיאים', 'בכסף: גרף חודשי והוצאה מובילה', 'בלמידה: ספירה לאחור למבחנים', 'בבית: 3 המשימות החשובות, רצועת שבוע, אירועי היום וצ׳ק-אין מצב רוח', 'תרגיל אקראי בעמוד הדיבור, היסטוריית סקירות, צבעים ומונה מילים לפתקים'] }
   ];
 
@@ -144,42 +145,6 @@
       U().on(n, '[data-mood]', 'click', function (b) { var tk = U().todayKey(); var r = S().reviews['day:' + tk] = S().reviews['day:' + tk] || {}; r.mood = +b.dataset.mood; api().save(); api().toast('נשמר', 'success'); api().rerender(); });
     }
   };
-
-  /* ================= fitness: rest timer, weekly volume, PRs ================= */
-  var rest = { endsAt: 0, iv: null, total: 0 };
-  chain('fitness', function (el) {
-    var log = S().workoutLog || [];
-    var tk = U().todayKey();
-    var weeks = [], lbl = [];
-    for (var w = 7; w >= 0; w--) {
-      var end = C.addDays(tk, -7 * w), startK = C.addDays(end, -6);
-      var vol = log.filter(function (e) { var k = e.date || (e.at ? C.dkey(new Date(e.at)) : ''); return k >= startK && k <= end; }).reduce(function (a, e) { return a + (+e.kg || 0) * (+e.reps || 0); }, 0);
-      weeks.push(Math.round(vol)); lbl.push(w === 0 ? 'השבוע' : 'לפני ' + w);
-    }
-    var prs = {};
-    log.forEach(function (e) { var k = (e.machine || '').trim(); if (!k) return; var orm = (+e.kg || 0) * (1 + (+e.reps || 0) / 30); if (!prs[k] || orm > prs[k].orm) prs[k] = { orm: orm, e: e }; });
-    var prList = Object.keys(prs).map(function (k) { return { name: k, orm: prs[k].orm, e: prs[k].e }; }).sort(function (a, b) { return b.orm - a.orm; }).slice(0, 6);
-    var setsToday = log.filter(function (e) { return (e.date || '') === tk; }).length;
-    var box = document.createElement('div');
-    box.innerHTML = '<div class="card fx-card-gap" id="rest-card"><div class="fx-row-between"><h3>⏱ טיימר מנוחה בין סטים</h3><span class="page-sub">' + setsToday + ' סטים היום</span></div>' +
-        '<div class="fx-rest"><div class="fx-rest-time num" id="rest-time">' + (rest.endsAt > Date.now() ? '' : '--:--') + '</div><div class="fx-btn-row" style="margin:0;">' + [60, 90, 120, 150].map(function (s) { return '<button class="btn btn-ghost btn-sm" data-rest="' + s + '">' + (s >= 120 ? (s / 60) + ' דק׳' : s + ' שנ׳') + '</button>'; }).join('') + '<button class="btn btn-ghost btn-sm" id="rest-stop">עצור</button></div></div>' +
-        '<p class="page-sub" style="margin:6px 0 0;">לקליסטניקס עד כשל: 2-2.5 דקות. בסוף המנוחה יישמע צליל.</p></div>' +
-      (log.length ? '<div class="grid-2 fx-card-gap"><div class="card"><h3>נפח אימון שבועי (ק״ג × חזרות)</h3>' + U().barChart(weeks, lbl, { showLabels: true, highlight: 7, aria: 'נפח אימון שבועי' }) +
-        '<p class="page-sub">' + (weeks[7] > weeks[6] ? '▲ עלייה מהשבוע שעבר, יפה!' : weeks[6] ? 'השבוע עוד מתחת לשבוע שעבר' : 'הנפח מחושב מיומן האימון') + '</p></div>' +
-        '<div class="card"><h3>🏆 שיאים (הערכת 1RM)</h3>' + prList.map(function (p) { return '<div class="fx-day-row"><span style="flex:1">' + U().esc(p.name) + '</span><span class="num">' + Math.round(p.orm) + ' ק״ג</span><span class="page-sub num" dir="ltr">' + p.e.kg + '×' + p.e.reps + '</span></div>'; }).join('') + '<p class="page-sub" style="font-size:11.5px;">הערכה לפי נוסחת Epley, לא מדידה.</p></div></div>' : '');
-    var anchor = el.querySelector('.card');
-    if (anchor && anchor.nextSibling) el.insertBefore(box, anchor.nextSibling); else el.appendChild(box);
-    U().on(box, '[data-rest]', 'click', function (b) { startRest(+b.dataset.rest); });
-    box.querySelector('#rest-stop').addEventListener('click', function () { clearInterval(rest.iv); rest.endsAt = 0; paintRest(); });
-    if (rest.endsAt > Date.now()) { clearInterval(rest.iv); rest.iv = setInterval(paintRest, 250); paintRest(); }
-  });
-  function startRest(sec) { rest.total = sec; rest.endsAt = Date.now() + sec * 1000; clearInterval(rest.iv); rest.iv = setInterval(paintRest, 250); paintRest(); }
-  function paintRest() {
-    var t = document.getElementById('rest-time');
-    var left = Math.max(0, Math.round((rest.endsAt - Date.now()) / 1000));
-    if (t) t.textContent = rest.endsAt ? U().pad(Math.floor(left / 60)) + ':' + U().pad(left % 60) : '--:--';
-    if (rest.endsAt && left <= 0) { clearInterval(rest.iv); rest.endsAt = 0; U().beep(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {} api().toast('המנוחה נגמרה, לסט הבא 💪', 'success'); if (t) t.textContent = '00:00'; }
-  }
 
   /* ================= money: monthly chart, top category ================= */
   chain('money', function (el) {

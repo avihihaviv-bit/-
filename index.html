@@ -1096,6 +1096,7 @@
 <script src="core.js"></script>
 <script src="features.js"></script>
 <script src="extras.js"></script>
+<script src="fitness.js"></script>
 <script>
 (function () {
   'use strict';
@@ -6109,6 +6110,8 @@
 
   /* ================= fitness ================= */
   function renderFitness() {
+    // the fitness module (fitness.js) owns this screen; the old log functions below are reused in its "יומן" tab
+    if (FX_MODULES.fitness) { renderPanelContent('fitness'); return; }
     var el = document.getElementById('panel-fitness');
     el.innerHTML =
       '<div class="page-head"><div><h2 class="page-title">כושר</h2><p class="page-sub">חלוקת אימונים, מאגר תרגילים וטיפים</p></div></div>' +
@@ -7065,7 +7068,8 @@
     isoWeekKey: function () { return isoWeekKey(todayDate()); },
     setRoutineDone: function (id, val) { setTaskDone(id, val); },
     applyPrefs: applyPrefs,
-    migratedFrom: function () { return loadInfo.migratedFrom; }
+    migratedFrom: function () { return loadInfo.migratedFrom; },
+    fitnessLegacy: function () { return { logHtml: workoutLogCardHtml, wireLog: wireWorkoutLogSection, EX_LIBRARY: EX_LIBRARY, SCIENCE_LINKS: SCIENCE_LINKS, TIP_LINKS: TIP_LINKS, EXTERNAL_FITNESS_APP: EXTERNAL_FITNESS_APP }; }
   };
 
   /* ================= init ================= */
