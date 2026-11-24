@@ -106,13 +106,13 @@
       all: all.filter(function (t) { return t.status !== 'done'; }).length,
       archive: tasks().filter(function (t) { return t.archived; }).length
     };
-    var views = [['today', 'היום'], ['all', 'הכל'], ['board', 'לוח Kanban'], ['overdue', 'באיחור'], ['upcoming', 'עתידיות'], ['archive', 'ארכיון']];
+    var views = [['today', 'היום'], ['all', 'הכל'], ['board', 'לוח Kanban'], ['matrix', 'מטריצת אייזנהאואר'], ['overdue', 'באיחור'], ['upcoming', 'עתידיות'], ['archive', 'ארכיון']];
     var cats = S().todo.categories;
     el.innerHTML =
       '<div class="page-head"><div><h2 class="page-title">משימות</h2><p class="page-sub">כל מה שצריך לעשות, במקום אחד. <kbd>N</kbd> להוספה מהירה מכל מסך</p></div>' +
         '<button class="btn btn-primary" id="tk-add">' + ic('plus') + 'משימה</button></div>' +
       '<div class="fx-tabs" role="tablist">' + views.map(function (v) {
-        var c = v[0] === 'board' ? '' : (counts[v[0]] ? '<span class="fx-tab-count' + (v[0] === 'overdue' ? ' danger' : '') + '">' + counts[v[0]] + '</span>' : '');
+        var c = (v[0] === 'board' || v[0] === 'matrix') ? '' : (counts[v[0]] ? '<span class="fx-tab-count' + (v[0] === 'overdue' ? ' danger' : '') + '">' + counts[v[0]] + '</span>' : '');
         return '<button role="tab" class="fx-tab' + (taskUI.view === v[0] ? ' active' : '') + '" data-tk-view="' + v[0] + '">' + v[1] + c + '</button>';
       }).join('') + '</div>' +
       '<div class="fx-quickbar"><input type="text" id="tk-quick" placeholder="הוספה מהירה: ״לקנות חלב מחר 18:00 !גבוה #בית״" maxlength="160"><button class="btn btn-primary btn-sm" id="tk-quick-btn">' + ic('plus') + '</button></div>' +
@@ -127,7 +127,23 @@
 
     var body = $('#tk-body', el);
     var f = { q: taskUI.q, priority: taskUI.priority, category: taskUI.category, tag: taskUI.tag };
-    if (taskUI.view === 'board') {
+    if (taskUI.view === 'matrix') {
+      var open = C.filterTasks(tasks(), f, tk).filter(function (t) { return t.status !== 'done'; });
+      var isUrgent = function (t) { var b = C.taskBucket(t, tk); return t.priority === 'urgent' || b === 'overdue' || b === 'today' || (t.due && t.due <= C.addDays(tk, 1)); };
+      var isImportant = function (t) { return t.priority === 'urgent' || t.priority === 'high'; };
+      var Q = [
+        ['עשה עכשיו', 'דחוף וחשוב', function (t) { return isUrgent(t) && isImportant(t); }, 'var(--danger)'],
+        ['תכנן', 'חשוב, לא דחוף', function (t) { return !isUrgent(t) && isImportant(t); }, 'var(--accent)'],
+        ['קצר או האצל', 'דחוף, פחות חשוב', function (t) { return isUrgent(t) && !isImportant(t); }, 'var(--accent-2)'],
+        ['אולי לוותר', 'לא דחוף ולא חשוב', function (t) { return !isUrgent(t) && !isImportant(t); }, 'var(--text-faint)']
+      ];
+      body.innerHTML = '<p class="page-sub">חשוב = עדיפות גבוהה או דחופה. דחוף = באיחור, להיום או למחר.</p><div class="fx-matrix">' + Q.map(function (q) {
+        var items = C.sortTasks(open.filter(q[2]), 'priority');
+        return '<div class="fx-quad" style="--qc:' + q[3] + '"><div class="fx-quad-h"><b>' + q[0] + '</b><span class="page-sub">' + q[1] + ' · ' + items.length + '</span></div>' +
+          (items.length ? '<div class="fx-task-list">' + items.slice(0, 8).map(taskRowHtml).join('') + '</div>' : '<div class="fx-col-empty">ריק</div>') + '</div>';
+      }).join('') + '</div>';
+      wireTaskRows(body, function () { renderTasks(el); });
+    } else if (taskUI.view === 'board') {
       var list = C.filterTasks(tasks(), f, tk);
       body.innerHTML = '<div class="fx-board">' + C.STATUSES.map(function (st) {
         var items = C.sortTasks(list.filter(function (t) { return t.status === st; }), taskUI.sort);
@@ -156,7 +172,9 @@
           if (od.length) groups.push(['באיחור', od, true]);
           groups.push(['להיום', td]);
         } else groups.push(['', items]);
-        body.innerHTML = groups.map(function (g) {
+        var todayAll = taskUI.view === 'today' ? items.length : 0;
+        var todayDone = taskUI.view === 'today' ? items.filter(function (t) { return t.status === 'done'; }).length : 0;
+        body.innerHTML = (taskUI.view === 'today' && todayAll ? '<div class="fx-today-prog"><span>' + todayDone + ' מתוך ' + todayAll + ' הושלמו היום</span>' + progressBar(Math.round(todayDone / todayAll * 100), 'var(--success)') + '</div>' : '') + groups.map(function (g) {
           return (g[0] ? '<div class="fx-group-title' + (g[2] ? ' danger' : '') + '">' + g[0] + ' · ' + g[1].length + '</div>' : '') +
             '<div class="fx-task-list">' + (g[1].length ? g[1].map(taskRowHtml).join('') : '<div class="page-sub" style="padding:10px 4px;">אין משימות פתוחות להיום</div>') + '</div>';
         }).join('') +
@@ -241,9 +259,10 @@
       '<div class="field"><label>תגיות (מופרדות בפסיק)</label><input type="text" id="te-tags" value="' + esc(t.tags.join(', ')) + '" placeholder="בית, דחוף"></div>' +
       '<div class="field"><label>תת-משימות</label><div id="te-subs"></div><div class="ms-add-row"><input type="text" class="ms-input" id="te-sub-in" placeholder="הוסף תת-משימה"><button class="btn btn-ghost btn-sm" id="te-sub-add" type="button">' + ic('plus') + '</button></div></div>' +
       '<div class="field"><label>הערות</label><textarea id="te-notes" rows="2">' + esc(t.notes) + '</textarea></div>' +
+      (isEdit ? '<div class="fx-btn-row" style="margin-top:0;"><button class="btn btn-ghost btn-sm" id="te-snooze" type="button">' + ic('calendar') + 'דחה למחר</button><button class="btn btn-ghost btn-sm" id="te-dup" type="button">' + ic('copy') + 'שכפל</button>' + (existing.status !== 'done' ? '<button class="btn btn-ghost btn-sm" id="te-focus" type="button">' + ic('target') + 'התחל פוקוס על זה</button>' : '') + '</div>' : '') +
       '<div class="modal-actions">' +
         '<button class="btn btn-primary btn-block" id="te-save">' + ic('check') + (isEdit ? 'שמור' : 'הוסף') + '</button>' +
-        (isEdit ? '<button class="btn btn-ghost" id="te-arch" title="' + (t.archived ? 'החזר מהארכיון' : 'לארכיון') + '">' + ic('bookmark') + '</button><button class="btn btn-danger" id="te-del" aria-label="מחק">' + ic('trash') + '</button>' : '') +
+        (isEdit ? '<button class="btn btn-ghost" id="te-arch" title="' + (t.archived ? 'החזר מהארכיון' : 'לארכיון') + '" aria-label="ארכיון">' + ic('bookmark') + '</button><button class="btn btn-danger" id="te-del" aria-label="מחק">' + ic('trash') + '</button>' : '') +
         '<button class="btn btn-ghost" id="te-cancel" aria-label="סגור">' + ic('x') + '</button>' +
       '</div>', { wide: true });
     function paintSubs() {
@@ -265,6 +284,14 @@
           S().todo.tasks = tasks().filter(function (x) { return x.id !== existing.id; }); save(); api.toast('נמחקה'); (after || rerenderActive)();
         });
       });
+      $('#te-snooze', m).addEventListener('click', function () { existing.due = C.addDays(todayKey(), 1); save(); api.toast('נדחתה למחר', 'success'); done(); });
+      $('#te-dup', m).addEventListener('click', function () {
+        var copy = JSON.parse(JSON.stringify(existing));
+        delete copy.id; delete copy.spawnedNextId; copy.status = 'todo'; copy.doneAt = null; copy.archived = false; copy.title = existing.title + ' (עותק)';
+        copy.subtasks = copy.subtasks.map(function (x) { return { id: api.uid(), title: x.title, done: false }; });
+        addTask(copy); api.toast('המשימה שוכפלה', 'success'); done();
+      });
+      var tf = $('#te-focus', m); if (tf) tf.addEventListener('click', function () { fx.taskId = existing.id; api.closeModal(); api.showPanel('focus'); });
       $('#te-arch', m).addEventListener('click', function () { existing.archived = !existing.archived; save(); api.toast(existing.archived ? 'הועברה לארכיון' : 'הוחזרה מהארכיון', 'success'); done(); });
     }
     $('#te-save', m).addEventListener('click', function () {
@@ -330,6 +357,7 @@
   }
 
   var notesUI = { tab: 'inbox', openId: null, q: '' };
+  function wordCount(t) { return ((t || '').trim().match(/\S+/g) || []).length; }
   function renderNotes(el) {
     var st = S();
     var html = '<div class="page-head"><div><h2 class="page-title">מחברת</h2><p class="page-sub">Inbox לרעיונות שעוד לא סווגו, ופתקים אישיים</p></div></div>' +
@@ -348,13 +376,14 @@
       html += '<div class="fx-notes">' +
         '<div class="fx-notes-list' + (open ? ' has-open' : '') + '"><div class="fx-toolbar"><div class="fx-search">' + ic('search') + '<input type="search" id="nt-q" placeholder="חיפוש בפתקים" value="' + esc(notesUI.q) + '"></div><button class="btn btn-primary btn-sm" id="nt-new">' + ic('plus') + 'פתק</button></div>' +
           (list.length ? list.map(function (n) {
-            return '<button class="fx-note-row' + (n.id === notesUI.openId ? ' active' : '') + '" data-nt-open="' + n.id + '"><div class="fx-task-title">' + (n.pinned ? '📌 ' : '') + esc(n.title || 'ללא כותרת') + '</div><div class="page-sub fx-clip">' + esc((n.body || '').slice(0, 90)) + '</div></button>';
+            return '<button class="fx-note-row' + (n.id === notesUI.openId ? ' active' : '') + '" data-nt-open="' + n.id + '"' + (n.color ? ' style="border-inline-start:4px solid ' + n.color + '"' : '') + '><div class="fx-task-title">' + (n.pinned ? '📌 ' : '') + esc(n.title || 'ללא כותרת') + '</div><div class="page-sub fx-clip">' + esc((n.body || '').slice(0, 90)) + '</div></button>';
           }).join('') : emptyState('note', st.notes.length ? 'אין תוצאות' : 'אין עדיין פתקים', st.notes.length ? '' : 'מחברת אישית לרעיונות, סיכומים ומחשבות.')) +
         '</div>' +
-        (open ? '<div class="fx-note-editor card"><div class="fx-note-head"><button class="btn btn-ghost btn-sm fx-only-mobile" id="nt-back">→ חזרה</button><button class="btn btn-ghost btn-sm" id="nt-pin">' + (open.pinned ? 'בטל נעיצה' : '📌 נעץ') + '</button><button class="btn btn-ghost btn-sm" id="nt-totask">' + ic('check') + 'צור משימה</button><button class="btn btn-danger btn-sm" id="nt-del" aria-label="מחק פתק">' + ic('trash') + '</button></div>' +
+        (open ? '<div class="fx-note-editor card"><div class="fx-note-head"><button class="btn btn-ghost btn-sm fx-only-mobile" id="nt-back">→ חזרה</button><button class="btn btn-ghost btn-sm" id="nt-pin">' + (open.pinned ? 'בטל נעיצה' : '📌 נעץ') + '</button><button class="btn btn-ghost btn-sm" id="nt-totask">' + ic('check') + 'צור משימה</button><button class="btn btn-ghost btn-sm" id="nt-export" aria-label="ייצוא לקובץ טקסט">' + ic('download') + '</button><button class="btn btn-danger btn-sm" id="nt-del" aria-label="מחק פתק">' + ic('trash') + '</button>' +
+          '<span class="fx-swatches" style="margin-inline-start:auto;">' + ['', '#f5a94e', '#7c9cff', '#55cf8f', '#f472b6'].map(function (c) { return '<button class="fx-swatch' + ((open.color || '') === c ? ' on' : '') + '" data-ncol="' + c + '" style="background:' + (c || 'var(--surface-3)') + ';width:22px;height:22px;" aria-label="צבע פתק"></button>'; }).join('') + '</span></div>' +
           '<input type="text" id="nt-title" class="fx-note-title" value="' + esc(open.title) + '" placeholder="כותרת" maxlength="120">' +
           '<textarea id="nt-body" class="fx-note-body" placeholder="כתוב כאן…">' + esc(open.body) + '</textarea>' +
-          '<div class="page-sub" id="nt-saved" style="font-size:11.5px;">נשמר אוטומטית · ' + new Date(open.updatedAt).toLocaleString('he-IL') + '</div></div>' : '<div class="fx-note-editor fx-note-placeholder fx-only-desktop">' + emptyState('edit', 'בחר פתק', 'או צור פתק חדש') + '</div>') +
+          '<div class="page-sub" id="nt-saved" style="font-size:11.5px;">נשמר אוטומטית · ' + new Date(open.updatedAt).toLocaleString('he-IL') + ' · <span id="nt-words">' + wordCount(open.body) + '</span> מילים</div></div>' : '<div class="fx-note-editor fx-note-placeholder fx-only-desktop">' + emptyState('edit', 'בחר פתק', 'או צור פתק חדש') + '</div>') +
       '</div>';
     }
     el.innerHTML = html;
@@ -375,7 +404,12 @@
       on(el, '[data-nt-open]', 'click', function (b) { notesUI.openId = b.dataset.ntOpen; renderNotes(el); });
       var open2 = st.notes.filter(function (n) { return n.id === notesUI.openId; })[0];
       if (open2) {
-        var persist = debounce(function () { open2.title = $('#nt-title', el).value; open2.body = $('#nt-body', el).value; open2.updatedAt = Date.now(); save(); var s = $('#nt-saved', el); if (s) s.textContent = 'נשמר אוטומטית · ' + new Date().toLocaleTimeString('he-IL'); }, 400);
+        var persist = debounce(function () { open2.title = $('#nt-title', el).value; open2.body = $('#nt-body', el).value; open2.updatedAt = Date.now(); save(); var s = $('#nt-saved', el); if (s) s.innerHTML = 'נשמר אוטומטית · ' + new Date().toLocaleTimeString('he-IL') + ' · ' + wordCount(open2.body) + ' מילים'; }, 400);
+        on(el, '[data-ncol]', 'click', function (b) { open2.color = b.dataset.ncol || null; save(); renderNotes(el); });
+        $('#nt-export', el).addEventListener('click', function () {
+          var blob = new Blob([(open2.title || 'פתק') + '\n\n' + (open2.body || '')], { type: 'text/plain;charset=utf-8' });
+          var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'maslul-note-' + todayKey() + '.txt'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+        });
         $('#nt-title', el).addEventListener('input', persist);
         $('#nt-body', el).addEventListener('input', persist);
         $('#nt-pin', el).addEventListener('click', function () { open2.pinned = !open2.pinned; save(); renderNotes(el); });
@@ -395,10 +429,22 @@
     var routine = (st.tasksByDate[k] || []);
     return {
       tasks: tasks().filter(function (t) { return t.due === k && !t.archived; }),
-      events: st.events.filter(function (e) { return e.date === k; }).sort(function (a, b) { return (a.time || '').localeCompare(b.time || ''); }),
+      events: st.events.filter(function (e) { return eventOccurs(e, k); }).sort(function (a, b) { return (a.time || '').localeCompare(b.time || ''); }),
       routine: routine.slice().sort(function (a, b) { return a.time.localeCompare(b.time); })
     };
   }
+  var EV_COLORS = ['#f5a94e', '#7c9cff', '#55cf8f', '#f472b6', '#a78bfa', '#ef6f6a'];
+  var EV_REPEAT = { '': 'לא חוזר', weekly: 'כל שבוע', monthly: 'כל חודש', yearly: 'כל שנה' };
+  function eventOccurs(e, k) {
+    if (e.date === k) return true;
+    if (!e.repeat || k < e.date || (e.until && k > e.until)) return false;
+    var a = C.parseKey(e.date), b = C.parseKey(k);
+    if (e.repeat === 'weekly') return a.getDay() === b.getDay();
+    if (e.repeat === 'monthly') return a.getDate() === b.getDate();
+    if (e.repeat === 'yearly') return a.getDate() === b.getDate() && a.getMonth() === b.getMonth();
+    return false;
+  }
+  function evStyle(e) { return e.color ? ' style="background:color-mix(in srgb, ' + e.color + ' 26%, transparent)"' : ''; }
   function loadLevel(k) {
     var it = dayItems(k);
     var mins = it.tasks.reduce(function (a, t) { return a + (+t.estimate || 30); }, 0) + it.events.length * 60;
@@ -422,7 +468,7 @@
         var n = it.tasks.length + it.events.length;
         body += '<button class="fx-cal-cell' + (other ? ' other' : '') + (k === tk ? ' today' : '') + ' load-' + loadLevel(k) + '" data-cal-day="' + k + '" data-drop-day="' + k + '">' +
           '<span class="fx-cal-num">' + d.getDate() + '</span>' +
-          '<span class="fx-cal-dots">' + it.events.slice(0, 2).map(function (e) { return '<i class="ev" draggable="true" data-drag-ev="' + e.id + '" title="' + esc(e.title) + '">' + esc(e.title) + '</i>'; }).join('') +
+          '<span class="fx-cal-dots">' + it.events.slice(0, 2).map(function (e) { return '<i class="ev"' + evStyle(e) + ' draggable="true" data-drag-ev="' + e.id + '" title="' + esc(e.title) + '">' + (e.repeat ? '↻ ' : '') + esc(e.title) + '</i>'; }).join('') +
             it.tasks.slice(0, 2).map(function (t) { return '<i class="tk' + (t.status === 'done' ? ' done' : '') + '" draggable="true" data-drag-tk="' + t.id + '" title="' + esc(t.title) + '">' + esc(t.title) + '</i>'; }).join('') +
             (n > 4 ? '<i class="more">+' + (n - 4) + '</i>' : '') + '</span></button>';
       }
@@ -434,12 +480,23 @@
       for (var j = 0; j < 7; j++) {
         var k2 = C.addDays(ws, j), it2 = dayItems(k2);
         body += '<div class="fx-week-col' + (k2 === tk ? ' today' : '') + '" data-drop-day="' + k2 + '"><button class="fx-week-head" data-cal-day="' + k2 + '">' + HE_DAYS[j] + ' <b>' + C.parseKey(k2).getDate() + '</b></button>' +
-          it2.events.map(function (e) { return '<div class="fx-wk-item ev" draggable="true" data-drag-ev="' + e.id + '" data-ev-open="' + e.id + '">' + (e.time ? '<span dir="ltr">' + e.time + '</span> ' : '') + esc(e.title) + '</div>'; }).join('') +
+          it2.events.map(function (e) { return '<div class="fx-wk-item ev"' + evStyle(e) + ' draggable="true" data-drag-ev="' + e.id + '" data-ev-open="' + e.id + '">' + (e.time ? '<span dir="ltr">' + e.time + '</span> ' : '') + esc(e.title) + '</div>'; }).join('') +
           it2.tasks.map(function (t) { return '<div class="fx-wk-item tk' + (t.status === 'done' ? ' done' : '') + '" draggable="true" data-drag-tk="' + t.id + '" data-task-open="' + t.id + '">' + (t.time ? '<span dir="ltr">' + t.time + '</span> ' : '') + esc(t.title) + '</div>'; }).join('') +
           (it2.routine.length ? '<div class="fx-wk-routine">' + it2.routine.length + ' פעילויות שגרה</div>' : '') +
         '</div>';
       }
       body += '</div>';
+    } else if (calUI.view === 'agenda') {
+      title = 'הימים הקרובים';
+      var blocks = [];
+      for (var a = 0; a < 21; a++) {
+        var ka = C.addDays(tk, a), ia = dayItems(ka);
+        if (!ia.events.length && !ia.tasks.length) continue;
+        blocks.push('<div class="fx-agenda-day"><div class="fx-agenda-h">' + HE_DAYS[C.parseKey(ka).getDay()] + ' · ' + relDate(ka) + '</div>' +
+          ia.events.map(function (e) { return '<div class="fx-day-row ev" data-ev-open="' + e.id + '"><span class="fx-day-time" dir="ltr">' + (e.time || 'כל היום') + '</span><span><i class="fx-dot" style="background:' + (e.color || 'var(--accent-2)') + '"></i>' + esc(e.title) + '</span>' + (e.repeat ? '<span class="fx-chip">↻ ' + EV_REPEAT[e.repeat] + '</span>' : '') + '</div>'; }).join('') +
+          ia.tasks.map(function (t) { return '<div class="fx-day-row tk' + (t.status === 'done' ? ' done' : '') + '" data-task-open="' + t.id + '"><span class="fx-day-time" dir="ltr">' + (t.time || '—') + '</span><span>' + esc(t.title) + '</span><span class="fx-chip" style="color:' + PRI[t.priority].color + '">משימה</span></div>'; }).join('') + '</div>');
+      }
+      body = blocks.length ? '<div class="card">' + blocks.join('') + '</div>' : emptyState('calendar', 'שלושת השבועות הקרובים פנויים', 'אין אירועים או משימות מתוזמנות.');
     } else {
       title = cur.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
       var it3 = dayItems(calUI.cursor);
@@ -453,7 +510,7 @@
     }
     el.innerHTML = '<div class="page-head"><div><h2 class="page-title">לוח שנה</h2><p class="page-sub">אירועים, משימות ושגרה. גרור משימה או אירוע ליום אחר כדי לשנות מועד</p></div>' +
         '<button class="btn btn-primary" id="cal-add-ev">' + ic('plus') + 'אירוע</button></div>' +
-      '<div class="fx-cal-bar"><div class="seg">' + [['day', 'יום'], ['week', 'שבוע'], ['month', 'חודש']].map(function (v) { return '<button data-cal-view="' + v[0] + '" class="' + (calUI.view === v[0] ? 'active' : '') + '">' + v[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="fx-cal-bar"><div class="seg">' + [['agenda', 'סדר יום'], ['day', 'יום'], ['week', 'שבוע'], ['month', 'חודש']].map(function (v) { return '<button data-cal-view="' + v[0] + '" class="' + (calUI.view === v[0] ? 'active' : '') + '">' + v[1] + '</button>'; }).join('') + '</div>' +
         '<div class="fx-cal-nav"><button class="btn-icon" id="cal-prev" aria-label="הקודם">›</button><b class="fx-cal-title">' + title + '</b><button class="btn-icon" id="cal-next" aria-label="הבא">‹</button><button class="btn btn-ghost btn-sm" id="cal-today">היום</button></div></div>' +
       (calUI.view === 'month' ? '<div class="fx-cal-legend"><span><i class="lg l1"></i>עומס קל</span><span><i class="lg l2"></i>בינוני</span><span><i class="lg l3"></i>עמוס</span></div>' : '') +
       body;
@@ -461,6 +518,7 @@
     var step = function (dir) {
       var c = C.parseKey(calUI.cursor);
       if (calUI.view === 'month') { c.setDate(1); c.setMonth(c.getMonth() + dir); calUI.cursor = C.dkey(c); }
+      else if (calUI.view === 'agenda') return;
       else calUI.cursor = C.addDays(calUI.cursor, dir * (calUI.view === 'week' ? 7 : 1));
       renderCalendar(el);
     };
@@ -491,13 +549,17 @@
     var m = openModal('<h3>' + (isEdit ? 'עריכת אירוע' : 'אירוע חדש') + '</h3>' +
       '<div class="field"><label>שם</label><input type="text" id="ev-title" maxlength="100" value="' + esc(e.title) + '" autofocus></div>' +
       '<div class="field-row"><div class="field"><label>תאריך</label><input type="date" id="ev-date" value="' + e.date + '"></div><div class="field"><label>התחלה</label><input type="time" id="ev-time" value="' + (e.time || '') + '"></div><div class="field"><label>סיום</label><input type="time" id="ev-end" value="' + (e.end || '') + '"></div></div>' +
+      '<div class="field-row"><div class="field"><label>חזרה</label><select id="ev-repeat">' + Object.keys(EV_REPEAT).map(function (r) { return '<option value="' + r + '"' + ((e.repeat || '') === r ? ' selected' : '') + '>' + EV_REPEAT[r] + '</option>'; }).join('') + '</select></div><div class="field"><label>עד תאריך (אופציונלי)</label><input type="date" id="ev-until" value="' + (e.until || '') + '"></div></div>' +
+      '<div class="field"><label>צבע</label><div class="fx-swatches" style="justify-content:flex-start;">' + EV_COLORS.map(function (c) { return '<button type="button" class="fx-swatch' + ((e.color || EV_COLORS[0]) === c ? ' on' : '') + '" data-evc="' + c + '" style="background:' + c + '" aria-label="צבע"></button>'; }).join('') + '</div></div>' +
       '<div class="field"><label>הערות</label><textarea id="ev-notes" rows="2">' + esc(e.notes) + '</textarea></div>' +
       '<div class="modal-actions"><button class="btn btn-primary btn-block" id="ev-save">' + ic('check') + 'שמור</button>' + (isEdit ? '<button class="btn btn-danger" id="ev-del" aria-label="מחק">' + ic('trash') + '</button>' : '') + '<button class="btn btn-ghost" id="ev-x" aria-label="סגור">' + ic('x') + '</button></div>');
     $('#ev-x', m).addEventListener('click', api.closeModal);
+    var evColor = e.color || EV_COLORS[0];
+    on(m, '[data-evc]', 'click', function (b) { evColor = b.dataset.evc; $$('[data-evc]', m).forEach(function (x) { x.classList.toggle('on', x === b); }); });
     if (isEdit) $('#ev-del', m).addEventListener('click', function () { S().events = S().events.filter(function (x) { return x.id !== ev.id; }); save(); api.closeModal(); after(); });
     $('#ev-save', m).addEventListener('click', function () {
       var t = $('#ev-title', m).value.trim(); if (!t) { $('#ev-title', m).classList.add('fx-invalid'); $('#ev-title', m).focus(); return; }
-      var f = { title: t, date: $('#ev-date', m).value || todayKey(), time: $('#ev-time', m).value || '', end: $('#ev-end', m).value || '', notes: $('#ev-notes', m).value.trim() };
+      var f = { title: t, date: $('#ev-date', m).value || todayKey(), time: $('#ev-time', m).value || '', end: $('#ev-end', m).value || '', notes: $('#ev-notes', m).value.trim(), repeat: $('#ev-repeat', m).value || '', until: $('#ev-until', m).value || '', color: evColor };
       if (f.end && f.time && f.end < f.time) { api.toast('שעת הסיום לפני שעת ההתחלה', 'error'); return; }
       if (isEdit) Object.assign(ev, f); else S().events.push(Object.assign({ id: api.uid() }, f));
       save(); api.closeModal(); api.toast('האירוע נשמר', 'success'); after();
@@ -549,6 +611,7 @@
         kpi('רצף הרגל הכי ארוך', bestStreak + ' 🔥', 'רצף כללי: ' + (st.gam.streak.current || 0) + ' ימים') +
         kpi('התקדמות מטרות', goalAvg == null ? '—' : goalAvg + '%', goals.length + ' מטרות') +
       '</div>' +
+      '<div class="card fx-card-gap"><div class="fx-row-between"><h3>מפת התמדה · 16 שבועות</h3><button class="btn btn-ghost btn-sm" id="an-csv">' + ic('download') + 'ייצוא CSV</button></div>' + yearHeatHtml(st, tk) + '</div>' +
       '<div class="card fx-card-gap"><h3>אחוז ביצוע יומי · 30 יום</h3>' + (days30.some(function (v) { return v != null; }) ? barChart(days30, lbl30, { unit: '%', max: 100, aria: 'אחוז ביצוע יומי ב-30 הימים האחרונים', highlight: 29 }) : emptyState('chart', 'עוד אין מספיק נתונים', 'תסמן משימות ושגרה כמה ימים והגרף יתמלא.')) + '</div>' +
       '<div class="grid-2 fx-card-gap">' +
         '<div class="card"><h3>שעות פרודוקטיביות</h3>' + (prof.bestHour != null ? '<p class="page-sub">השיא שלך סביב <b dir="ltr">' + pad(prof.bestHour) + ':00</b></p>' + barChart(hoursShown, hourLbls, { showLabels: true, unit: ' השלמות', highlight: prof.bestHour - 5, aria: 'השלמות לפי שעה' }) : '<p class="page-sub">יתמלא אחרי שתשלים משימות.</p>') + '</div>' +
@@ -559,6 +622,25 @@
       }).join('') + '</div>' +
       '<div class="card fx-card-gap"><h3>השוואת שבועות</h3>' + compareWeeksHtml(st, tk) + '</div>' +
       (goals.length ? '<div class="card fx-card-gap"><h3>מטרות</h3>' + goals.map(function (g) { var p = api.goalProgress(g); return '<div class="fx-hrow"><span class="fx-hname">' + esc(g.title) + '</span>' + progressBar(p) + '<span class="num fx-hval">' + p + '%</span></div>'; }).join('') + '</div>' : '');
+    $('#an-csv', el).addEventListener('click', function () { exportCSV(); api.toast('הקובץ ירד', 'success'); });
+  }
+  function yearHeatHtml(st, tk) {
+    var start = C.addDays(tk, -C.parseKey(tk).getDay() - 7 * 15), cells = '';
+    for (var i = 0; i < 112; i++) {
+      var k = C.addDays(start, i), c = C.dayCompletion(st, k);
+      var lvl = k > tk ? 'fut' : c.rate == null ? '' : c.rate >= 85 ? 'l4' : c.rate >= 60 ? 'l3' : c.rate >= 30 ? 'l2' : c.rate > 0 ? 'l1' : 'l0';
+      cells += '<i class="' + lvl + '" title="' + fmtDate(k) + (c.rate != null ? ': ' + c.rate + '%' : '') + '"></i>';
+    }
+    return '<div class="fx-heat fx-heat-lv">' + cells + '</div><div class="fx-cal-legend" style="margin-top:8px;"><span>פחות</span><i class="lg hl1"></i><i class="lg hl2"></i><i class="lg hl3"></i><i class="lg hl4"></i><span>יותר</span></div>';
+  }
+  function exportCSV() {
+    var st = S(), tk = todayKey(), rows = [['תאריך', 'הושלמו', 'סה"כ', 'אחוז', 'דקות ריכוז']];
+    var keys = Object.keys(st.tasksByDate).concat(tasks().map(function (t) { return t.due; }).filter(Boolean)).filter(function (k) { return k <= tk; });
+    keys = keys.filter(function (k, i) { return keys.indexOf(k) === i; }).sort();
+    keys.forEach(function (k) { var c = C.dayCompletion(st, k); rows.push([k, c.done, c.total, c.rate == null ? '' : c.rate, C.focusMinutes(st, k)]); });
+    var csv = '\ufeff' + rows.map(function (r) { return r.join(','); }).join('\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'maslul-stats-' + tk + '.csv';
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
   }
   function compareWeeksHtml(st, tk) {
     var rows = [];
@@ -707,7 +789,27 @@
      FOCUS (Pomodoro pro) - wall-clock based so background tabs don't drift
      ================================================================ */
   var fx = { phase: 'work', running: false, endsAt: 0, remaining: 0, total: 0, cycle: 0, taskId: '', timer: null, zen: false };
-  function focusPrefs() { return S().prefs.focus; }
+  function focusPrefs() { var f = S().prefs.focus; if (!f.goal) f.goal = 120; return f; }
+  var noise = { ctx: null, src: null, gain: null, kind: '' };
+  function setNoise(kind) {
+    try {
+      if (noise.src) { noise.src.stop(); noise.src.disconnect(); noise.src = null; }
+      noise.kind = kind;
+      if (!kind) return;
+      noise.ctx = noise.ctx || new (window.AudioContext || window.webkitAudioContext)();
+      var len = noise.ctx.sampleRate * 4, buf = noise.ctx.createBuffer(1, len, noise.ctx.sampleRate), d = buf.getChannelData(0), last = 0;
+      for (var i = 0; i < len; i++) {
+        var w = Math.random() * 2 - 1;
+        if (kind === 'white') d[i] = w * 0.25;
+        else { last = (last + 0.02 * w) / 1.02; d[i] = last * (kind === 'brown' ? 3.2 : 2.2); }
+      }
+      noise.src = noise.ctx.createBufferSource(); noise.src.buffer = buf; noise.src.loop = true;
+      noise.gain = noise.ctx.createGain(); noise.gain.gain.value = kind === 'rain' ? 0.5 : 0.35;
+      var node = noise.src;
+      if (kind === 'rain') { var f = noise.ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1200; f.Q.value = 0.4; node.connect(f); node = f; }
+      node.connect(noise.gain); noise.gain.connect(noise.ctx.destination); noise.src.start();
+    } catch (e) { api.toast('הדפדפן לא תומך בצלילי רקע', 'error'); }
+  }
   function phaseMinutes(p) { var f = focusPrefs(); return p === 'work' ? f.work : p === 'short' ? f.short : f.long; }
   function resetPhase(p) { fx.phase = p; fx.total = phaseMinutes(p) * 60; fx.remaining = fx.total; fx.running = false; clearInterval(fx.timer); }
   function beep() {
@@ -771,10 +873,12 @@
         '<div class="field" style="width:100%;max-width:360px;"><label>על מה עובדים?</label><select id="fx-task"><option value="">בלי משימה מסוימת</option>' + open.map(function (t) { return '<option value="' + t.id + '"' + (fx.taskId === t.id ? ' selected' : '') + '>' + esc(t.title) + '</option>'; }).join('') + '</select></div>' +
         '<div class="focus-controls"><button class="btn btn-primary" id="fx-toggle"></button><button class="btn btn-ghost" id="fx-reset" aria-label="איפוס">' + ic('reset') + '</button><button class="btn btn-ghost" id="fx-skip" aria-label="דלג לשלב הבא">' + ic('skip') + '</button>' + (fx.taskId ? '<button class="btn btn-ghost" id="fx-done-task">' + ic('check') + 'סיימתי את המשימה</button>' : '') + '</div>' +
         '<p class="focus-task">היום: <b class="num">' + todaySessions.length + '</b> מקטעים · <b class="num">' + minsLabel(mins) + '</b> ריכוז · מחזור ' + ((fx.cycle % f.longEvery) + 1) + '/' + f.longEvery + '</p>' +
+        '<div class="fx-goal-line"><span>יעד יומי: ' + minsLabel(f.goal) + '</span>' + progressBar(Math.round(mins / f.goal * 100), mins >= f.goal ? 'var(--success)' : null) + '<span class="num">' + Math.min(100, Math.round(mins / f.goal * 100)) + '%</span></div>' +
+        '<div class="fx-noise"><span class="page-sub">צליל רקע:</span>' + [['', 'ללא'], ['white', 'רעש לבן'], ['brown', 'רעש חום'], ['rain', 'גשם']].map(function (n) { return '<button class="fx-mini' + (noise.kind === n[0] ? ' fx-mini-on' : '') + '" data-noise="' + n[0] + '">' + n[1] + '</button>'; }).join('') + '</div>' +
       '</div></div>' +
       '<div class="grid-2 fx-card-gap"><div class="card"><h3>7 ימים אחרונים</h3>' + barChart(week, wl, { showLabels: true, unit: ' דק׳', highlight: 6, aria: 'דקות ריכוז ב-7 ימים' }) + '</div>' +
         '<div class="card"><h3>הגדרות טיימר</h3><div class="fx-focus-set">' +
-          '<label>ריכוז (דק׳)<input type="number" min="1" max="180" data-fset="work" value="' + f.work + '"></label><label>הפסקה קצרה<input type="number" min="1" max="60" data-fset="short" value="' + f.short + '"></label><label>הפסקה ארוכה<input type="number" min="1" max="90" data-fset="long" value="' + f.long + '"></label><label>ארוכה כל<input type="number" min="2" max="10" data-fset="longEvery" value="' + f.longEvery + '"></label></div>' +
+          '<label>ריכוז (דק׳)<input type="number" min="1" max="180" data-fset="work" value="' + f.work + '"></label><label>הפסקה קצרה<input type="number" min="1" max="60" data-fset="short" value="' + f.short + '"></label><label>הפסקה ארוכה<input type="number" min="1" max="90" data-fset="long" value="' + f.long + '"></label><label>ארוכה כל<input type="number" min="2" max="10" data-fset="longEvery" value="' + f.longEvery + '"></label><label>יעד יומי (דק׳)<input type="number" min="10" max="720" step="10" data-fset="goal" value="' + f.goal + '"></label></div>' +
           '<div class="settings-row" style="border:none;padding-bottom:0;"><div><div class="lbl">צליל סיום</div></div><label class="switch"><input type="checkbox" id="fx-sound"' + (f.sound ? ' checked' : '') + '><span></span></label></div></div></div>' +
       '<div class="card fx-card-gap"><h3>היסטוריית סשנים</h3>' + (st.focusSessions.length ? '<div class="fx-task-list">' + st.focusSessions.slice(-8).reverse().map(function (s) { var t = s.taskId && findTask(s.taskId); return '<div class="fx-day-row"><span class="fx-day-time">' + new Date(s.endedAt).toLocaleString('he-IL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</span><span>' + (s.type === 'work' ? '🎯 ריכוז' : '☕ הפסקה') + ' · ' + s.minutes + ' דק׳' + (t ? ' · ' + esc(t.title) : '') + '</span></div>'; }).join('') + '</div>' : '<p class="page-sub">הסשן הראשון שלך יופיע כאן.</p>') + '</div>';
     paintFocus();
@@ -787,6 +891,7 @@
     on(el, '[data-fset]', 'change', function (inp) { var v = Math.max(1, Math.round(+inp.value || 1)); f[inp.dataset.fset] = v; save(); if (!fx.running) resetPhase(fx.phase); renderFocusPro(el); });
     $('#fx-sound', el).addEventListener('change', function (e) { f.sound = e.target.checked; save(); });
     $('#fx-zen', el).addEventListener('click', openZen);
+    on(el, '[data-noise]', 'click', function (b) { setNoise(b.dataset.noise); renderFocusPro(el); });
   }
   function openZen() {
     var z = document.createElement('div');
@@ -999,6 +1104,21 @@
     { lvl: 5, t: 'משפטים', s: ['סָבְתָא סִפְּרָה סִפּוּר עַל סוּס', 'הַסּוּסִים בָּאִים לְבֵית הַסֵּפֶר', 'סַל עִם סֻכָּרִיּוֹת סְגֻלּוֹת'], sh: ['שָׁלוֹשׁ שְׁעוֹת שִׁעוּר שֶׁל שִׁירָה', 'הַשֶּׁמֶשׁ שׁוֹקַעַת בַּשָּׁעָה שֵׁשׁ', 'שִׁמְשׁוֹן שָׁתָה שֵׁשׁ כּוֹסוֹת'] },
     { lvl: 6, t: 'ערבוב (הכי קשה)', s: ['שֵׁשׁ סוּסוֹת שׁוֹתוֹת מַיִם', 'סָשָׁה שָׁם סַל שֶׁל שׁוֹקוֹלָד', 'שׁוּשַׁנָּה סִדְּרָה שֵׁשׁ סְפָרִים'], sh: ['קריאה בקול: עמוד אחד מספר, לאט, עם הקפדה על כל ס ו-ש', 'שיחה של 2 דקות: לבחור מילה אחת ולהקפיד עליה', 'הקלטה של 30 שניות והאזנה'] }
   ];
+  var ORAL_MOTOR = [
+    ['gum-spread', 'מסטיק על התקרה', 'ללעוס מסטיק עד שהוא רך, ואז להשתמש <b>רק בלשון</b> כדי לשטח אותו על החך (התקרה של הפה) מאחורי השיניים העליונות. זה בדיוק האזור של ס.'],
+    ['gum-chew', 'לעיסה משני הצדדים', '2-3 דקות לעיסה של מסטיק קשה (כמו בזוקה) או גומי, לסירוגין צד ימין ושמאל. מחזק את הלסת ואת השליטה בלשון.'],
+    ['gum-ball', 'כדור מסטיק', 'לגלגל את המסטיק לכדור עם הלשון בלבד, ולהעביר אותו מצד לצד בפה בלי עזרת השיניים.'],
+    ['tip-spot', 'נקודת הלשון', 'לגעת עם קצה הלשון ברכס שמאחורי השיניים העליונות ולהחזיק 5 שניות. 10 חזרות.'],
+    ['groove', 'ערוץ באמצע הלשון', 'לנסות לקפל את צדי הלשון למעלה (כמו צינור) או ללחוץ קשית דקה לאורך מרכז הלשון ולנשוף דרכה. מלמד את האוויר לצאת באמצע.'],
+    ['smile-s', 'חיוך + ססס', 'לחייך עם שיניים סגורות ולהחזיק ססס 5 שניות, 5 פעמים. אחר כך שפתיים קדימה ושששש.']
+  ];
+  var NEED_SLP_Q = [
+    'כשאני מקליט את עצמי, ה-ס נשמע "רטוב" או שהאוויר יוצא מהצדדים',
+    'אנשים מעירים לי או לא מבינים מילים עם ס/ש',
+    'הלשון שלי יוצאת בין השיניים כשאני אומר ס (רואים במראה)',
+    'גם אחרי שבועיים של תרגול יומי אין שיפור שאני שומע בהקלטה',
+    'זה מפריע לי, מביך אותי, או גורם לי להימנע ממילים מסוימות'
+  ];
   var rec = { media: null, chunks: [], url: null, recording: false };
   function renderSpeech(el) {
     var st = S(), tk = todayKey(), sp = st.speech;
@@ -1020,6 +1140,7 @@
       '<div class="card fx-card-gap"><div class="fx-row-between"><h3>הקלטה והאזנה</h3><span class="page-sub" style="font-size:12px;">ההקלטה נשארת רק בזיכרון הדפדפן ולא נשמרת</span></div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;"><button class="btn ' + (rec.recording ? 'btn-danger' : 'btn-primary') + '" id="sp-rec">' + ic('mic') + (rec.recording ? 'עצור הקלטה' : 'התחל הקלטה') + '</button>' + (rec.url ? '<audio controls src="' + rec.url + '" style="max-width:100%;"></audio>' : '') + '</div></div>' +
       '<div class="card fx-card-gap"><div class="fx-row-between"><h3>תרגילים לפי שלבים</h3><button class="btn btn-primary btn-sm" id="sp-timer">' + ic('alarm') + (spTimer.running ? 'עצור טיימר' : 'טיימר תרגול 10 דק׳') + '</button></div>' +
+        '<div class="fx-random-drill" id="sp-rand-box"><div class="page-sub">תרגיל אקראי</div><div class="fx-random-text" id="sp-rand-text">לחץ על הכפתור לקבלת משפט לתרגול</div><button class="btn btn-ghost btn-sm" id="sp-rand">🎲 תרגיל חדש</button></div>' +
         '<p class="page-sub">עוברים לשלב הבא רק כשהשלב הנוכחי יוצא נכון ברוב הפעמים. 5-10 חזרות לכל שורה.</p><div class="num" id="sp-clock" style="font-size:22px;font-weight:700;' + (spTimer.running ? '' : 'display:none;') + '"></div>' +
         SPEECH_DRILLS.map(function (d) {
           var doneL = !!todayLog.levels[d.lvl];
@@ -1028,6 +1149,15 @@
         }).join('') + '</div>' +
       '<div class="card fx-card-gap"><h3>איך יצא היום? (דירוג עצמי)</h3><div class="fx-rate-row"><span>ס</span>' + [1, 2, 3, 4, 5].map(function (n) { return '<button class="fx-rate" data-rate-s="' + n + '">' + n + '</button>'; }).join('') + '</div><div class="fx-rate-row"><span>ש</span>' + [1, 2, 3, 4, 5].map(function (n) { return '<button class="fx-rate" data-rate-sh="' + n + '">' + n + '</button>'; }).join('') + '</div>' +
         (ratings.length > 1 ? '<div class="page-sub" style="margin-top:8px;">מגמת ס (10 אחרונים)</div>' + barChart(ratings.map(function (r) { return r.s; }), ratings.map(function (r) { return fmtDate(r.k); }), { max: 5, unit: '/5', aria: 'מגמת דירוג ס' }) : '') + '</div>' +
+      '<div class="card fx-card-gap"><div class="fx-row-between"><h3>תרגילי פה ולשון (כמו אצל הקלינאית)</h3><span class="page-sub">' + ORAL_MOTOR.filter(function (o) { return (todayLog.oral || {})[o[0]]; }).length + '/' + ORAL_MOTOR.length + ' היום</span></div>' +
+        '<p class="page-sub">תרגילי לעיסה ולשון מחזקים את המודעות והשליטה בלשון. הם עובדים הכי טוב <b>יחד</b> עם אמירת מילים, לא במקומה: 3-5 דקות לעיסה, ואז ישר לתרגול מילים.</p>' +
+        ORAL_MOTOR.map(function (o) { var on2 = (todayLog.oral || {})[o[0]]; return '<label class="fx-pick fx-oral"><input type="checkbox" data-oral="' + o[0] + '"' + (on2 ? ' checked' : '') + '><span><b>' + o[1] + '</b><br><span class="page-sub">' + o[2] + '</span></span></label>'; }).join('') + '</div>' +
+      '<div class="card fx-card-gap"><div class="fx-row-between"><h3>המילים שלי</h3><span class="page-sub">כמו בשיעור: אומרים כל מילה 5 פעמים</span></div>' +
+        '<div class="fx-quickbar" style="margin-top:8px;"><input type="text" id="sp-word-in" maxlength="40" placeholder="הוסף מילה עם ס או ש (למשל: סַבָּא, שׁוֹקוֹלָד)"><button class="btn btn-primary btn-sm" id="sp-word-add" aria-label="הוסף מילה">' + ic('plus') + '</button></div>' +
+        ((sp.words || []).length ? '<div class="fx-words">' + sp.words.map(function (w, i) { return '<span class="fx-word' + (w.ok ? ' ok' : '') + '"><button class="fx-word-t" data-word-ok="' + i + '" title="סמן שיוצאת טוב">' + (w.ok ? '✓ ' : '') + esc(w.t) + '</button><button class="fx-word-x" data-word-del="' + i + '" aria-label="מחק מילה">×</button></span>'; }).join('') + '</div><div class="fx-btn-row"><button class="btn btn-ghost btn-sm" id="sp-word-quiz">🎲 מילה אקראית מהרשימה</button><span class="page-sub" id="sp-word-show" style="font-size:22px;font-weight:700;"></span></div>' : '<p class="page-sub">הרשימה ריקה. תוסיף את המילים שהכי קשות לך, ותסמן ✓ כשהן יוצאות טוב.</p>') + '</div>' +
+      '<div class="card fx-card-gap"><h3>האם אני עדיין צריך קלינאית תקשורת?</h3><p class="page-sub">סמן מה נכון לגביך היום (מומלץ להקליט את עצמך קודם):</p>' +
+        NEED_SLP_Q.map(function (q, i) { return '<label class="fx-pick"><input type="checkbox" data-slpq="' + i + '"' + ((sp.slpCheck || {})[i] ? ' checked' : '') + '><span>' + q + '</span></label>'; }).join('') +
+        '<div class="fx-tip" id="sp-slp-result">' + slpVerdict(sp.slpCheck || {}) + '</div></div>' +
       '<div class="card fx-card-gap"><h3>המחקר שלי</h3><p class="page-sub">מקום לרשום מה מצאת: טיפים, סרטונים, מה עובד לך.</p><textarea id="sp-notes" class="fx-note-body" style="min-height:120px;" placeholder="למשל: גיליתי שכשאני מחייך ה-ס יוצא יותר חד…">' + esc(sp.notes || '') + '</textarea></div>' +
       '<div class="card fx-card-gap fx-note-warn"><b>מתי כדאי לפנות לקלינאית תקשורת?</b><p class="page-sub" style="margin:6px 0 0;">אם האוויר יוצא מהצדדים (שיבוש צדי), אם אחרי כמה שבועות של תרגול אין שיפור, או אם זה מפריע לך ביום-יום. בישראל אפשר לקבל אבחון וטיפול דרך קופת החולים (בדרך כלל עם הפניה מרופא). תיקון הגייה אפשרי בכל גיל. המדריך כאן מבוסס על עקרונות מקובלים בתרגול הגייה, והוא לא תחליף לאבחון מקצועי.</p></div>';
     var clock = $('#sp-clock', el);
@@ -1044,8 +1174,27 @@
     });
     on(el, '[data-rate-s]', 'click', function (b) { rateSpeech('s', +b.dataset.rateS); api.toast('נשמר', 'success'); renderSpeech(el); });
     on(el, '[data-rate-sh]', 'click', function (b) { rateSpeech('sh', +b.dataset.rateSh); api.toast('נשמר', 'success'); renderSpeech(el); });
+    on(el, '[data-oral]', 'change', function (c) { var lg = sp.log[tk] = sp.log[tk] || { minutes: 0, levels: {} }; lg.oral = lg.oral || {}; lg.oral[c.dataset.oral] = c.checked; if (c.checked && !lg.minutes) lg.minutes = 2; creditSpeech(); save(); renderSpeech(el); });
+    on(el, '[data-slpq]', 'change', function (c) { sp.slpCheck = sp.slpCheck || {}; sp.slpCheck[c.dataset.slpq] = c.checked; save(); $('#sp-slp-result', el).innerHTML = slpVerdict(sp.slpCheck); });
+    var addWord = function () { var v = $('#sp-word-in', el).value.trim(); if (!v) return; sp.words = sp.words || []; sp.words.push({ t: v, ok: false }); save(); renderSpeech(el); $('#sp-word-in', el).focus(); };
+    $('#sp-word-add', el).addEventListener('click', addWord);
+    $('#sp-word-in', el).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addWord(); } });
+    on(el, '[data-word-ok]', 'click', function (b) { var w = sp.words[+b.dataset.wordOk]; w.ok = !w.ok; save(); renderSpeech(el); });
+    on(el, '[data-word-del]', 'click', function (b) { sp.words.splice(+b.dataset.wordDel, 1); save(); renderSpeech(el); });
+    var wq = $('#sp-word-quiz', el); if (wq) wq.addEventListener('click', function () { var pool = sp.words.filter(function (w) { return !w.ok; }); if (!pool.length) pool = sp.words; $('#sp-word-show', el).textContent = pool[Math.floor(Math.random() * pool.length)].t; });
     $('#sp-notes', el).addEventListener('input', debounce(function (e) { sp.notes = e.target.value; save(); }, 500));
     $('#sp-rec', el).addEventListener('click', function () { toggleRecord(function () { renderSpeech(el); }); });
+    $('#sp-rand', el).addEventListener('click', function () {
+      var pool = []; SPEECH_DRILLS.filter(function (d) { return d.lvl >= 3; }).forEach(function (d) { d.s.concat(d.sh).forEach(function (x) { if (!/^(שִׂים לב|קריאה|שיחה|הקלטה|אמור)/.test(x)) pool.push(x.replace(/^(בהתחלה|באמצע|בסוף): /, '')); }); });
+      $('#sp-rand-text', el).textContent = pool[Math.floor(Math.random() * pool.length)];
+    });
+  }
+  function slpVerdict(c) {
+    var n = Object.keys(c).filter(function (k) { return c[k]; }).length;
+    if (c[0]) return '🔎 אוויר שיוצא מהצדדים (שיבוש צדי) כמעט תמיד צריך הדרכה של קלינאית. כדאי לחזור לאבחון. התרגול כאן יכול ללוות את הטיפול.';
+    if (n >= 2) return '🗣 סימנת כמה דברים. מומלץ לקבוע פגישת מעקב אחת אצל קלינאית: היא תגיד לך בדיוק מה נשאר לעבוד עליו, ואז אפשר להמשיך לתרגל כאן.';
+    if (n === 1) return '👍 נראה שרוב העבודה כבר נעשתה. תמשיך תרגול יומי קצר כאן, ותבדוק שוב בעוד שבועיים עם הקלטה.';
+    return '✅ אם שום דבר לא נכון לגביך, כנראה מספיק תרגול שימור: 5-10 דקות כמה פעמים בשבוע, בעיקר משפטים וקריאה בקול.';
   }
   var spTimer = { running: false, start: 0, iv: null };
   function paintSpTimer() {
@@ -1083,6 +1232,13 @@
      REVIEWS: end-of-day summary, plan tomorrow, weekly review
      ================================================================ */
   var reviewUI = { tab: 'day' };
+  function reviewHistoryHtml(rv, tk) {
+    var moods = [], lbl = [], past = [];
+    for (var i = 13; i >= 0; i--) { var k = C.addDays(tk, -i), r = rv['day:' + k]; moods.push(r && r.mood ? r.mood : null); lbl.push(fmtDate(k)); if (i > 0 && r && (r.good || r.improve)) past.push({ k: k, r: r }); }
+    if (!moods.some(function (m) { return m; }) && !past.length) return '';
+    return '<div class="card fx-card-gap"><h3>מצב רוח · 14 ימים</h3>' + barChart(moods, lbl, { max: 5, unit: '/5', highlight: 13, aria: 'מצב רוח יומי' }) +
+      (past.length ? '<h3 style="margin-top:14px;">סיכומים קודמים</h3>' + past.reverse().slice(0, 7).map(function (x) { return '<details class="fx-coach-old"><summary>' + HE_DAYS[C.parseKey(x.k).getDay()] + ' ' + fmtDate(x.k) + (x.r.mood ? ' · ' + x.r.mood + '/5' : '') + '</summary>' + (x.r.good ? '<p><b>הלך טוב:</b> ' + esc(x.r.good) + '</p>' : '') + (x.r.improve ? '<p><b>לשפר:</b> ' + esc(x.r.improve) + '</p>' : '') + '</details>'; }).join('') : '') + '</div>';
+  }
   function renderReview(el) {
     var st = S(), tk = todayKey(), tom = C.addDays(tk, 1);
     var rv = st.reviews;
@@ -1096,7 +1252,8 @@
       html += '<div class="fx-kpis fx-kpis-sm">' + kpi('ביצוע היום', dc.rate == null ? '—' : dc.rate + '%', dc.done + '/' + dc.total) + kpi('שגרה', routine.filter(function (t) { return t.done; }).length + '/' + routine.length) + kpi('משימות שהושלמו', doneToday.length) + kpi('ריכוז', minsLabel(C.focusMinutes(st, tk))) + '</div>' +
         '<div class="card fx-card-gap"><h3>מה הלך טוב היום?</h3><textarea class="fx-note-body" data-rv="good" placeholder="3 דברים קטנים שהצליחו">' + esc(r.good || '') + '</textarea>' +
         '<h3 style="margin-top:12px;">מה אפשר לשפר?</h3><textarea class="fx-note-body" data-rv="improve">' + esc(r.improve || '') + '</textarea>' +
-        '<h3 style="margin-top:12px;">איך היה היום? (1-5)</h3><div class="fx-rate-row">' + [1, 2, 3, 4, 5].map(function (n) { return '<button class="fx-rate' + (r.mood === n ? ' on' : '') + '" data-rv-mood="' + n + '">' + n + '</button>'; }).join('') + '</div></div>';
+        '<h3 style="margin-top:12px;">איך היה היום? (1-5)</h3><div class="fx-rate-row">' + [1, 2, 3, 4, 5].map(function (n) { return '<button class="fx-rate' + (r.mood === n ? ' on' : '') + '" data-rv-mood="' + n + '">' + n + '</button>'; }).join('') + '</div></div>' +
+        reviewHistoryHtml(rv, tk);
     } else if (reviewUI.tab === 'tomorrow') {
       var open = C.sortTasks(tasks().filter(function (t) { return t.status !== 'done' && !t.archived && (!t.due || t.due <= tom); }), 'priority');
       var tmr = tasks().filter(function (t) { return t.due === tom && !t.archived; });
@@ -1360,8 +1517,14 @@
      DASHBOARD widgets + customizer
      ================================================================ */
   var WIDGET_LABELS = { now: 'עכשיו ואחוז ההתקדמות', todo: 'משימות היום', gamer: 'רמה, XP ורצף', score: 'ציון יומי', habits: 'הרגלים', goals: 'מטרות פעילות', focus: 'זמן ריכוז', actions: 'פעולות מהירות', reminder: 'תזכורת שבועית', balance: 'איזון היום', summary: 'סיכום קצר של היום' };
+  var EXTRA_WIDGETS = {};
+  // a calm default: the essentials first, near-duplicates hidden until the user opts in
+  var PREFERRED_ORDER = ['now', 'top3', 'todo', 'habits', 'mood', 'gamer', 'week', 'events', 'goals', 'focus', 'summary', 'actions', 'reminder', 'score', 'balance'];
+  var DEFAULT_HIDDEN = { score: true, balance: true };
+  function hiddenWidgets() { var d = S().prefs.dashboard; return d.customized ? d.hidden : Object.assign({}, DEFAULT_HIDDEN, d.hidden); }
   function widgetOrder() {
-    var d = S().prefs.dashboard, all = C.DEFAULT_WIDGETS.concat(['summary']);
+    var d = S().prefs.dashboard, all = PREFERRED_ORDER.concat(C.DEFAULT_WIDGETS).concat(['summary']).concat(Object.keys(EXTRA_WIDGETS));
+    all = all.filter(function (id, i) { return all.indexOf(id) === i && (WIDGET_LABELS[id] || EXTRA_WIDGETS[id]); });
     var order = d.order.filter(function (id) { return all.indexOf(id) >= 0; });
     all.forEach(function (id) { if (order.indexOf(id) < 0) order.push(id); });
     return order;
@@ -1396,7 +1559,8 @@
     return parts.length ? parts.join(' · ') + '.' : 'היום רק מתחיל. תבחר דבר אחד חשוב ותתחיל ממנו.';
   }
   function applyDashboard(el) {
-    var st = S(), hidden = st.prefs.dashboard.hidden, w = dashboardWidgets();
+    var st = S(), hidden = hiddenWidgets(), w = dashboardWidgets();
+    Object.keys(EXTRA_WIDGETS).forEach(function (id) { try { var h = EXTRA_WIDGETS[id].html(); if (h) w[id] = h; } catch (e) { console.error(e); } });
     var hero = el.querySelector('.hero');
     var host = document.createElement('div'); host.className = 'fx-dash';
     widgetOrder().forEach(function (id) {
@@ -1419,6 +1583,7 @@
     var wa = $('#w-add-task', el); if (wa) wa.addEventListener('click', function () { openTaskEditor(null, { due: todayKey() }); });
     var wg = $('#w-add-goal', el); if (wg) wg.addEventListener('click', function () { api.showPanel('goals'); });
     wireTaskRows(host.querySelector('[data-w="todo"]') || document.createElement('div'), function () { api.rerender(); });
+    Object.keys(EXTRA_WIDGETS).forEach(function (id) { var n = host.querySelector('[data-w="' + id + '"]'); if (n && EXTRA_WIDGETS[id].wire) { try { EXTRA_WIDGETS[id].wire(n); } catch (e) { console.error(e); } } });
     // avatar in hero
     if (st.prefs.avatar && hero && !hero.querySelector('.fx-avatar')) { var a = document.createElement('div'); a.className = 'fx-avatar fx-avatar-hero'; a.innerHTML = '<img src="' + st.prefs.avatar + '" alt="">'; hero.insertBefore(a, hero.firstChild); }
   }
@@ -1426,18 +1591,18 @@
     var d = S().prefs.dashboard;
     var order = widgetOrder();
     var m = openModal('<h3>התאמת מסך הבית</h3><p class="page-sub">סמן מה יוצג וסדר עם החצים.</p><div id="dc-list"></div><div class="modal-actions"><button class="btn btn-primary btn-block" id="dc-save">' + ic('check') + 'שמור</button><button class="btn btn-ghost" id="dc-reset">ברירת מחדל</button></div>');
-    var hid = Object.assign({}, d.hidden);
+    var hid = Object.assign({}, hiddenWidgets());
     function paint() {
       $('#dc-list', m).innerHTML = order.map(function (id, i) {
-        return '<div class="fx-dc-row"><label><input type="checkbox" data-dc-show="' + id + '"' + (hid[id] ? '' : ' checked') + '> ' + (WIDGET_LABELS[id] || id) + '</label><span><button class="fx-mini" data-dc-up="' + i + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="למעלה">▲</button><button class="fx-mini" data-dc-down="' + i + '"' + (i === order.length - 1 ? ' disabled' : '') + ' aria-label="למטה">▼</button></span></div>';
+        return '<div class="fx-dc-row"><label><input type="checkbox" data-dc-show="' + id + '"' + (hid[id] ? '' : ' checked') + '> ' + (WIDGET_LABELS[id] || (EXTRA_WIDGETS[id] && EXTRA_WIDGETS[id].label) || id) + '</label><span><button class="fx-mini" data-dc-up="' + i + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="למעלה">▲</button><button class="fx-mini" data-dc-down="' + i + '"' + (i === order.length - 1 ? ' disabled' : '') + ' aria-label="למטה">▼</button></span></div>';
       }).join('');
       on(m, '[data-dc-show]', 'change', function (c) { if (c.checked) delete hid[c.dataset.dcShow]; else hid[c.dataset.dcShow] = true; });
       on(m, '[data-dc-up]', 'click', function (b) { var i = +b.dataset.dcUp; var x = order[i]; order[i] = order[i - 1]; order[i - 1] = x; paint(); });
       on(m, '[data-dc-down]', 'click', function (b) { var i = +b.dataset.dcDown; var x = order[i]; order[i] = order[i + 1]; order[i + 1] = x; paint(); });
     }
     paint();
-    $('#dc-save', m).addEventListener('click', function () { d.order = order; d.hidden = hid; save(); api.closeModal(); api.toast('מסך הבית עודכן', 'success'); if (api.activePanel() === 'dashboard') api.rerender(); });
-    $('#dc-reset', m).addEventListener('click', function () { d.order = []; d.hidden = {}; save(); api.closeModal(); if (api.activePanel() === 'dashboard') api.rerender(); });
+    $('#dc-save', m).addEventListener('click', function () { d.order = order; d.hidden = hid; d.customized = true; save(); api.closeModal(); api.toast('מסך הבית עודכן', 'success'); if (api.activePanel() === 'dashboard') api.rerender(); });
+    $('#dc-reset', m).addEventListener('click', function () { d.order = []; d.hidden = {}; d.customized = false; save(); api.closeModal(); if (api.activePanel() === 'dashboard') api.rerender(); });
   }
 
   /* ================================================================
@@ -1499,6 +1664,15 @@
       setInterval(function () { if (new Date().getHours() === 0) snapshot('daily'); }, 60 * 60 * 1000);
     },
     openQuickAdd: function () { openQuickAdd(); },
-    openSearch: function () { openSearch(); }
+    openSearch: function () { openSearch(); },
+    widgets: EXTRA_WIDGETS,
+    api: function () { return api; },
+    util: {
+      openModal: openModal, emptyState: emptyState, kpi: kpi, barChart: barChart, progressBar: progressBar, skeleton: skeleton,
+      esc: esc, ic: ic, debounce: debounce, fmtDate: fmtDate, relDate: relDate, minsLabel: minsLabel, todayKey: todayKey, pad: pad,
+      tasks: tasks, addTask: addTask, openTaskEditor: openTaskEditor, taskRowHtml: taskRowHtml, wireTaskRows: wireTaskRows,
+      notify: notify, beep: beep, on: on, $: $, $$: $$, HE_DAYS: HE_DAYS, HE_DAYS_SHORT: HE_DAYS_SHORT, PRI: PRI,
+      openEventEditor: openEventEditor, dayItems: dayItems
+    }
   };
 })();

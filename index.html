@@ -1066,7 +1066,7 @@
     </div>
     <div id="nav-desktop"></div>
     <div class="nav-spacer"></div>
-    <div class="nav-foot">הנתונים נשמרים בדפדפן הזה בלבד</div>
+    <div class="nav-foot">הנתונים נשמרים בדפדפן הזה בלבד · <button type="button" id="foot-update" class="fx-link">בדוק עדכונים</button></div>
   </aside>
 
   <main class="main">
@@ -1095,6 +1095,7 @@
 
 <script src="core.js"></script>
 <script src="features.js"></script>
+<script src="extras.js"></script>
 <script>
 (function () {
   'use strict';
@@ -4839,7 +4840,7 @@
     var byId = {};
     items.forEach(function (n) { byId[n.id] = n; });
     modal.innerHTML = '<div class="sheet-handle"></div>' +
-      (window.MaslulFeatures ? '<button class="sb-search" id="more-search">' + icon('search') + '<span>חיפוש בכל האפליקציה</span></button>' : '') +
+      (window.MaslulFeatures ? '<div class="fx-btn-row" style="margin:0 0 6px;"><button class="sb-search" id="more-search" style="flex:1;margin:0;">' + icon('search') + '<span>חיפוש בכל האפליקציה</span></button>' + (window.MaslulFeatures.checkForUpdates ? '<button class="sb-search" id="more-update" style="width:auto;margin:0;">' + icon('reset') + '<span>בדוק עדכונים</span></button>' : '') + '</div>' : '') +
       groups.map(function (g) {
       var tiles = g.ids.filter(function (id) { return byId[id]; }).map(function (id) {
         var n = byId[id];
@@ -4849,6 +4850,8 @@
     }).join('');
     var ms = modal.querySelector('#more-search');
     if (ms) ms.addEventListener('click', function () { closeModal(); window.MaslulFeatures.openSearch(); });
+    var mu = modal.querySelector('#more-update');
+    if (mu) mu.addEventListener('click', function () { closeModal(); window.MaslulFeatures.checkForUpdates(); });
     Array.prototype.forEach.call(modal.querySelectorAll('[data-more-panel]'), function (b) {
       b.addEventListener('click', function () { closeModal(); showPanel(b.dataset.morePanel); });
     });
@@ -7049,7 +7052,7 @@
     rerender: function () { renderPanelContent(activePanel); },
     navItems: function () { return NAV_ITEMS.slice(); },
     uid: uid, timeToMin: timeToMin, nowNextLater: nowNextLater,
-    grantXPOnce: grantXPOnce, flushXP: function (anchor) { gamFlushEventQueue(anchor || null); },
+    grantXPOnce: function (id, amount, kind, meta) { var r = grantXPOnce(id, amount, kind, meta); if (r) saveState(); return r; }, flushXP: function (anchor) { gamFlushEventQueue(anchor || null); },
     level: function () { return levelInfoFromXP(state.gam.totalXP).level; },
     habits: function () { return HABITS.slice(); },
     habitDef: function (h) {
@@ -7075,6 +7078,8 @@
   shopExpirePotions();
   saveState();
   if (window.MaslulFeatures) { try { window.MaslulFeatures.boot(maslulBridge); } catch (e) { console.error('features boot failed', e); } }
+  var footUpd = document.getElementById('foot-update');
+  if (footUpd && window.MaslulFeatures && window.MaslulFeatures.checkForUpdates) footUpd.addEventListener('click', function () { window.MaslulFeatures.checkForUpdates(); }); else if (footUpd) footUpd.remove();
   var startPanel = (location.hash || '').replace('#', '');
   showPanel(startPanel && document.getElementById('panel-' + startPanel) ? startPanel : 'dashboard');
   window.addEventListener('hashchange', function () { var h = location.hash.replace('#', ''); if (h && h !== activePanel && document.getElementById('panel-' + h)) showPanel(h); });

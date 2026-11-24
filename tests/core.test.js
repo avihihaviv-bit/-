@@ -102,3 +102,12 @@ test('weeklyPlan respects daily capacity', () => {
   assert.ok(plan.slice(0, 6).every(d => d.mins <= 180));
   assert.strictEqual(plan.reduce((a, d) => a + d.tasks.length, 0), 10);
 });
+
+test('version.json matches the version baked into extras.js (update checker relies on it)', () => {
+  const fs = require('fs'), path = require('path');
+  const v = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'version.json'), 'utf8')).version;
+  const src = fs.readFileSync(path.join(__dirname, '..', 'extras.js'), 'utf8');
+  assert.ok(src.includes("var APP_VERSION = '" + v + "'"), 'bump APP_VERSION in extras.js together with version.json');
+  const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  ['core.js', 'features.js', 'extras.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
+});
