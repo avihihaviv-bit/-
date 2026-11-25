@@ -41,7 +41,8 @@
     root.innerHTML = '';
     root.appendChild(wrap);
     var first = wrap.querySelector('[autofocus]') || wrap.querySelector('input,textarea,select');
-    if (first && !opts.noFocus) setTimeout(function () { try { first.focus(); } catch (e) {} }, 30);
+    // focus the first field, but never steal focus from a field the user already moved to
+    if (first && !opts.noFocus) setTimeout(function () { try { if (!wrap.contains(document.activeElement) || document.activeElement === wrap) first.focus(); } catch (e) {} }, 30);
     return wrap.firstChild;
   }
   function emptyState(iconName, title, sub, ctaId, ctaLabel) {

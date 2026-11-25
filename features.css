@@ -397,3 +397,51 @@ textarea.fx-note-body[data-rv], textarea.fx-note-body[data-rvw] { min-height: 90
 .ft-plan-act { display: flex; gap: 4px; }
 .ft-ext { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-decoration: none; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .ft-rest-bar i { transition: none; } }
+
+/* ---- fitness entry UX ---- */
+.ft-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ft-field-l { font-size: 14px; font-weight: 700; color: var(--text); }
+.ft-opt { font-weight: 500; color: var(--text-faint); font-size: 12px; }
+.ft-hidden { display: none; }
+.ft-num { display: flex; align-items: stretch; gap: 6px; }
+.ft-num-btn { flex: 0 0 48px; min-height: 52px; border-radius: 14px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); font-size: 24px; font-weight: 600; cursor: pointer; transition: transform .1s, background .15s; }
+.ft-num-btn:active { transform: scale(.93); background: var(--surface-3); }
+.ft-num-box { flex: 1; min-width: 0; position: relative; display: flex; align-items: center; border: 1.5px solid var(--border-strong); border-radius: 14px; background: var(--surface); transition: border-color .15s, box-shadow .15s; }
+.ft-num-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.ft-num-box input { width: 100%; min-width: 0; border: none; background: none; color: var(--text); font: inherit; font-size: 22px; font-weight: 800; text-align: center; padding: 10px 4px; outline: none; -moz-appearance: textfield; font-family: "JetBrains Mono", monospace; }
+.ft-num-box input::-webkit-outer-spin-button, .ft-num-box input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ft-num-box input::placeholder { color: var(--text-faint); font-weight: 500; font-size: 15px; font-family: Rubik, sans-serif; }
+.ft-unit { position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; font-size: 10.5px; color: var(--text-faint); pointer-events: none; }
+.ft-err { min-height: 0; font-size: 12.5px; font-weight: 600; color: var(--danger); line-height: 1.4; }
+.ft-err:empty { display: none; }
+.ft-bad .ft-num-box, .ft-bad .ft-name-in { border-color: var(--danger) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
+.ft-name-in { width: 100%; min-height: 50px; padding: 10px 14px; border-radius: 14px; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-size: 16px; font-weight: 600; }
+.ft-name-in:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.ft-name-in::placeholder { font-weight: 400; color: var(--text-faint); }
+.ft-chips { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 4px; scrollbar-width: none; }
+.ft-chips::-webkit-scrollbar { display: none; }
+.ft-chip { flex-shrink: 0; padding: 8px 12px; min-height: 36px; border-radius: 99px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ft-chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.ft-ctx { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); font-size: 13px; color: var(--text-soft); }
+.ft-ctx .ft-sug { margin-top: 6px; }
+.ft-type { margin-top: 6px; display: flex; }
+.ft-type button { flex: 1; min-height: 40px; }
+.ft-input { display: grid !important; grid-template-columns: 1fr !important; gap: 14px !important; margin-top: 12px; align-items: start !important; }
+@media (min-width: 560px) { .ft-input { grid-template-columns: 1fr 1fr !important; } }
+.ft-num-btn { flex-basis: 56px; }
+.ft-num-box input { font-size: 26px; padding: 12px 4px 16px; }
+.ft-input > .ft-field:only-child { grid-column: 1 / -1; }
+@media (max-width: 380px) { .ft-num-btn { flex-basis: 42px; } .ft-num-box input { font-size: 19px; } }
+.ft-log-btn { margin-top: 14px; min-height: 52px; font-size: 15.5px; font-weight: 700; justify-content: center; }
+.ft-log-lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ft-more { margin-top: 10px; font-size: 13px; color: var(--text-soft); }
+.ft-more summary { cursor: pointer; min-height: 30px; display: inline-flex; align-items: center; }
+.ft-more input { margin-top: 6px; min-height: 40px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; }
+.ft-log-group { border-bottom: 1px solid var(--border); padding: 4px 0; }
+.ft-log-group:last-child { border-bottom: none; }
+.ft-log-group summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; min-height: 46px; padding: 4px 2px; }
+.ft-log-name { font-weight: 700; font-size: 15px; }
+.ft-log-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 6px; min-height: 44px; border: none; border-radius: 10px; background: none; color: var(--text); font: inherit; cursor: pointer; text-align: right; }
+.ft-log-row:hover, .ft-log-row:active { background: var(--surface-2); }
+.ft-log-row svg { width: 15px; height: 15px; color: var(--text-faint); }
+.ft-log-val { flex: 1; font-size: 14.5px; }

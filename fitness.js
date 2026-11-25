@@ -47,9 +47,40 @@
     plan().days.forEach(function (d) { d.exercises.forEach(function (x) { if (x.name.trim() === n) g = x.group; }); });
     return g || 'אחר';
   }
-  function fmtSet(e, type) { return type === 'time' ? (e.reps + ' דק׳') : (+e.kg ? r1(e.kg) + '×' + e.reps : e.reps + ' חזרות'); }
+  function fmtSet(e, type) { return type === 'time' ? (e.reps + ' דק׳') : (+e.kg ? r1(e.kg) + ' ק״ג × ' + e.reps : e.reps + ' חזרות'); }
 
-  var ui = { tab: 'today', exSel: null, editDay: null };
+  var ui = { tab: 'today', exSel: null, editDay: null, logName: '', logType: null };
+
+  /* A labelled number field: big value, unit inside the box, − on the left and + on the right
+     (number-line order, forced LTR so RTL doesn't flip it), and an error line under it. */
+  function numField(id, label, unit, value, step, opts) {
+    opts = opts || {};
+    return '<div class="ft-field' + (opts.hidden ? ' ft-hidden' : '') + '" data-field="' + id + '">' +
+      '<label class="ft-field-l" for="' + id + '">' + label + (opts.optional ? ' <span class="ft-opt">(לא חובה)</span>' : '') + '</label>' +
+      '<div class="ft-num" dir="ltr"><button type="button" class="ft-num-btn" data-nstep="' + id + '" data-d="-' + step + '" aria-label="הפחת ' + label + '">−</button>' +
+      '<div class="ft-num-box"><input type="number" id="' + id + '" inputmode="' + (step % 1 ? 'decimal' : 'numeric') + '" min="0" step="' + (step % 1 ? 0.5 : 1) + '" value="' + (value === '' || value == null ? '' : value) + '" placeholder="' + (opts.placeholder || '0') + '" aria-describedby="err-' + id + '"><span class="ft-unit">' + unit + '</span></div>' +
+      '<button type="button" class="ft-num-btn" data-nstep="' + id + '" data-d="' + step + '" aria-label="הוסף ' + label + '">+</button></div>' +
+      '<div class="ft-err" id="err-' + id + '" role="alert"></div></div>';
+  }
+  function wireNum(root, onChange) {
+    U().on(root, '[data-nstep]', 'click', function (b) {
+      var inp = root.querySelector('#' + b.dataset.nstep);
+      inp.value = r1(Math.max(0, (+inp.value || 0) + (+b.dataset.d)));
+      clearErr(root, b.dataset.nstep); if (onChange) onChange();
+    });
+    U().on(root, '.ft-num-box input, .ft-name-in', 'input', function (i) { clearErr(root, i.id); if (onChange) onChange(); });
+  }
+  function showErr(root, id, msg) {
+    var e = root.querySelector('#err-' + id), f = root.querySelector('[data-field="' + id + '"]');
+    if (e) e.textContent = msg; if (f) f.classList.add('ft-bad');
+    var inp = root.querySelector('#' + id); if (inp) { inp.focus(); try { inp.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) {} }
+  }
+  function clearErr(root, id) { var e = root.querySelector('#err-' + id), f = root.querySelector('[data-field="' + id + '"]'); if (e) e.textContent = ''; if (f) f.classList.remove('ft-bad'); }
+  function setLabel(kg, reps, type) {
+    if (type === 'time') return reps ? reps + ' דק׳' : '';
+    if (!reps || (type === 'weight' && !(+kg))) return '';
+    return (+kg ? r1(kg) + ' ק״ג × ' : (type === 'bodyweight' ? 'משקל גוף × ' : '')) + reps;
+  }
 
   /* ---------------- rest timer (floating, wall-clock) ---------------- */
   var rest = { endsAt: 0, total: 0, iv: null };
@@ -123,7 +154,7 @@
         '<div class="ft-daypick">' + p.days.map(function (d, i) { return '<button class="fx-mini' + (i === idx ? ' fx-mini-on' : '') + '" data-pick="' + i + '">' + esc(d.name) + '</button>'; }).join('') + '</div>' +
         '<div class="ft-preview">' + day.exercises.map(function (x) {
           var last = lastSessionSets(x.name), sug = last ? C.suggestNext(last.sets, x.reps, x.type) : null;
-          return '<div class="ft-prev-row"><span class="ft-prev-name">' + esc(x.name) + '</span><span class="page-sub">' + '<bdi dir="ltr">' + x.sets + '×' + esc(x.reps) + '</bdi>' + (x.type === 'time' ? ' דק׳' : '') + '</span>' + (sug && x.type !== 'time' ? '<span class="fx-chip fx-chip-accent">' + (sug.action === 'up' ? '▲ ' + sug.kg + ' ק״ג' : '<bdi dir="ltr">' + last.sets.map(function (s) { return fmtSet(s, x.type); }).slice(-1)[0] + '</bdi>') + '</span>' : '') + '</div>';
+          return '<div class="ft-prev-row"><span class="ft-prev-name">' + esc(x.name) + '</span><span class="page-sub">' + x.sets + ' סטים × <bdi>' + esc(x.reps) + '</bdi>' + (x.type === 'time' ? ' דק׳' : '') + '</span>' + (sug && x.type !== 'time' ? '<span class="fx-chip fx-chip-accent">' + (sug.action === 'up' ? '▲ ' + sug.kg + ' ק״ג' : '<bdi>' + last.sets.map(function (s) { return fmtSet(s, x.type); }).slice(-1)[0] + '</bdi>') + '</span>' : '') + '</div>';
         }).join('') + '</div></div>' +
       '<div class="card fx-card-gap"><div class="fx-row-between"><h3>השבוע</h3><span class="page-sub">' + w.count + '/' + f.weeklyGoal + ' אימונים' + (streak ? ' · 🔥 ' + streak + ' שבועות ברצף' : '') + '</span></div>' + U().progressBar(Math.round(w.count / f.weeklyGoal * 100), w.count >= f.weeklyGoal ? 'var(--success)' : null) + '<div class="fx-week-strip" style="margin-top:10px;">' + strip + '</div></div>' +
       '<div class="card fx-card-gap"><div class="fx-row-between"><h3>⏱ טיימר מנוחה</h3><span class="page-sub">מתחיל לבד אחרי כל סט באימון</span></div><div class="fx-btn-row">' + [60, 90, 120, 150, 180].map(function (s) { return '<button class="btn btn-ghost btn-sm" data-rest="' + s + '">' + (s % 60 ? s + ' שנ׳' : (s / 60) + ' דק׳') + '</button>'; }).join('') + '</div></div>' +
@@ -155,17 +186,27 @@
       '<div class="ft-finish-row"><button class="btn btn-primary btn-block" id="ft-finish">' + ic('check') + 'סיים אימון</button><button class="btn btn-ghost" id="ft-cancel">בטל</button></div>';
     var elapsed = setInterval(function () { var t = document.getElementById('ft-elapsed'); if (!t || !FS().active) { clearInterval(elapsed); return; } t.textContent = Math.round((Date.now() - a.startedAt) / 60000); }, 20000);
 
-    U().on(body, '[data-step2]', 'click', function (b) { var inp = body.querySelector('#' + b.dataset.step2); inp.value = r1(Math.max(0, (+inp.value || 0) + (+b.dataset.d))); });
+    // live button label: shows exactly what will be saved
+    var paintBtns = function () {
+      U().$$('[data-logset]', body).forEach(function (btn) {
+        var i = btn.dataset.logset, x2 = list[+i], kgI = body.querySelector('#kg-' + i), rpI = body.querySelector('#rp-' + i);
+        var lbl = setLabel(kgI ? kgI.value : 0, rpI ? rpI.value : 0, x2.type);
+        var n = (S().workoutLog || []).filter(function (e) { return e.sessionId === a.id && e.machine === x2.name.trim(); }).length;
+        btn.querySelector('.ft-log-lbl').textContent = (lbl ? 'שמור סט ' + (n + 1) + ': ' : 'שמור סט ' + (n + 1)) + lbl;
+      });
+    };
+    wireNum(body, paintBtns); paintBtns();
     U().on(body, '[data-logset]', 'click', function (b) {
-      var x = list[+b.dataset.logset];
-      var kg = +body.querySelector('#kg-' + b.dataset.logset).value || 0;
-      var reps = Math.round(+body.querySelector('#rp-' + b.dataset.logset).value || 0);
-      if (!reps) { api().toast(x.type === 'time' ? 'כמה דקות?' : 'כמה חזרות עשית?', 'error'); body.querySelector('#rp-' + b.dataset.logset).focus(); return; }
+      var i = b.dataset.logset, x = list[+i];
+      var kgEl = body.querySelector('#kg-' + i), kg = kgEl ? (+kgEl.value || 0) : 0;
+      var reps = Math.round(+body.querySelector('#rp-' + i).value || 0);
+      if (x.type === 'weight' && !(kg > 0)) { showErr(body, 'kg-' + i, 'חסר משקל: כמה ק״ג הרמת? (אם זה תרגיל משקל גוף, שנה את סוג התרגיל בתוכנית)'); return; }
+      if (!reps) { showErr(body, 'rp-' + i, x.type === 'time' ? 'כמה דקות?' : 'חסר מספר חזרות'); return; }
       var prevBest = Math.max.apply(null, [0].concat(setsOf(x.name).map(function (e) { return C.e1rm(e.kg, e.reps); })));
-      S().workoutLog.push({ id: uid(), machine: x.name.trim(), kg: x.type === 'weight' ? kg : (x.type === 'bodyweight' ? kg : 0), reps: reps, date: tk(), at: Date.now(), sessionId: a.id, dayId: a.dayId });
+      S().workoutLog.push({ id: uid(), machine: x.name.trim(), kg: x.type === 'time' ? 0 : kg, reps: reps, date: tk(), at: Date.now(), sessionId: a.id, dayId: a.dayId });
       save();
       var isPR = x.type === 'weight' && prevBest > 0 && C.e1rm(kg, reps) > prevBest;
-      api().toast(isPR ? '🏆 שיא חדש ב' + x.name + '!' : 'סט נשמר ✓', 'success');
+      api().toast(isPR ? '🏆 שיא חדש ב' + x.name + '!' : 'נשמר: ' + setLabel(kg, reps, x.type), 'success');
       var nowSets = (S().workoutLog || []).filter(function (e) { return e.sessionId === a.id && e.machine === x.name.trim(); }).length;
       if (x.type !== 'time' && nowSets < x.sets + 3) startRest(x.rest || 90);
       render(el);
@@ -193,15 +234,17 @@
     var done = mine.length >= x.sets;
     var unit = x.type === 'time' ? 'דקות' : 'חזרות';
     return '<div class="card fx-card-gap ft-ex' + (done ? ' done' : '') + '" data-ex-card="' + xi + '">' +
-      '<div class="fx-row-between"><div><div class="ft-ex-name">' + (done ? '✅ ' : '') + esc(x.name) + '</div><div class="page-sub">' + esc(x.group || '') + ' · יעד ' + '<bdi dir="ltr">' + x.sets + '×' + esc(x.reps) + '</bdi>' + ' ' + (x.type === 'time' ? 'דק׳' : '') + (x.rest && x.type !== 'time' ? ' · מנוחה ' + x.rest + ' שנ׳' : '') + '</div></div><span class="ft-count num">' + mine.length + '/' + x.sets + '</span></div>' +
-      (last ? '<div class="ft-last page-sub">פעם קודמת (' + U().relDate(last.date) + '): <b dir="ltr">' + last.sets.map(function (s) { return fmtSet(s, x.type); }).join(' , ') + '</b></div>' : '<div class="ft-last page-sub">פעם ראשונה: התחל במשקל נוח שאפשר לבצע בו את כל החזרות בטכניקה טובה.</div>') +
+      '<div class="fx-row-between"><div><div class="ft-ex-name">' + (done ? '✅ ' : '') + esc(x.name) + '</div><div class="page-sub">' + esc(x.group || '') + ' · יעד ' + x.sets + ' סטים × <bdi>' + esc(x.reps) + '</bdi>' + ' ' + (x.type === 'time' ? 'דק׳' : '') + (x.rest && x.type !== 'time' ? ' · מנוחה ' + x.rest + ' שנ׳' : '') + '</div></div><span class="ft-count num">' + mine.length + '/' + x.sets + '</span></div>' +
+      (last ? '<div class="ft-last page-sub">פעם קודמת (' + U().relDate(last.date) + '): <b><bdi>' + last.sets.map(function (s) { return fmtSet(s, x.type); }).join(' , ') + '</bdi></b></div>' : '<div class="ft-last page-sub">פעם ראשונה: התחל במשקל נוח שאפשר לבצע בו את כל החזרות בטכניקה טובה.</div>') +
       (sug ? '<div class="ft-sug ft-sug-' + sug.action + '">' + (sug.action === 'up' ? '▲ ' : '→ ') + esc(sug.text) + '</div>' : '') +
-      (mine.length ? '<div class="ft-sets">' + mine.map(function (e, i) { return '<span class="ft-set"><b>סט ' + (i + 1) + '</b> <span dir="ltr">' + fmtSet(e, x.type) + '</span><button class="ft-set-x" data-delset="' + e.id + '" aria-label="מחק סט">×</button></span>'; }).join('') + '</div>' : '') +
+      (mine.length ? '<div class="ft-sets">' + mine.map(function (e, i) { return '<span class="ft-set"><b>סט ' + (i + 1) + '</b> <bdi>' + fmtSet(e, x.type) + '</bdi><button class="ft-set-x" data-delset="' + e.id + '" aria-label="מחק סט">×</button></span>'; }).join('') + '</div>' : '') +
       '<div class="ft-input">' +
-        (x.type === 'weight' || x.type === 'bodyweight' ? '<label class="wl-lbl">' + (x.type === 'bodyweight' ? 'תוספת ק״ג' : 'ק״ג') + '<div class="wl-step"><button type="button" class="wl-step-btn" data-step2="kg-' + xi + '" data-d="-2.5" aria-label="פחות">−</button><input type="number" inputmode="decimal" id="kg-' + xi + '" step="0.5" min="0" value="' + (preKg === '' ? '' : r1(preKg)) + '"><button type="button" class="wl-step-btn" data-step2="kg-' + xi + '" data-d="2.5" aria-label="יותר">+</button></div></label>' : '<input type="hidden" id="kg-' + xi + '" value="0">') +
-        '<label class="wl-lbl">' + unit + '<div class="wl-step"><button type="button" class="wl-step-btn" data-step2="rp-' + xi + '" data-d="-1" aria-label="פחות">−</button><input type="number" inputmode="numeric" id="rp-' + xi + '" min="0" value="' + preReps + '"><button type="button" class="wl-step-btn" data-step2="rp-' + xi + '" data-d="1" aria-label="יותר">+</button></div></label>' +
-        '<button class="btn ' + (done ? 'btn-ghost' : 'btn-primary') + ' ft-log-btn" data-logset="' + xi + '">' + ic('check') + (done ? 'סט נוסף' : 'סט ' + (mine.length + 1)) + '</button>' +
-      '</div></div>';
+        (x.type === 'weight' ? numField('kg-' + xi, 'משקל', 'ק״ג', preKg === '' ? '' : r1(preKg), 2.5, { placeholder: 'כמה?' }) : '') +
+        (x.type === 'bodyweight' ? numField('kg-' + xi, 'תוספת משקל', 'ק״ג', preKg ? r1(preKg) : '', 2.5, { optional: true, placeholder: '0' }) : '') +
+        numField('rp-' + xi, x.type === 'time' ? 'זמן' : 'חזרות', x.type === 'time' ? 'דק׳' : 'חזרות', preReps, 1) +
+      '</div>' +
+      '<button class="btn ' + (done ? 'btn-ghost' : 'btn-primary') + ' btn-block ft-log-btn" data-logset="' + xi + '" data-type="' + x.type + '">' + ic('check') + '<span class="ft-log-lbl">' + (done ? 'סט נוסף' : 'שמור סט ' + (mine.length + 1)) + '</span></button>' +
+    '</div>';
   }
   function finishWorkout(el, day, sesSets) {
     var f = FS(), a = f.active;
@@ -283,12 +326,12 @@
       '<div class="card fx-card-gap"><div class="fx-row-between"><h3>התקדמות בתרגיל</h3><select id="ft-ex-sel" aria-label="בחר תרגיל">' + names.map(function (n) { return '<option' + (n === ui.exSel ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div>' +
         (h.length > 1 ? '<p class="page-sub">1RM משוער לכל אימון (כמה היית מרים לחזרה אחת). שיא: <b>' + Math.max.apply(null, best) + ' ק״ג</b> · משקל עבודה אחרון: <b>' + topSet[topSet.length - 1] + ' ק״ג</b></p>' + U().barChart(best, h.map(function (s) { return U().fmtDate(s.date); }), { unit: ' ק״ג', showLabels: h.length <= 8, highlight: best.length - 1, aria: 'התקדמות 1RM משוער' }) :
           '<p class="page-sub">צריך לפחות שני אימונים בתרגיל הזה כדי לראות מגמה.</p>') +
-        '<div class="ft-hist">' + historyOf(ui.exSel).slice(0, 6).map(function (s) { return '<div class="fx-day-row"><span class="fx-day-time">' + U().relDate(s.date) + '</span><span dir="ltr" style="text-align:right;">' + s.sets.map(function (e) { return fmtSet(e, 'weight'); }).join(' , ') + '</span></div>'; }).join('') + '</div></div>' +
+        '<div class="ft-hist">' + historyOf(ui.exSel).slice(0, 6).map(function (s) { return '<div class="fx-day-row"><span class="fx-day-time">' + U().relDate(s.date) + '</span><span><bdi>' + s.sets.map(function (e) { return fmtSet(e, 'weight'); }).join(' , ') + '</bdi></span></div>'; }).join('') + '</div></div>' +
       '<div class="grid-2 fx-card-gap"><div class="card"><h3>נפח שבועי</h3>' + U().barChart(weeks, wl, { unit: ' ק״ג', highlight: 7, aria: 'נפח שבועי' }) + '<p class="page-sub" style="margin-bottom:0;">נפח = משקל × חזרות של כל הסטים</p></div>' +
         '<div class="card"><h3>אימונים בשבוע</h3>' + U().barChart(sessW, wl, { highlight: 7, max: Math.max(f.weeklyGoal, 1), unit: ' אימונים', aria: 'אימונים בשבוע' }) + '<p class="page-sub" style="margin-bottom:0;">יעד: ' + f.weeklyGoal + ' בשבוע</p></div></div>' +
       (gKeys.length ? '<div class="card fx-card-gap"><h3>סטים לפי קבוצת שריר · החודש</h3>' + gKeys.map(function (g) { return '<div class="fx-hrow"><span class="fx-hname">' + g + '</span>' + U().progressBar(Math.round(byGroup[g] / gMax * 100)) + '<span class="num fx-hval">' + byGroup[g] + '</span></div>'; }).join('') +
         balanceHint(byGroup) + '</div>' : '') +
-      '<div class="card fx-card-gap"><h3>🏆 שיאים אישיים</h3>' + prs.slice(0, 10).map(function (x, i) { return '<div class="fx-day-row"><span class="ft-rank">' + (i + 1) + '</span><span style="flex:1">' + esc(x.n) + '</span><span class="page-sub num" dir="ltr">' + fmtSet(x.b.e, 'weight') + '</span><span class="num"><b>' + x.b.v + '</b> ק״ג 1RM</span></div>'; }).join('') +
+      '<div class="card fx-card-gap"><h3>🏆 שיאים אישיים</h3>' + prs.slice(0, 10).map(function (x, i) { return '<div class="fx-day-row"><span class="ft-rank">' + (i + 1) + '</span><span style="flex:1">' + esc(x.n) + '</span><span class="page-sub num"><bdi>' + fmtSet(x.b.e, 'weight') + '</bdi></span><span class="num"><b>' + x.b.v + '</b> ק״ג 1RM</span></div>'; }).join('') +
         (recentPRs.length ? '<p class="page-sub" style="margin-top:10px;">שיאים אחרונים: ' + recentPRs.map(function (s) { return U().relDate(s.date) + ' (' + s.prs.map(esc).join(', ') + ')'; }).join(' · ') + '</p>' : '') +
         '<p class="page-sub" style="font-size:11.5px;margin-bottom:0;">1RM משוער לפי נוסחת Epley. זו הערכה, לא מדידה, ולא כדאי לנסות חזרה מקסימלית בלי השגחה.</p></div>' +
       bodyweightQuickHtml();
@@ -315,7 +358,7 @@
           '<div class="fx-btn-row" style="margin:0;"><button class="fx-mini" data-day-edit="' + d.id + '">' + (editing ? ic('check') + 'סיום' : ic('edit') + 'עריכה') + '</button>' + (editing ? '<button class="fx-mini" data-day-del="' + d.id + '" aria-label="מחק יום">' + ic('trash') + '</button>' : '') + '</div></div>' +
           (editing ? '<input type="text" class="ms-input" data-day-focus="' + d.id + '" value="' + esc(d.focus || '') + '" placeholder="מיקוד (למשל: חזה, גב)" style="margin-top:8px;width:100%;">' : '') +
           '<div class="ft-plan-list">' + d.exercises.map(function (x, xi) {
-            return '<div class="ft-plan-ex"><span class="ft-plan-n">' + esc(x.name) + '</span><span class="page-sub">' + '<bdi dir="ltr">' + x.sets + '×' + esc(x.reps) + '</bdi>' + ' · ' + esc(x.group) + (x.type !== 'weight' ? ' · ' + TYPE_LABEL[x.type] : '') + '</span>' +
+            return '<div class="ft-plan-ex"><span class="ft-plan-n">' + esc(x.name) + '</span><span class="page-sub">' + x.sets + ' סטים × <bdi>' + esc(x.reps) + '</bdi>' + ' · ' + esc(x.group) + (x.type !== 'weight' ? ' · ' + TYPE_LABEL[x.type] : '') + '</span>' +
               (editing ? '<span class="ft-plan-act"><button class="fx-mini" data-ex-up="' + d.id + '|' + xi + '"' + (xi === 0 ? ' disabled' : '') + ' aria-label="למעלה">▲</button><button class="fx-mini" data-ex-edit="' + d.id + '|' + x.id + '" aria-label="ערוך">' + ic('edit') + '</button><button class="fx-mini" data-ex-del="' + d.id + '|' + x.id + '" aria-label="מחק">' + ic('x') + '</button></span>' : '') + '</div>';
           }).join('') + '</div>' +
           (editing ? '<button class="btn btn-ghost btn-sm" data-ex-add="' + d.id + '" style="margin-top:8px;">' + ic('plus') + 'תרגיל</button>' : '') +
@@ -356,18 +399,115 @@
   }
 
   /* ---------- LOG ---------- */
+  function recentNames() {
+    var seen = {}, out = [];
+    (S().workoutLog || []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }).forEach(function (e) { var n = (e.machine || '').trim(); if (n && !seen[n]) { seen[n] = 1; out.push(n); } });
+    plan().days.forEach(function (d) { d.exercises.forEach(function (x) { if (x.type !== 'time' && !seen[x.name.trim()]) { seen[x.name.trim()] = 1; out.push(x.name.trim()); } }); });
+    return out;
+  }
+  function guessType(name) {
+    var n = (name || '').trim(), t = null;
+    plan().days.forEach(function (d) { d.exercises.forEach(function (x) { if (x.name.trim() === n) t = x.type; }); });
+    if (t === 'weight' || t === 'bodyweight') return t;
+    var prev = setsOf(n);
+    if (prev.length && prev.every(function (e) { return !(+e.kg); })) return 'bodyweight';
+    return 'weight';
+  }
+  function planRange(name) { var r = null; plan().days.forEach(function (d) { d.exercises.forEach(function (x) { if (x.name.trim() === name.trim()) r = x.reps; }); }); return r || '8-12'; }
   function renderLog(body, el) {
-    var legacy = api().fitnessLegacy();
+    var name = ui.logName, type = ui.logType || (name ? guessType(name) : 'weight');
+    var last = name ? lastSessionSets(name) : null;
+    var sug = last ? C.suggestNext(last.sets, planRange(name), type) : null;
+    var names = recentNames();
+    var lastSet = last ? last.sets[last.sets.length - 1] : null;
+    var preKg = ui.logKg != null ? ui.logKg : (sug ? sug.kg : (lastSet ? lastSet.kg : ''));
+    var preReps = ui.logReps != null ? ui.logReps : (sug ? sug.reps : (lastSet ? lastSet.reps : ''));
     var ses = FS().sessions.slice().sort(function (a, b) { return b.endedAt - a.endedAt; });
-    body.innerHTML = '<div id="ft-legacy-log"></div>' +
-      '<div class="card fx-card-gap"><h3>היסטוריית אימונים</h3>' + (ses.length ? ses.slice(0, 30).map(function (s) {
-        return '<div class="fx-day-row"><span class="fx-day-time">' + U().relDate(s.date) + '</span><span style="flex:1"><b>' + esc(s.dayName || '') + '</b> · ' + s.minutes + ' דק׳ · ' + s.sets + ' סטים · ' + s.volume + ' ק״ג' + (s.prs && s.prs.length ? ' · 🏆 ' + s.prs.length : '') + '</span><button class="fx-mini" data-ses-del="' + s.id + '" aria-label="מחק אימון">' + ic('trash') + '</button></div>';
+    body.innerHTML =
+      '<div class="card ft-quick"><h3>רישום סט</h3><p class="page-sub" style="margin-top:0;">לרישום מהיר בלי להתחיל אימון. לאימון מלא לפי התוכנית: לשונית "אימון היום".</p>' +
+        '<div class="ft-field" data-field="lg-name"><label class="ft-field-l" for="lg-name">1. איזה תרגיל?</label>' +
+          '<input type="text" class="ft-name-in" id="lg-name" maxlength="40" value="' + esc(name) + '" placeholder="הקלד שם או בחר מהרשימה" autocomplete="off" aria-describedby="err-lg-name">' +
+          '<div class="ft-err" id="err-lg-name" role="alert"></div>' +
+          (names.length ? '<div class="ft-chips" role="list">' + names.slice(0, 12).map(function (n) { return '<button type="button" class="ft-chip' + (n === name ? ' on' : '') + '" data-pickname="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>' : '') +
+        '</div>' +
+        (name ? '<div class="ft-ctx">' + (last ? '<div>פעם קודמת (' + U().relDate(last.date) + '): <b><bdi>' + last.sets.map(function (x) { return fmtSet(x, type); }).join(' , ') + '</bdi></b></div>' : '<div>תרגיל חדש. התחל במשקל שאפשר לבצע בו את כל החזרות נקי.</div>') +
+          (sug ? '<div class="ft-sug ft-sug-' + sug.action + '">' + (sug.action === 'up' ? '▲ ' : '→ ') + esc(sug.text) + '</div>' : '') + '</div>' : '') +
+        '<div class="ft-field-l" style="margin-top:14px;">2. סוג</div><div class="seg fx-seg ft-type"><button type="button" data-ltype="weight" class="' + (type === 'weight' ? 'active' : '') + '">עם משקל</button><button type="button" data-ltype="bodyweight" class="' + (type === 'bodyweight' ? 'active' : '') + '">משקל גוף</button></div>' +
+        '<div class="ft-field-l" style="margin-top:14px;">3. כמה?</div>' +
+        '<div class="ft-input">' +
+          numField('lg-kg', type === 'bodyweight' ? 'תוספת משקל' : 'משקל', 'ק״ג', preKg === '' ? '' : r1(preKg), 2.5, { optional: type === 'bodyweight', placeholder: type === 'bodyweight' ? '0' : 'כמה?' }) +
+          numField('lg-reps', 'חזרות', 'חזרות', preReps, 1, { placeholder: 'כמה?' }) +
+        '</div>' +
+        '<details class="ft-more"><summary>תאריך אחר</summary><input type="date" id="lg-date" value="' + (ui.logDate || tk()) + '" max="' + tk() + '"></details>' +
+        '<button class="btn btn-primary btn-block ft-log-btn" id="lg-save">' + ic('check') + '<span class="ft-log-lbl">שמור סט</span></button>' +
+      '</div>' +
+      logListHtml() +
+      '<div class="card fx-card-gap"><h3>היסטוריית אימונים</h3>' + (ses.length ? ses.slice(0, 30).map(function (s2) {
+        return '<div class="fx-day-row"><span class="fx-day-time">' + U().relDate(s2.date) + '</span><span style="flex:1"><b>' + esc(s2.dayName || '') + '</b> · ' + s2.minutes + ' דק׳ · ' + s2.sets + ' סטים · ' + s2.volume + ' ק״ג' + (s2.prs && s2.prs.length ? ' · 🏆 ' + s2.prs.length : '') + '</span><button class="fx-mini" data-ses-del="' + s2.id + '" aria-label="מחק אימון">' + ic('trash') + '</button></div>';
       }).join('') : '<p class="page-sub">אימונים שתסיים בלשונית "אימון היום" יופיעו כאן.</p>') + '</div>';
-    var host = body.querySelector('#ft-legacy-log');
-    host.innerHTML = legacy.logHtml();
-    legacy.wireLog(host);
+
+    var paint = function () {
+      var lbl = setLabel(body.querySelector('#lg-kg').value, body.querySelector('#lg-reps').value, type);
+      var n = body.querySelector('#lg-name').value.trim();
+      body.querySelector('#lg-save .ft-log-lbl').textContent = n && lbl ? 'שמור: ' + n + ' · ' + lbl : 'שמור סט';
+    };
+    wireNum(body, paint); paint();
+    var nameIn = body.querySelector('#lg-name');
+    var choose = function (n) { ui.logName = n; ui.logType = null; ui.logKg = null; ui.logReps = null; render(el); var r = document.querySelector('#lg-reps'); if (r) r.focus(); };
+    U().on(body, '[data-pickname]', 'click', function (b) { choose(b.dataset.pickname); });
+    nameIn.addEventListener('change', function () { var v = nameIn.value.trim(); if (v !== ui.logName) { keepNums(); ui.logName = v; ui.logType = null; render(el); } });
+    nameIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); nameIn.blur(); } });
+    U().on(body, '[data-ltype]', 'click', function (b) { keepNums(); ui.logName = nameIn.value.trim(); ui.logType = b.dataset.ltype; render(el); });
+    function keepNums() { var k = body.querySelector('#lg-kg').value, r = body.querySelector('#lg-reps').value; ui.logKg = k === '' ? null : +k; ui.logReps = r === '' ? null : +r; var d = body.querySelector('#lg-date'); ui.logDate = d ? d.value : null; }
+    body.querySelector('#lg-save').addEventListener('click', function () {
+      var n = nameIn.value.trim(), kg = +body.querySelector('#lg-kg').value || 0, reps = Math.round(+body.querySelector('#lg-reps').value || 0);
+      var date = (body.querySelector('#lg-date') || {}).value || tk();
+      if (!n) { showErr(body, 'lg-name', 'חסר שם תרגיל: הקלד או בחר מהרשימה'); return; }
+      if (type === 'weight' && !(kg > 0)) { showErr(body, 'lg-kg', 'חסר משקל: כמה ק״ג הרמת? (תרגיל בלי משקל? בחר "משקל גוף")'); return; }
+      if (!reps) { showErr(body, 'lg-reps', 'חסר מספר חזרות'); return; }
+      var prevBest = Math.max.apply(null, [0].concat(setsOf(n).map(function (e) { return C.e1rm(e.kg, e.reps); })));
+      S().workoutLog.push({ id: uid(), machine: n, kg: kg, reps: reps, date: date > tk() ? tk() : date, at: date === tk() ? Date.now() : C.parseKey(date).getTime() + 12 * 3600e3 });
+      save();
+      var isPR = type === 'weight' && prevBest > 0 && C.e1rm(kg, reps) > prevBest;
+      api().toast(isPR ? '🏆 שיא חדש ב' + n + '!' : 'נשמר: ' + n + ' · ' + setLabel(kg, reps, type), 'success');
+      ui.logName = n; ui.logType = type; ui.logKg = kg; ui.logReps = reps; ui.logDate = date;
+      render(el);
+      var r = document.querySelector('#lg-reps'); if (r) r.focus();
+    });
+    U().on(body, '[data-set-edit]', 'click', function (b) { openSetEditor(b.dataset.setEdit, el); });
     U().on(body, '[data-ses-del]', 'click', function (b) {
-      api().openConfirmModal('למחוק את רשומת האימון? הסטים עצמם יישארו ביומן למעלה.', function () { FS().sessions = FS().sessions.filter(function (s) { return s.id !== b.dataset.sesDel; }); save(); render(el); });
+      api().openConfirmModal('למחוק את רשומת האימון? הסטים עצמם יישארו ביומן.', function () { FS().sessions = FS().sessions.filter(function (s2) { return s2.id !== b.dataset.sesDel; }); save(); render(el); });
+    });
+  }
+  function logListHtml() {
+    var groups = {}, order = [];
+    (S().workoutLog || []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }).forEach(function (e) { var n = (e.machine || '').trim() || 'ללא שם'; if (!groups[n]) { groups[n] = []; order.push(n); } groups[n].push(e); });
+    if (!order.length) return '<div class="card fx-card-gap">' + U().emptyState('dumbbell', 'היומן ריק', 'הסט הראשון שתרשום יופיע כאן.') + '</div>';
+    return '<div class="card fx-card-gap"><div class="fx-row-between"><h3>היומן שלי</h3><span class="page-sub">לחיצה על סט לעריכה</span></div>' + order.slice(0, 25).map(function (n) {
+      var sets = groups[n], best = sets.reduce(function (m, e) { return C.e1rm(e.kg, e.reps) > C.e1rm(m.kg, m.reps) ? e : m; }, sets[0]);
+      var bw = sets.every(function (e) { return !(+e.kg); });
+      return '<details class="ft-log-group"' + (order.indexOf(n) < 3 ? ' open' : '') + '><summary><span class="ft-log-name">' + esc(n) + '</span><span class="page-sub">' + sets.length + ' סטים · שיא <bdi>' + fmtSet(best, bw ? 'bodyweight' : 'weight') + '</bdi></span></summary>' +
+        sets.slice(0, 10).map(function (e) { return '<button class="ft-log-row" data-set-edit="' + e.id + '"><span class="fx-day-time">' + U().relDate(setDate(e)) + '</span><span class="ft-log-val">' + (+e.kg ? '<b class="num">' + r1(e.kg) + '</b> ק״ג × <b class="num">' + e.reps + '</b> חזרות' : '<b class="num">' + e.reps + '</b> חזרות (משקל גוף)') + '</span>' + ic('edit') + '</button>'; }).join('') + '</details>';
+    }).join('') + '</div>';
+  }
+  function openSetEditor(id, el) {
+    var e = (S().workoutLog || []).filter(function (x) { return x.id === id; })[0];
+    if (!e) return;
+    var m = U().openModal('<h3>עריכת סט</h3>' +
+      '<div class="ft-field" data-field="se-name"><label class="ft-field-l" for="se-name">תרגיל</label><input type="text" class="ft-name-in" id="se-name" maxlength="40" value="' + esc(e.machine) + '"><div class="ft-err" id="err-se-name" role="alert"></div></div>' +
+      '<div class="ft-input">' + numField('se-kg', 'משקל', 'ק״ג', +e.kg ? r1(e.kg) : '', 2.5, { optional: true }) + numField('se-reps', 'חזרות', 'חזרות', e.reps, 1) + '</div>' +
+      '<div class="field" style="margin-top:10px;"><label>תאריך</label><input type="date" id="se-date" value="' + setDate(e) + '" max="' + tk() + '"></div>' +
+      '<div class="modal-actions"><button class="btn btn-primary btn-block" id="se-save">' + ic('check') + 'שמור</button><button class="btn btn-danger" id="se-del" aria-label="מחק סט">' + ic('trash') + '</button><button class="btn btn-ghost" id="se-x" aria-label="סגור">' + ic('x') + '</button></div>', { noFocus: true });
+    wireNum(m);
+    m.querySelector('#se-x').addEventListener('click', api().closeModal);
+    m.querySelector('#se-del').addEventListener('click', function () { S().workoutLog = S().workoutLog.filter(function (x) { return x.id !== id; }); save(); api().closeModal(); api().toast('הסט נמחק'); render(el); });
+    m.querySelector('#se-save').addEventListener('click', function () {
+      var n = m.querySelector('#se-name').value.trim(), reps = Math.round(+m.querySelector('#se-reps').value || 0);
+      if (!n) { showErr(m, 'se-name', 'חסר שם תרגיל'); return; }
+      if (!reps) { showErr(m, 'se-reps', 'חסר מספר חזרות'); return; }
+      e.machine = n; e.kg = +m.querySelector('#se-kg').value || 0; e.reps = reps;
+      var d = m.querySelector('#se-date').value; if (d && d !== setDate(e)) { e.date = d; e.at = C.parseKey(d).getTime() + 12 * 3600e3; }
+      save(); api().closeModal(); api().toast('הסט עודכן', 'success'); render(el);
     });
   }
 
