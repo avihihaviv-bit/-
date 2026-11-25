@@ -49,7 +49,7 @@
   }
   function fmtSet(e, type) { return type === 'time' ? (e.reps + ' דק׳') : (+e.kg ? r1(e.kg) + ' ק״ג × ' + e.reps : e.reps + ' חזרות'); }
 
-  var ui = { tab: 'today', exSel: null, editDay: null, logName: '', logType: null };
+  var ui = { tab: null, exSel: null, editDay: null, logName: '', logType: null, allChips: false };
 
   /* A labelled number field: big value, unit inside the box, − on the left and + on the right
      (number-line order, forced LTR so RTL doesn't flip it), and an error line under it. */
@@ -114,13 +114,15 @@
   /* ---------------- render ---------------- */
   function render(el) {
     var f = FS(); plan();
-    var tabs = [['today', f.active ? 'אימון פעיל •' : 'אימון היום'], ['progress', 'התקדמות'], ['plan', 'תוכנית'], ['log', 'יומן'], ['library', 'ספרייה']];
+    // default: free logging (any exercise), unless a plan workout is running
+    if (!ui.tab) ui.tab = f.active ? 'today' : 'quick';
+    var tabs = [['quick', 'רישום'], ['today', f.active ? 'אימון פעיל •' : 'לפי תוכנית'], ['progress', 'התקדמות'], ['plan', 'תוכנית'], ['log', 'יומן'], ['library', 'ספרייה']];
     el.innerHTML = '<div class="page-head"><div><h2 class="page-title">כושר</h2><p class="page-sub">אימון לפי תוכנית, מעקב משקלים, התקדמות וטיפים</p></div></div>' +
       '<div class="fx-tabs">' + tabs.map(function (t) { return '<button class="fx-tab' + (ui.tab === t[0] ? ' active' : '') + '" data-ft-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
       '<div id="ft-body"></div>';
     var body = el.querySelector('#ft-body');
     try {
-      ({ today: renderToday, progress: renderProgress, plan: renderPlan, log: renderLog, library: renderLibrary })[ui.tab](body, el);
+      ({ quick: function (b, e) { renderLog(b, e, 'quick'); }, today: renderToday, progress: renderProgress, plan: renderPlan, log: function (b, e) { renderLog(b, e, 'log'); }, library: renderLibrary })[ui.tab](body, el);
     } catch (e) { console.error(e); body.innerHTML = '<div class="card">משהו השתבש במסך הזה. הנתונים שלך בטוחים.</div>'; }
     U().on(el, '[data-ft-tab]', 'click', function (b) { ui.tab = b.dataset.ftTab; render(el); });
   }
@@ -162,7 +164,7 @@
       '<div class="ft-tip page-sub">💡 העיקרון החשוב: <b>עומס מתקדם</b>. כשכל הסטים מגיעים לקצה העליון של טווח החזרות, מעלים משקל. האפליקציה מציעה לך את זה אוטומטית.</div>';
     U().on(body, '[data-pick]', 'click', function (b) { ui.pickDay = +b.dataset.pick; render(el); });
     body.querySelector('#ft-start').addEventListener('click', function () {
-      f.active = { id: 'ses_' + uid(), dayId: day.id, startedAt: Date.now(), extra: [] };
+      f.active = { id: 'ses_' + uid(), dayId: day.id, startedAt: Date.now(), extra: [] }; ui.tab = 'today';
       ui.pickDay = null; save(); render(el); window.scrollTo(0, 0);
     });
     U().on(body, '[data-rest]', 'click', function (b) { startRest(+b.dataset.rest); });
@@ -414,23 +416,27 @@
     return 'weight';
   }
   function planRange(name) { var r = null; plan().days.forEach(function (d) { d.exercises.forEach(function (x) { if (x.name.trim() === name.trim()) r = x.reps; }); }); return r || '8-12'; }
-  function renderLog(body, el) {
+  function renderLog(body, el, mode) {
+    if (mode === 'log') return renderJournal(body, el);
     var name = ui.logName, type = ui.logType || (name ? guessType(name) : 'weight');
     var last = name ? lastSessionSets(name) : null;
-    var sug = last ? C.suggestNext(last.sets, planRange(name), type) : null;
+    // continuing today's sets on the same exercise: keep the same weight; suggest progression only vs an earlier day
+    var sameDay = last && last.date === tk();
+    var sug = last && !sameDay ? C.suggestNext(last.sets, planRange(name), type) : null;
     var names = recentNames();
     var lastSet = last ? last.sets[last.sets.length - 1] : null;
     var preKg = ui.logKg != null ? ui.logKg : (sug ? sug.kg : (lastSet ? lastSet.kg : ''));
     var preReps = ui.logReps != null ? ui.logReps : (sug ? sug.reps : (lastSet ? lastSet.reps : ''));
     var ses = FS().sessions.slice().sort(function (a, b) { return b.endedAt - a.endedAt; });
     body.innerHTML =
-      '<div class="card ft-quick"><h3>רישום סט</h3><p class="page-sub" style="margin-top:0;">לרישום מהיר בלי להתחיל אימון. לאימון מלא לפי התוכנית: לשונית "אימון היום".</p>' +
+      '<div class="card ft-quick"><h3>רישום תרגיל</h3><p class="page-sub" style="margin-top:0;">כל תרגיל שתרצה: שם, משקל וחזרות. נשמר ביומן, והשם נשמר לפעם הבאה.</p>' +
         '<div class="ft-field" data-field="lg-name"><label class="ft-field-l" for="lg-name">1. איזה תרגיל?</label>' +
-          '<input type="text" class="ft-name-in" id="lg-name" maxlength="40" value="' + esc(name) + '" placeholder="הקלד שם או בחר מהרשימה" autocomplete="off" aria-describedby="err-lg-name">' +
+          '<input type="text" class="ft-name-in" id="lg-name" maxlength="40" value="' + esc(name) + '" placeholder="הקלד שם תרגיל (כל שם) או בחר למטה" autocomplete="off" list="lg-names" aria-describedby="err-lg-name">' +
           '<div class="ft-err" id="err-lg-name" role="alert"></div>' +
-          (names.length ? '<div class="ft-chips" role="list">' + names.slice(0, 12).map(function (n) { return '<button type="button" class="ft-chip' + (n === name ? ' on' : '') + '" data-pickname="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>' : '') +
+          '<datalist id="lg-names">' + names.map(function (n) { return '<option value="' + esc(n) + '">'; }).join('') + '</datalist>' +
+          (names.length ? '<div class="ft-chips-l page-sub">התרגילים שלך:</div><div class="ft-chips ft-chips-wrap" role="list">' + (ui.allChips ? names : names.slice(0, 10)).map(function (n) { return '<button type="button" class="ft-chip' + (n === name ? ' on' : '') + '" data-pickname="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + (names.length > 10 ? '<button type="button" class="ft-chip ft-chip-more" id="lg-more">' + (ui.allChips ? 'פחות' : 'עוד ' + (names.length - 10)) + '</button>' : '') + '</div>' : '') +
         '</div>' +
-        (name ? '<div class="ft-ctx">' + (last ? '<div>פעם קודמת (' + U().relDate(last.date) + '): <b><bdi>' + last.sets.map(function (x) { return fmtSet(x, type); }).join(' , ') + '</bdi></b></div>' : '<div>תרגיל חדש. התחל במשקל שאפשר לבצע בו את כל החזרות נקי.</div>') +
+        (name ? '<div class="ft-ctx">' + (last ? '<div>' + (sameDay ? 'היום עד עכשיו' : 'פעם קודמת') + ' (' + U().relDate(last.date) + '): <b><bdi>' + last.sets.map(function (x) { return fmtSet(x, type); }).join(' , ') + '</bdi></b></div>' : '<div>תרגיל חדש. התחל במשקל שאפשר לבצע בו את כל החזרות נקי.</div>') +
           (sug ? '<div class="ft-sug ft-sug-' + sug.action + '">' + (sug.action === 'up' ? '▲ ' : '→ ') + esc(sug.text) + '</div>' : '') + '</div>' : '') +
         '<div class="ft-field-l" style="margin-top:14px;">2. סוג</div><div class="seg fx-seg ft-type"><button type="button" data-ltype="weight" class="' + (type === 'weight' ? 'active' : '') + '">עם משקל</button><button type="button" data-ltype="bodyweight" class="' + (type === 'bodyweight' ? 'active' : '') + '">משקל גוף</button></div>' +
         '<div class="ft-field-l" style="margin-top:14px;">3. כמה?</div>' +
@@ -441,10 +447,7 @@
         '<details class="ft-more"><summary>תאריך אחר</summary><input type="date" id="lg-date" value="' + (ui.logDate || tk()) + '" max="' + tk() + '"></details>' +
         '<button class="btn btn-primary btn-block ft-log-btn" id="lg-save">' + ic('check') + '<span class="ft-log-lbl">שמור סט</span></button>' +
       '</div>' +
-      logListHtml() +
-      '<div class="card fx-card-gap"><h3>היסטוריית אימונים</h3>' + (ses.length ? ses.slice(0, 30).map(function (s2) {
-        return '<div class="fx-day-row"><span class="fx-day-time">' + U().relDate(s2.date) + '</span><span style="flex:1"><b>' + esc(s2.dayName || '') + '</b> · ' + s2.minutes + ' דק׳ · ' + s2.sets + ' סטים · ' + s2.volume + ' ק״ג' + (s2.prs && s2.prs.length ? ' · 🏆 ' + s2.prs.length : '') + '</span><button class="fx-mini" data-ses-del="' + s2.id + '" aria-label="מחק אימון">' + ic('trash') + '</button></div>';
-      }).join('') : '<p class="page-sub">אימונים שתסיים בלשונית "אימון היום" יופיעו כאן.</p>') + '</div>';
+      todayListHtml();
 
     var paint = function () {
       var lbl = setLabel(body.querySelector('#lg-kg').value, body.querySelector('#lg-reps').value, type);
@@ -455,6 +458,7 @@
     var nameIn = body.querySelector('#lg-name');
     var choose = function (n) { ui.logName = n; ui.logType = null; ui.logKg = null; ui.logReps = null; render(el); var r = document.querySelector('#lg-reps'); if (r) r.focus(); };
     U().on(body, '[data-pickname]', 'click', function (b) { choose(b.dataset.pickname); });
+    var more = body.querySelector('#lg-more'); if (more) more.addEventListener('click', function () { ui.allChips = !ui.allChips; keepNums(); ui.logName = nameIn.value.trim(); render(el); });
     nameIn.addEventListener('change', function () { var v = nameIn.value.trim(); if (v !== ui.logName) { keepNums(); ui.logName = v; ui.logType = null; render(el); } });
     nameIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); nameIn.blur(); } });
     U().on(body, '[data-ltype]', 'click', function (b) { keepNums(); ui.logName = nameIn.value.trim(); ui.logType = b.dataset.ltype; render(el); });
@@ -474,6 +478,28 @@
       render(el);
       var r = document.querySelector('#lg-reps'); if (r) r.focus();
     });
+    U().on(body, '[data-set-edit]', 'click', function (b) { openSetEditor(b.dataset.setEdit, el); });
+    U().on(body, '[data-ses-del]', 'click', function (b) {
+      api().openConfirmModal('למחוק את רשומת האימון? הסטים עצמם יישארו ביומן.', function () { FS().sessions = FS().sessions.filter(function (s2) { return s2.id !== b.dataset.sesDel; }); save(); render(el); });
+    });
+  }
+  function todayListHtml() {
+    var today = (S().workoutLog || []).filter(function (e) { return setDate(e) === tk(); }).sort(function (a, b) { return (a.at || 0) - (b.at || 0); });
+    if (!today.length) return '<div class="card fx-card-gap"><h3>היום</h3><p class="page-sub" style="margin:0;">עוד לא רשמת סטים היום. כל סט שתשמור יופיע כאן.</p></div>';
+    var by = {}, order = [];
+    today.forEach(function (e) { var n = (e.machine || '').trim(); if (!by[n]) { by[n] = []; order.push(n); } by[n].push(e); });
+    var vol = today.reduce(function (a, e) { return a + (+e.kg || 0) * (+e.reps || 0); }, 0);
+    return '<div class="card fx-card-gap"><div class="fx-row-between"><h3>רשמת היום</h3><span class="page-sub">' + today.length + ' סטים · ' + order.length + ' תרגילים' + (vol ? ' · ' + Math.round(vol) + ' ק״ג נפח' : '') + '</span></div>' +
+      order.map(function (n) {
+        return '<div class="ft-today-ex"><div class="ft-log-name">' + esc(n) + '</div>' + by[n].map(function (e, i) { return '<button class="ft-log-row" data-set-edit="' + e.id + '"><span class="fx-day-time">סט ' + (i + 1) + '</span><span class="ft-log-val">' + (+e.kg ? '<b class="num">' + r1(e.kg) + '</b> ק״ג × <b class="num">' + e.reps + '</b> חזרות' : '<b class="num">' + e.reps + '</b> חזרות (משקל גוף)') + '</span>' + ic('edit') + '</button>'; }).join('') + '</div>';
+      }).join('') + '<p class="page-sub" style="margin:8px 0 0;font-size:12px;">לחיצה על סט לעריכה או מחיקה. כל ההיסטוריה בלשונית "יומן".</p></div>';
+  }
+  function renderJournal(body, el) {
+    var ses = FS().sessions.slice().sort(function (a, b) { return b.endedAt - a.endedAt; });
+    body.innerHTML = logListHtml() +
+      '<div class="card fx-card-gap"><h3>אימונים לפי תוכנית</h3>' + (ses.length ? ses.slice(0, 30).map(function (s2) {
+        return '<div class="fx-day-row"><span class="fx-day-time">' + U().relDate(s2.date) + '</span><span style="flex:1"><b>' + esc(s2.dayName || '') + '</b> · ' + s2.minutes + ' דק׳ · ' + s2.sets + ' סטים · ' + s2.volume + ' ק״ג' + (s2.prs && s2.prs.length ? ' · 🏆 ' + s2.prs.length : '') + '</span><button class="fx-mini" data-ses-del="' + s2.id + '" aria-label="מחק אימון">' + ic('trash') + '</button></div>';
+      }).join('') : '<p class="page-sub">אימונים שתסיים בלשונית "לפי תוכנית" יופיעו כאן.</p>') + '</div>';
     U().on(body, '[data-set-edit]', 'click', function (b) { openSetEditor(b.dataset.setEdit, el); });
     U().on(body, '[data-ses-del]', 'click', function (b) {
       api().openConfirmModal('למחוק את רשומת האימון? הסטים עצמם יישארו ביומן.', function () { FS().sessions = FS().sessions.filter(function (s2) { return s2.id !== b.dataset.sesDel; }); save(); render(el); });

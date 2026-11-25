@@ -445,3 +445,10 @@ textarea.fx-note-body[data-rv], textarea.fx-note-body[data-rvw] { min-height: 90
 .ft-log-row:hover, .ft-log-row:active { background: var(--surface-2); }
 .ft-log-row svg { width: 15px; height: 15px; color: var(--text-faint); }
 .ft-log-val { flex: 1; font-size: 14.5px; }
+.ft-chips-wrap { flex-wrap: wrap; overflow: visible; }
+.ft-chips-l { margin-top: 10px; font-size: 12px; }
+.ft-chip-more { background: none; border-style: dashed; color: var(--text-soft); }
+.ft-today-ex + .ft-today-ex { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
+.ft-today-ex .ft-log-name { padding: 6px 2px 2px; }
+/* the fitness screen has its own entry flow; keep the floating + from covering its steppers */
+body:has(#panel-fitness:not([hidden])) .fx-fab { display: none; }
