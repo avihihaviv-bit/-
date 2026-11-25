@@ -32,3 +32,10 @@ test('rejects other methods and empty chat questions', async () => {
   res = mockRes(); await handler({ method: 'POST', body: { mode: 'chat', question: '  ' } }, res); assert.strictEqual(res.code, 400);
   delete process.env.ANTHROPIC_API_KEY;
 });
+
+test('history is accepted and sanitised (no crash, still needs a key)', async () => {
+  delete process.env.ANTHROPIC_API_KEY;
+  const res = mockRes();
+  await handler({ method: 'POST', body: { mode: 'workout', history: [{ role: 'assistant', content: 'x' }, { role: 'system', content: 'evil' }, { role: 'user', content: 'hi' }], context: {} } }, res);
+  assert.strictEqual(res.code, 503);
+});

@@ -974,60 +974,113 @@
     var st = S(), tk = todayKey();
     var t = tasks().filter(function (x) { return !x.archived; });
     var hs = api.habits().map(function (h) { var d = api.habitDef(h); var s = C.habitStats(d, st.habitLog, st.habitValues, tk, 14); return { name: d.name, rate14: s.rate, streak: s.streak }; });
+    var ws = C.addDays(tk, -6), log = st.workoutLog || [];
+    var weekSets = log.filter(function (e) { return (e.date || '') >= ws; });
+    var exWeek = {}; weekSets.forEach(function (e) { var n = (e.machine || '').trim(); exWeek[n] = exWeek[n] || { sets: 0, best: '' }; exWeek[n].sets++; exWeek[n].best = (+e.kg ? e.kg + 'kg×' : '') + e.reps; });
+    var bw = ((st.fitness && st.fitness.bodyweight) || []).slice(-6).map(function (x) { return { date: x.date, kg: x.kg }; });
+    var nut = window.MaslulFeatures.nutrition, nutDays = [];
+    if (nut) for (var i = 0; i < 7; i++) { var k = C.addDays(tk, -i), tt = nut.dayTotals(k); if (tt.mealsDone || tt.water) nutDays.push({ date: k, meals: tt.mealsDone + '/' + tt.meals, proteinEst: tt.protein, water: tt.water }); }
+    var speechMin = 0; for (var j = 0; j < 7; j++) speechMin += ((st.speech && st.speech.log[C.addDays(tk, -j)]) || {}).minutes || 0;
     return {
       today: tk, weekday: HE_DAYS[new Date().getDay()], now: pad(new Date().getHours()) + ':' + pad(new Date().getMinutes()),
       routineToday: (st.tasksByDate[tk] || []).map(function (r) { return { time: r.time, title: r.title, done: !!r.done, optional: !!r.optional }; }),
-      openTasks: C.sortTasks(t.filter(function (x) { return x.status !== 'done'; }), 'priority').slice(0, 40).map(function (x) { return { title: x.title, due: x.due, time: x.time, priority: x.priority, estimateMin: x.estimate, status: x.status, category: x.category }; }),
+      openTasks: C.sortTasks(t.filter(function (x) { return x.status !== 'done'; }), 'priority').slice(0, 30).map(function (x) { return { title: x.title, due: x.due, time: x.time, priority: x.priority, estimateMin: x.estimate, status: x.status }; }),
       doneLast7: t.filter(function (x) { return x.doneAt && x.doneAt > Date.now() - 7 * 864e5; }).length,
       habits14d: hs,
       goals: (st.goals || []).map(function (g) { return { title: g.title, progress: api.goalProgress(g), targetDate: g.targetDate }; }),
       completionRate: { today: C.dayCompletion(st, tk).rate, week: C.rangeRate(st, tk, 7), prevWeek: C.rangeRate(st, C.addDays(tk, -7), 7) },
-      focusMinutesWeek: [0, 1, 2, 3, 4, 5, 6].reduce(function (a, i) { return a + C.focusMinutes(st, C.addDays(tk, -i)); }, 0),
+      focusMinutesWeek: [0, 1, 2, 3, 4, 5, 6].reduce(function (a, i2) { return a + C.focusMinutes(st, C.addDays(tk, -i2)); }, 0),
+      fitness: {
+        weeklyGoal: st.fitness && st.fitness.weeklyGoal,
+        trainingDaysLast7: Object.keys(weekSets.reduce(function (a, e) { a[e.date] = 1; return a; }, {})).length,
+        exercisesLast7: exWeek,
+        recentSessions: ((st.fitness && st.fitness.sessions) || []).slice(-5).map(function (s) { return { date: s.date, day: s.dayName, minutes: s.minutes, sets: s.sets, volumeKg: s.volume, prs: s.prs }; }),
+        bodyweight: bw
+      },
+      nutritionLast7: nutDays,
+      nutritionTargets: nut ? nut.targets() : null,
+      speechPracticeMinutesWeek: speechMin,
       streakDays: st.gam.streak.current, level: api.level()
     };
   }
   function mdLite(text) {
-    return esc(text).split('\n').map(function (line) {
+    var out = [], inList = false;
+    esc(text).split('\n').forEach(function (line) {
       var l = line.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-      if (/^#{1,3}\s/.test(line)) return '<h4>' + l.replace(/^#{1,3}\s/, '') + '</h4>';
-      if (/^\s*[-•*]\s/.test(line)) return '<li>' + l.replace(/^\s*[-•*]\s/, '') + '</li>';
-      if (/^\s*\d+\.\s/.test(line)) return '<li>' + l + '</li>';
-      return l ? '<p>' + l + '</p>' : '';
-    }).join('');
+      var isLi = /^\s*([-•*]|\d+[.)])\s/.test(line);
+      if (isLi && !inList) { out.push('<ul>'); inList = true; }
+      if (!isLi && inList) { out.push('</ul>'); inList = false; }
+      if (/^#{1,4}\s/.test(line)) out.push('<h4>' + l.replace(/^#{1,4}\s/, '') + '</h4>');
+      else if (isLi) out.push('<li>' + l.replace(/^\s*([-•*]|\d+[.)])\s/, '') + '</li>');
+      else if (l.trim()) out.push('<p>' + l + '</p>');
+    });
+    if (inList) out.push('</ul>');
+    return out.join('');
+  }
+  function actionLines(text) {
+    return String(text || '').split('\n').map(function (l) { return l.replace(/\*\*/g, '').trim(); })
+      .filter(function (l) { return /^([-•*]|\d+[.)])\s+/.test(l); })
+      .map(function (l) { return l.replace(/^([-•*]|\d+[.)])\s+/, '').replace(/[:：]\s*$/, '').slice(0, 120); })
+      .filter(function (l) { return l.length > 3; }).slice(0, 12);
   }
   function checkCoach(cb) {
     if (location.protocol === 'file:') { coachState.status = 'offline'; cb(); return; }
+    coachState.status = 'unknown';
     fetch('api/coach', { method: 'GET', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : { configured: false, missing: r.status === 404 }; })
       .then(function (j) { coachState.status = j.configured ? 'ready' : (j.missing ? 'nobackend' : 'nokey'); cb(); })
       .catch(function () { coachState.status = navigator.onLine === false ? 'offline' : 'nobackend'; cb(); });
   }
+  var COACH_ACTIONS = [
+    ['analyze', 'נתח את ההתקדמות שלי', 'chart'], ['plan_day', 'תכנן לי את היום', 'calendar'], ['plan_week', 'תוכנית שבועית', 'grid'],
+    ['workout', 'ניתוח האימונים שלי', 'dumbbell'], ['nutrition', 'מה לשפר בתזונה', 'bowl'], ['summary', 'סכם את השבוע', 'trophy']
+  ];
+  var COACH_PROMPTS = ['יש לי שעה פנויה, מה הכי כדאי לעשות?', 'אני עייף היום, איך להוריד הילוך בלי להפסיד את היום?', 'איך לעלות במשקל בלחיצת חזה?', 'מה לאכול אחרי אימון?', 'איך להתמיד בהרגל שאני לא מצליח בו?'];
   function renderCoach(el) {
-    var st = S(), tk = todayKey();
+    var st = S(), tk = todayKey(), ready = coachState.status === 'ready';
     var statusHtml = {
-      unknown: '<span class="fx-status">' + skeleton(1) + '</span>',
-      ready: '<span class="fx-status ok">● מחובר למודל AI</span>',
-      nokey: '<span class="fx-status warn">● לא מחובר: חסר מפתח API בשרת</span>',
-      nobackend: '<span class="fx-status warn">● לא מחובר: השרת לא זמין</span>',
+      unknown: '<span class="fx-status">בודק חיבור…</span>',
+      ready: '<span class="fx-status ok">● מחובר</span>',
+      nokey: '<span class="fx-status warn">● לא מחובר: חסר מפתח</span>',
+      nobackend: '<span class="fx-status warn">● לא מחובר: אין שרת</span>',
       offline: '<span class="fx-status warn">● לא מחובר (אופליין / קובץ מקומי)</span>'
     }[coachState.status];
-    var insights = C.coachInsights(st, tk, api.habits().map(api.habitDef));
+    var insights = C.coachInsights(st, tk, api.habits().map(api.habitDef)).concat(extraInsights());
     var plan = C.weeklyPlan(st, tk, 180);
-    el.innerHTML = '<div class="page-head"><div><h2 class="page-title">מאמן אישי</h2><p class="page-sub">ניתוח, תכנון יום ושבוע וסדרי עדיפויות לפי הנתונים האמיתיים שלך</p></div>' + statusHtml + '</div>' +
-      (coachState.status === 'ready' ? '' : '<div class="card fx-card-gap fx-note-warn"><b>המאמן החכם (AI) עדיין לא מחובר.</b><p class="page-sub" style="margin:6px 0 0;">כדי להפעיל אותו צריך להוסיף ב-Vercel משתנה סביבה <code dir="ltr">ANTHROPIC_API_KEY</code> (Settings → Environment Variables) ולעשות Redeploy. המפתח נשמר רק בשרת ולא נחשף בדפדפן. בינתיים, למטה יש תובנות שמחושבות מקומית לפי כללים קבועים. זה לא AI.</p></div>') +
-      '<div class="fx-coach-actions">' + [['analyze', 'נתח את ההתקדמות שלי', 'chart'], ['plan_day', 'עזור לי לתכנן את היום', 'calendar'], ['plan_week', 'צור תוכנית שבועית', 'grid'], ['summary', 'סכם את הביצועים שלי', 'trophy']].map(function (a) {
-        return '<button class="fx-coach-btn" data-coach="' + a[0] + '"' + (coachState.status !== 'ready' ? ' disabled title="דורש חיבור AI"' : '') + '>' + ic(a[2]) + '<span>' + a[1] + '</span></button>';
+    var thread = st.coach.thread || [];
+    el.innerHTML = '<div class="page-head"><div><h2 class="page-title">מאמן AI</h2><p class="page-sub">שיחה עם מאמן שרואה את המשימות, ההרגלים, האימונים והתזונה שלך</p></div>' + statusHtml + '</div>' +
+      (ready ? '' : setupCardHtml()) +
+      '<div class="fx-coach-actions">' + COACH_ACTIONS.map(function (a) {
+        return '<button class="fx-coach-btn" data-coach="' + a[0] + '"' + (!ready ? ' disabled title="דורש חיבור AI"' : '') + '>' + ic(a[2]) + '<span>' + a[1] + '</span></button>';
       }).join('') + '</div>' +
-      '<form class="advisor-form" id="coach-form"><textarea id="coach-q" placeholder="' + (coachState.status === 'ready' ? 'שאל את המאמן כל דבר על היום, השבוע או ההרגלים שלך' : 'השאלות החופשיות יעבדו אחרי חיבור AI') + '"' + (coachState.status !== 'ready' ? ' disabled' : '') + '></textarea><button type="submit" class="btn btn-primary" aria-label="שלח"' + (coachState.status !== 'ready' ? ' disabled' : '') + '>' + ic('send') + '</button></form>' +
-      '<div id="coach-out"></div>' +
-      (st.coach.log.length ? '<div class="card fx-card-gap"><h3>תשובות קודמות</h3>' + st.coach.log.slice(0, 5).map(function (e) { return '<details class="fx-coach-old"><summary>' + esc(e.label) + ' · ' + new Date(e.at).toLocaleString('he-IL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</summary><div class="fx-md">' + mdLite(e.text) + '</div></details>'; }).join('') + '</div>' : '') +
-      '<div class="card fx-card-gap"><h3>תובנות מקומיות <span class="fx-chip">חישוב לפי כללים · לא AI</span></h3>' +
-        (insights.length ? insights.map(function (x) { return '<div class="fx-insight fx-insight-' + x.kind + '"><b>' + esc(x.title) + '</b><div class="page-sub">' + esc(x.text) + '</div></div>'; }).join('') : '<p class="page-sub">צריך עוד קצת נתונים: משימות, הרגלים או שגרה מסומנת.</p>') + '</div>' +
+      '<div class="card fx-card-gap co-chat"><div class="fx-row-between"><h3>שיחה</h3>' + (thread.length ? '<button class="btn btn-ghost btn-sm" id="co-new">' + ic('plus') + 'שיחה חדשה</button>' : '') + '</div>' +
+        '<div class="co-thread" id="co-thread">' + (thread.length ? thread.map(bubbleHtml).join('') : '<div class="co-empty page-sub">' + (ready ? 'שאל כל דבר, או לחץ על אחד הכפתורים למעלה. המאמן זוכר את השיחה עד שתתחיל חדשה.' : 'השיחה תיפתח אחרי חיבור ה-AI.') + '</div>') + '</div>' +
+        (ready ? '<div class="co-prompts">' + COACH_PROMPTS.map(function (q) { return '<button class="ft-chip" data-cprompt="' + esc(q) + '">' + esc(q) + '</button>'; }).join('') + '</div>' : '') +
+        '<form class="co-form" id="coach-form"><textarea id="coach-q" rows="1" maxlength="1500" placeholder="' + (ready ? 'כתוב הודעה למאמן…' : 'זמין אחרי חיבור AI') + '"' + (!ready ? ' disabled' : '') + '></textarea><button type="submit" class="btn btn-primary" aria-label="שלח"' + (!ready ? ' disabled' : '') + '>' + ic('send') + '</button></form>' +
+      '</div>' +
+      '<div class="card fx-card-gap"><h3>תובנות מהירות <span class="fx-chip">חישוב לפי כללים · לא AI</span></h3>' +
+        (insights.length ? (function () {
+          var row = function (x) { return '<div class="fx-insight fx-insight-' + x.kind + '"><b>' + esc(x.title) + '</b><div class="page-sub">' + esc(x.text) + '</div></div>'; };
+          var order = { warn: 0, focus: 1, habit: 2, time: 3, summary: 4 };
+          var sorted = insights.slice().sort(function (a, b) { return (order[a.kind] || 5) - (order[b.kind] || 5); });
+          return sorted.slice(0, 4).map(row).join('') + (sorted.length > 4 ? '<details class="ft-more"><summary>עוד ' + (sorted.length - 4) + ' תובנות</summary>' + sorted.slice(4).map(row).join('') + '</details>' : '');
+        })() : '<p class="page-sub">צריך עוד קצת נתונים: משימות, הרגלים, אימונים או ארוחות.</p>') + '</div>' +
       '<div class="card fx-card-gap"><div class="fx-row-between"><h3>הצעה לחלוקת משימות לשבוע</h3>' + (plan.some(function (d) { return d.tasks.length; }) ? '<button class="btn btn-ghost btn-sm" id="coach-apply-plan">' + ic('check') + 'החל תאריכים</button>' : '') + '</div>' +
         '<p class="page-sub">עד 3 שעות משימות ביום, לפי חשיבות ותאריכי יעד.</p>' +
         (plan.some(function (d) { return d.tasks.length; }) ? '<div class="fx-plan">' + plan.map(function (d) { return '<div class="fx-plan-day"><div class="fx-plan-h">' + HE_DAYS[C.parseKey(d.k).getDay()] + ' · ' + fmtDate(d.k) + '<span class="page-sub"> ' + minsLabel(d.mins) + '</span></div>' + (d.tasks.length ? d.tasks.map(function (t) { return '<div class="fx-plan-t" style="border-inline-start-color:' + PRI[t.priority].color + '">' + esc(t.title) + '</div>'; }).join('') : '<div class="page-sub">יום פנוי</div>') + '</div>'; }).join('') + '</div>' : emptyState('grid', 'אין משימות פתוחות לחלק', 'הוסף משימות במסך המשימות.')) + '</div>';
     if (coachState.status === 'unknown') checkCoach(function () { if (api.activePanel() === 'coach') renderCoach(el); });
-    on(el, '[data-coach]', 'click', function (b) { askCoach(b.dataset.coach, '', b.textContent.trim()); });
-    $('#coach-form', el).addEventListener('submit', function (e) { e.preventDefault(); var q = $('#coach-q', el).value.trim(); if (q) askCoach('chat', q, q.slice(0, 50)); });
+    var th = $('#co-thread', el); if (th) th.scrollTop = th.scrollHeight;
+    on(el, '[data-coach]', 'click', function (b) { sendCoach(b.dataset.coach, '', b.textContent.trim(), el); });
+    on(el, '[data-cprompt]', 'click', function (b) { sendCoach('chat', b.dataset.cprompt, b.dataset.cprompt, el); });
+    var ta = $('#coach-q', el);
+    if (ta) {
+      ta.addEventListener('input', function () { ta.style.height = 'auto'; ta.style.height = Math.min(160, ta.scrollHeight) + 'px'; });
+      ta.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#coach-form', el).requestSubmit ? $('#coach-form', el).requestSubmit() : $('#coach-form', el).dispatchEvent(new Event('submit')); } });
+    }
+    $('#coach-form', el).addEventListener('submit', function (e) { e.preventDefault(); var q = $('#coach-q', el).value.trim(); if (q) sendCoach('chat', q, q, el); });
+    var nw = $('#co-new', el); if (nw) nw.addEventListener('click', function () { st.coach.thread = []; save(); renderCoach(el); });
+    on(el, '[data-co-copy]', 'click', function (b) { var m = thread[+b.dataset.coCopy]; copyText(m.text); api.toast('הועתק', 'success'); });
+    on(el, '[data-co-tasks]', 'click', function (b) { openActionsToTasks(thread[+b.dataset.coTasks].text); });
+    on(el, '[data-co-retry]', 'click', function () { checkCoach(function () { renderCoach(el); }); });
     var ap = $('#coach-apply-plan', el);
     if (ap) ap.addEventListener('click', function () {
       api.openConfirmModal('לקבוע לכל משימה פתוחה תאריך לפי ההצעה? משימות עם תאריך יעד מוקדם יותר לא יידחו.', function () {
@@ -1036,33 +1089,72 @@
       }, { danger: false, confirmLabel: 'החל', title: 'החלת תוכנית שבועית' });
     });
   }
-  function askCoach(mode, question, label) {
+  function setupCardHtml() {
+    var why = { nokey: 'השרת קיים אבל חסר בו מפתח API.', nobackend: 'לא נמצא שרת המאמן (זה קורה כשפותחים את האפליקציה לא מהאתר ב-Vercel).', offline: 'אין חיבור לאינטרנט, או שהאפליקציה פתוחה כקובץ מקומי.', unknown: '' }[coachState.status] || '';
+    return '<div class="card fx-card-gap fx-note-warn co-setup"><div class="fx-row-between"><b>איך מחברים את המאמן החכם</b><button class="btn btn-ghost btn-sm" data-co-retry>' + ic('reset') + 'בדוק שוב</button></div>' +
+      (why ? '<p class="page-sub" style="margin:4px 0 8px;">' + why + '</p>' : '') +
+      '<ol class="fx-steps"><li>נכנסים ל-<b dir="ltr">console.anthropic.com</b>, נרשמים ומוסיפים אמצעי תשלום (Billing).</li><li>ב-API Keys לוחצים Create Key ומעתיקים את המפתח.</li><li>ב-Vercel: הפרויקט ← Settings ← Environment Variables. שם: <code dir="ltr">ANTHROPIC_API_KEY</code>, ערך: המפתח. מסמנים Production ושומרים.</li><li>Deployments ← שלוש נקודות ← <b>Redeploy</b>.</li><li>חוזרים לכאן ולוחצים "בדוק שוב".</li></ol>' +
+      '<p class="page-sub" style="margin:6px 0 0;">המפתח נשמר רק בשרת ולא מגיע לדפדפן. בינתיים יש למטה תובנות שמחושבות לפי כללים (לא AI).</p></div>';
+  }
+  function bubbleHtml(m, i) {
+    if (m.role === 'user') return '<div class="co-msg co-user"><div class="co-bubble">' + esc(m.label || m.text) + '</div></div>';
+    if (m.error) return '<div class="co-msg co-ai"><div class="co-bubble co-err">' + esc(m.text) + '</div></div>';
+    var acts = actionLines(m.text);
+    return '<div class="co-msg co-ai"><div class="co-avatar">' + ic('spark') + '</div><div class="co-bubble fx-md">' + mdLite(m.text) +
+      '<div class="co-tools"><button class="fx-mini" data-co-copy="' + i + '">' + ic('copy') + 'העתק</button>' + (acts.length ? '<button class="fx-mini" data-co-tasks="' + i + '">' + ic('check') + 'הפוך ל-' + acts.length + ' משימות</button>' : '') + '<span class="page-sub">' + new Date(m.at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + '</span></div></div></div>';
+  }
+  function copyText(t) { try { navigator.clipboard.writeText(t); } catch (e) { var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e2) {} ta.remove(); } }
+  function openActionsToTasks(text) {
+    var acts = actionLines(text);
+    var m = openModal('<h3>הוספה כמשימות</h3><p class="page-sub">בחר מה להוסיף. המשימות ייווצרו להיום.</p>' +
+      acts.map(function (a, i) { return '<label class="fx-pick"><input type="checkbox" data-act="' + i + '" checked><span>' + esc(a) + '</span></label>'; }).join('') +
+      '<div class="modal-actions"><button class="btn btn-primary btn-block" id="act-go">' + ic('plus') + 'הוסף משימות</button><button class="btn btn-ghost" id="act-x" aria-label="סגור">' + ic('x') + '</button></div>', { noFocus: true });
+    $('#act-x', m).addEventListener('click', api.closeModal);
+    $('#act-go', m).addEventListener('click', function () {
+      var n = 0; $$('[data-act]:checked', m).forEach(function (c) { addTask({ title: acts[+c.dataset.act], due: todayKey(), tags: ['מאמן'] }); n++; });
+      api.closeModal(); api.toast(n ? n + ' משימות נוספו להיום' : 'לא נבחרו משימות', n ? 'success' : 'error');
+    });
+  }
+  function extraInsights() {
+    var st = S(), tk = todayKey(), out = [];
+    var ws = C.addDays(tk, -6), days = {};
+    (st.workoutLog || []).forEach(function (e) { if ((e.date || '') >= ws) days[e.date] = 1; });
+    var n = Object.keys(days).length, goal = (st.fitness && st.fitness.weeklyGoal) || 4;
+    if ((st.workoutLog || []).length) out.push({ kind: n >= goal ? 'summary' : 'habit', title: 'אימונים ב-7 הימים האחרונים: ' + n + '/' + goal, text: n >= goal ? 'עמדת ביעד האימונים. אל תשכח מנוחה ושינה.' : 'עוד ' + (goal - n) + ' אימונים כדי לעמוד ביעד. גם אימון קצר של 30 דקות נחשב.' });
+    var nut = window.MaslulFeatures.nutrition;
+    if (nut) {
+      var tt = nut.dayTotals(tk), tg = nut.targets();
+      if (tt.water < tg.water && new Date().getHours() >= 14) out.push({ kind: 'warn', title: 'מים היום: ' + tt.water + '/' + tg.water + ' כוסות', text: 'שתה עכשיו כוס, ועוד אחת עם כל ארוחה.' });
+      if (tt.mealsDone && tt.protein < tg.protein * 0.5 && new Date().getHours() >= 16) out.push({ kind: 'habit', title: 'חלבון נמוך היום (~' + tt.protein + ' ג׳)', text: 'מעדן חלבון, יוגורט או טונה בערב יסגרו את הפער.' });
+    }
+    return out;
+  }
+  function sendCoach(mode, question, label, el) {
     if (coachState.busy) return;
-    var out = document.getElementById('coach-out');
-    coachState.busy = true;
-    if (out) out.innerHTML = '<div class="card fx-card-gap"><div class="advisor-thinking">' + ic('spark') + '<span>המאמן חושב</span><span class="advisor-dots"><span></span><span></span><span></span></span></div>' + skeleton(4) + '</div>';
-    fetch('api/coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: mode, question: question, context: coachContext() }) })
-      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, j: j }; }); })
+    var st = S(), thread = st.coach.thread = st.coach.thread || [];
+    var history = thread.filter(function (m) { return !m.error; }).slice(-10).map(function (m) { return { role: m.role, content: m.role === 'user' ? (m.text || m.label) : m.text }; });
+    thread.push({ role: 'user', text: question || label, label: label, mode: mode, at: Date.now() });
+    save(); coachState.busy = true; renderCoach(el);
+    var th = $('#co-thread', el);
+    if (th) { th.insertAdjacentHTML('beforeend', '<div class="co-msg co-ai" id="co-typing"><div class="co-avatar">' + ic('spark') + '</div><div class="co-bubble"><span class="advisor-dots"><span></span><span></span><span></span></span>' + skeleton(2) + '</div></div>'); th.scrollTop = th.scrollHeight; }
+    fetch('api/coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: mode, question: question, history: history, context: coachContext() }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }, function () { return { ok: false, j: { error: 'bad_response' } }; }); })
       .then(function (res) {
         coachState.busy = false;
-        var o = document.getElementById('coach-out');
         if (!res.ok || res.j.error) {
           var msg = { not_configured: 'המפתח לא מוגדר בשרת.', bad_key: 'מפתח ה-API בשרת לא תקין.', rate_limited: 'יותר מדי בקשות, נסה שוב בעוד דקה.', refused: 'המודל לא ענה על הבקשה הזו. נסה לנסח אחרת.', upstream: 'שירות ה-AI לא זמין כרגע.' }[res.j.error] || 'שגיאה בחיבור למאמן.';
-          if (o) o.innerHTML = '<div class="card fx-card-gap fx-note-error">' + msg + '</div>';
-          api.toast(msg, 'error');
-          return;
+          thread.push({ role: 'assistant', text: msg, error: true, at: Date.now() }); api.toast(msg, 'error');
+        } else {
+          thread.push({ role: 'assistant', text: res.j.text + (res.j.truncated ? '\n\n(התשובה נחתכה)' : ''), at: Date.now() });
+          st.coach.log.unshift({ at: Date.now(), mode: mode, label: label, text: res.j.text }); st.coach.log = st.coach.log.slice(0, 20);
         }
-        var st = S();
-        st.coach.log.unshift({ at: Date.now(), mode: mode, label: label, text: res.j.text });
-        st.coach.log = st.coach.log.slice(0, 20);
-        save();
-        if (o) o.innerHTML = '<div class="card fx-card-gap fx-md">' + mdLite(res.j.text) + (res.j.truncated ? '<p class="page-sub">(התשובה נחתכה)</p>' : '') + '</div>';
+        st.coach.thread = thread.slice(-30); save();
+        if (api.activePanel() === 'coach') renderCoach(el);
       })
       .catch(function () {
         coachState.busy = false;
-        var o = document.getElementById('coach-out');
-        if (o) o.innerHTML = '<div class="card fx-card-gap fx-note-error">אין חיבור לשרת. בדוק את האינטרנט ונסה שוב.</div>';
-        api.toast('אין חיבור לשרת', 'error');
+        thread.push({ role: 'assistant', text: 'אין חיבור לשרת. בדוק את האינטרנט ונסה שוב.', error: true, at: Date.now() });
+        save(); api.toast('אין חיבור לשרת', 'error'); if (api.activePanel() === 'coach') renderCoach(el);
       });
   }
 

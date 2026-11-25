@@ -1097,6 +1097,7 @@
 <script src="features.js"></script>
 <script src="extras.js"></script>
 <script src="fitness.js"></script>
+<script src="nutrition.js"></script>
 <script>
 (function () {
   'use strict';
@@ -6342,6 +6343,8 @@
   var NUTRITION_QUANTITY_RULE = ['🍚 אורז: 2 כוסות אחרי בישול', '🍗 עוף: חתיכה בערך בגודל כף היד שלך ובעובי סביר', '🥔 תפוחי אדמה: 3 בינוניים', '🍌 פרי: בדרך כלל 1 יחידה', '🥛 חלב: כוס = כ-250 מ"ל', '🥚 ביצים: 2 בכל פעם', '🥗 ירקות: אפשר להוסיף יותר לפי רעב'];
   var nutritionTab = 0;
   function renderNutrition() {
+    // nutrition.js owns this screen; the plan data above remains its default
+    if (FX_MODULES.nutrition) { renderPanelContent('nutrition'); return; }
     var el = document.getElementById('panel-nutrition');
     var day = NUTRITION_PLAN[nutritionTab];
     el.innerHTML =
@@ -7069,6 +7072,7 @@
     setRoutineDone: function (id, val) { setTaskDone(id, val); },
     applyPrefs: applyPrefs,
     migratedFrom: function () { return loadInfo.migratedFrom; },
+    nutritionLegacy: function () { return { PLAN: NUTRITION_PLAN, RULES: NUTRITION_QUANTITY_RULE }; },
     fitnessLegacy: function () { return { logHtml: workoutLogCardHtml, wireLog: wireWorkoutLogSection, EX_LIBRARY: EX_LIBRARY, SCIENCE_LINKS: SCIENCE_LINKS, TIP_LINKS: TIP_LINKS, EXTERNAL_FITNESS_APP: EXTERNAL_FITNESS_APP }; }
   };
 

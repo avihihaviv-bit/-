@@ -109,7 +109,7 @@ test('version.json matches the version baked into extras.js (update checker reli
   const src = fs.readFileSync(path.join(__dirname, '..', 'extras.js'), 'utf8');
   assert.ok(src.includes("var APP_VERSION = '" + v + "'"), 'bump APP_VERSION in extras.js together with version.json');
   const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
-  ['core.js', 'features.js', 'extras.js', 'fitness.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
+  ['core.js', 'features.js', 'extras.js', 'fitness.js', 'nutrition.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
 });
 
 test('fitness: e1rm, rep range parsing, progressive overload suggestion', () => {
@@ -137,4 +137,21 @@ test('migrate adds fitness structures and keeps workout log', () => {
   const s = C.migrate({ workoutLog: [{ id: 'w', kg: 50 }] });
   assert.strictEqual(s.workoutLog.length, 1);
   assert.ok(Array.isArray(s.fitness.sessions) && Array.isArray(s.fitness.bodyweight) && s.fitness.weeklyGoal === 4);
+});
+
+test('nutrition estimates parse quantities and pick the first of "X או Y"', () => {
+  assert.strictEqual(C.estimateFood('2 ביצים').protein, 12);
+  assert.strictEqual(C.estimateFood('3 פרוסות לחם חלבון').key, 'pbread');
+  assert.strictEqual(C.estimateFood('2 כוסות אורז מבושל').kcal, 400);
+  assert.strictEqual(C.estimateFood('3 תפוחי אדמה בינוניים').key, 'potato');
+  assert.strictEqual(C.estimateFood('תפוח').key, 'apple');
+  assert.strictEqual(C.estimateFood('½ כוס תירס').qty, 0.5);
+  assert.strictEqual(C.estimateFood('חביתה מ-2 ביצים').qty, 2);
+  assert.strictEqual(C.estimateFood('קופסת טונה או 2 ביצים').key, 'tuna');
+  assert.strictEqual(C.estimateFood('משקה/מעדן חלבון אחד, בערך 20–25 גרם חלבון').key, 'shake');
+  assert.strictEqual(C.estimateFood('קינמון'), null);
+  const day = C.estimateMeals([{ items: ['2 ביצים', 'חזה עוף בגודל כף יד גדולה'] }]);
+  assert.strictEqual(day.protein, 47);
+  const list = C.shoppingList([{ meals: [{ items: ['2 ביצים', 'בננה'] }] }, { meals: [{ items: ['2 ביצים'] }] }]);
+  assert.strictEqual(list.find(x => x.key === 'egg').qty, 4);
 });

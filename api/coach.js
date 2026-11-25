@@ -11,6 +11,8 @@ const MODES = {
   plan_day: 'עזור לי לתכנן את היום: סדר עדיפויות, חלוקת זמן ריאלית בין המשימות והשגרה, וזיהוי עומס יתר.',
   plan_week: 'צור לי תוכנית שבועית מאוזנת לפי המשימות, המטרות וההרגלים שלי.',
   summary: 'סכם את הביצועים שלי בשבוע האחרון בקצרה: מה הלך טוב, מה פחות, ומה הצעד הבא.',
+  workout: 'נתח את האימונים שלי (תדירות, נפח, התקדמות בתרגילים, איזון בין קבוצות שריר) ותן 3 המלצות קונקרטיות לשבוע הבא.',
+  nutrition: 'נתח את התזונה והשתייה שלי בימים האחרונים מול היעדים, ותן 3 שיפורים פשוטים ומעשיים. בלי דיאטות ובלי ספירת קלוריות.',
   chat: ''
 };
 
@@ -20,7 +22,10 @@ const SYSTEM = [
   'התבסס רק על הנתונים שקיבלת בהודעה. אם חסר מידע - אמור זאת במפורש ואל תמציא מספרים.',
   'תן המלצות קונקרטיות עם שעות ומשימות אמיתיות מהנתונים. העדף מעט צעדים ברורים על פני רשימות ארוכות.',
   'מבנה: כותרות קצרות ותבליטים. עד כ-250 מילים, אלא אם התבקשה תוכנית שבועית.',
-  'אתה לא איש מקצוע רפואי; בנושאי בריאות, שינה או דיבור המלץ לפנות לאיש מקצוע כשמתאים.'
+  'כשאתה נותן צעדים לביצוע, כתוב אותם כרשימת תבליטים קצרה (שורה שמתחילה ב-"- "), כדי שהמשתמש יוכל להפוך אותם למשימות.',
+  'ייתכן שהמשתמש צעיר (נער). אל תמליץ על דיאטות קיצוניות, צום, ספירת קלוריות אגרסיבית, תוספי תזונה או חומרים. העדף אוכל רגיל, שינה ועקביות.',
+  'אתה לא איש מקצוע רפואי; בנושאי בריאות, פציעות, שינה או דיבור המלץ לפנות לאיש מקצוע כשמתאים.',
+  'זו שיחה מתמשכת: התייחס להודעות הקודמות בשיחה, ואל תחזור על מה שכבר אמרת.'
 ].join('\n');
 
 function readBody(req) {
@@ -46,6 +51,12 @@ async function handler(req, res) {
   const mode = MODES.hasOwnProperty(body.mode) ? body.mode : 'chat';
   const question = String(body.question || '').slice(0, 2000);
   const context = JSON.stringify(body.context || {}).slice(0, MAX_BODY_CHARS);
+  // previous turns of this conversation (validated, capped); the app's data is attached only to the newest message
+  const history = (Array.isArray(body.history) ? body.history : [])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
+    .slice(-12)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, 3000) }));
+  while (history.length && history[0].role !== 'user') history.shift();
   if (mode === 'chat' && !question.trim()) return res.status(400).json({ error: 'empty_question' });
 
   const userText = (MODES[mode] ? MODES[mode] + '\n\n' : '') + (question ? 'השאלה שלי: ' + question + '\n\n' : '') +
@@ -60,7 +71,7 @@ async function handler(req, res) {
       fallbacks: 'default',
       output_config: { effort: 'low' },
       system: SYSTEM,
-      messages: [{ role: 'user', content: userText }]
+      messages: history.concat([{ role: 'user', content: userText }])
     });
     if (response.stop_reason === 'refusal') return res.status(200).json({ error: 'refused' });
     const text = response.content.filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();

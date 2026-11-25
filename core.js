@@ -57,6 +57,12 @@
       s.fitness.sessions = arr(s.fitness.sessions);
       s.fitness.bodyweight = arr(s.fitness.bodyweight);
       s.fitness.weeklyGoal = s.fitness.weeklyGoal || 4;
+      s.nutrition = obj(s.nutrition);
+      s.nutrition.log = obj(s.nutrition.log);
+      s.nutrition.water = obj(s.nutrition.water);
+      s.nutrition.shopping = obj(s.nutrition.shopping);
+      if (s.nutrition.plan !== null && s.nutrition.plan !== undefined && !Array.isArray(s.nutrition.plan)) s.nutrition.plan = null;
+      s.coach.thread = arr(s.coach.thread);
       if (s.fitness.plan !== null && !isObj(s.fitness.plan)) s.fitness.plan = null;
       if (s.fitness.active && !isObj(s.fitness.active)) s.fitness.active = null;
       arr(s.goals).forEach(function (g) {
@@ -371,9 +377,63 @@
     var i = days.map(function (d) { return d.id; }).indexOf(done[0].dayId);
     return i < 0 ? 0 : (i + 1) % days.length;
   }
+  /* ---------- nutrition: rough per-item estimate (protein g, kcal) ----------
+     Matching is by keyword; the leading number (2, ½, ¼) multiplies. "X או Y" uses X.
+     These are rough averages for the plan's foods, shown in the app as an estimate. */
+  var FOODS = [
+    { k: 'shake', re: /משקה חלבון|מעדן חלבון|משקה\/מעדן חלבון/, p: 22, kcal: 150, label: 'משקה/מעדן חלבון', unit: 'יח׳' },
+    { k: 'pbread', re: /לחם חלבון/, p: 5, kcal: 70, label: 'לחם חלבון', unit: 'פרוסות' },
+    { k: 'egg', re: /ביצ/, p: 6, kcal: 75, label: 'ביצים', unit: 'יח׳' },
+    { k: 'chicken', re: /עוף|הודו/, p: 35, kcal: 170, label: 'חזה עוף', unit: 'מנות (כף יד)' },
+    { k: 'tuna', re: /טונה/, p: 26, kcal: 120, label: 'טונה', unit: 'קופסאות' },
+    { k: 'milk', re: /חלב(?! חלבון)/, p: 8, kcal: 120, label: 'חלב', unit: 'כוסות' },
+    { k: 'yogurt', re: /יוגורט/, p: 6, kcal: 120, label: 'יוגורט', unit: 'גביעים' },
+    { k: 'cheese', re: /גבינה/, p: 6, kcal: 80, label: 'גבינה צהובה', unit: 'פרוסות' },
+    { k: 'rice', re: /אורז/, p: 4, kcal: 200, label: 'אורז', unit: 'כוסות מבושל' },
+    { k: 'potato', re: /תפוחי אדמה|תפוח אדמה/, p: 4, kcal: 160, label: 'תפוחי אדמה', unit: 'יח׳' },
+    { k: 'bread', re: /לחם|פרוס/, p: 3, kcal: 80, label: 'לחם', unit: 'פרוסות' },
+    { k: 'cereal', re: /קורנפלקס/, p: 2, kcal: 100, label: 'קורנפלקס', unit: 'כוסות' },
+    { k: 'corn', re: /תירס/, p: 5, kcal: 140, label: 'תירס', unit: 'כוסות' },
+    { k: 'banana', re: /בננה/, p: 1, kcal: 105, label: 'בננות', unit: 'יח׳' },
+    { k: 'apple', re: /תפוח(?! אדמה)(?!י אדמה)/, p: 0.5, kcal: 95, label: 'תפוחים', unit: 'יח׳' },
+    { k: 'fruit', re: /פרי/, p: 1, kcal: 80, label: 'פירות', unit: 'יח׳' },
+    { k: 'oil', re: /שמן/, p: 0, kcal: 40, label: 'שמן זית', unit: 'כפיות' },
+    { k: 'veg', re: /ירקות|סלט|עגבני|מלפפון|בצל|פלפל/, p: 1, kcal: 25, label: 'ירקות', unit: 'מנות' }
+  ];
+  function leadingQty(t) {
+    var m = String(t).trim().match(/^(\d+(?:\.\d+)?|½|¼|¾)/);
+    if (!m) { var m2 = String(t).match(/מ-?(\d+)\s*ביצ/); return m2 ? +m2[1] : 1; }
+    return { '½': 0.5, '¼': 0.25, '¾': 0.75 }[m[1]] || +m[1];
+  }
+  function estimateFood(text) {
+    var t = String(text || '').split(/\sאו\s/)[0];
+    for (var i = 0; i < FOODS.length; i++) {
+      if (FOODS[i].re.test(t)) {
+        var q = leadingQty(t);
+        if (FOODS[i].k === 'corn' && !/^\s*[\d½¼¾]/.test(t)) q = 0.5;
+        return { key: FOODS[i].k, label: FOODS[i].label, unit: FOODS[i].unit, qty: q, protein: Math.round(FOODS[i].p * q * 10) / 10, kcal: Math.round(FOODS[i].kcal * q) };
+      }
+    }
+    return null;
+  }
+  function estimateMeals(meals) {
+    var p = 0, k = 0;
+    arr(meals).forEach(function (m) { arr(m.items).forEach(function (it) { var e = estimateFood(it); if (e) { p += e.protein; k += e.kcal; } }); });
+    return { protein: Math.round(p), kcal: Math.round(k / 10) * 10 };
+  }
+  function shoppingList(days) {
+    var agg = {};
+    arr(days).forEach(function (d) { arr(d.meals).forEach(function (m) { arr(m.items).forEach(function (it) {
+      var e = estimateFood(it); if (!e || e.key === 'oil') return;
+      if (!agg[e.key]) agg[e.key] = { key: e.key, label: e.label, unit: e.unit, qty: 0 };
+      agg[e.key].qty += e.qty;
+    }); }); });
+    return Object.keys(agg).map(function (k) { var a = agg[k]; a.qty = Math.round(a.qty * 2) / 2; return a; }).sort(function (a, b) { return b.qty - a.qty; });
+  }
   function weekStartKey(k) { return addDays(k, -parseKey(k).getDay()); }
 
   return {
+    estimateFood: estimateFood, estimateMeals: estimateMeals, shoppingList: shoppingList,
     e1rm: e1rm, parseRepRange: parseRepRange, suggestNext: suggestNext, nextSplitIndex: nextSplitIndex, weekStartKey: weekStartKey,
     SCHEMA_VERSION: SCHEMA_VERSION, DEFAULT_WIDGETS: DEFAULT_WIDGETS, PRIORITY_RANK: PRIORITY_RANK, STATUSES: STATUSES,
     dkey: dkey, parseKey: parseKey, addDays: addDays,
