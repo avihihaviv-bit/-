@@ -514,3 +514,5 @@ body:has(#panel-fitness:not([hidden])) .fx-fab { display: none; }
 .sb-music.on { filter: none; background: color-mix(in srgb, var(--accent) 18%, transparent); }
 .more-music.on { border-color: var(--accent); color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .mu-eq i { animation: none; height: 10px; } }
+.fx-status.free { color: var(--accent); }
+.co-local { font-size: 11.5px; color: var(--text-faint); margin-bottom: 4px; }

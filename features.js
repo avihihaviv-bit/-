@@ -1024,7 +1024,7 @@
       .filter(function (l) { return l.length > 3; }).slice(0, 12);
   }
   function checkCoach(cb) {
-    if (location.protocol === 'file:') { coachState.status = 'offline'; cb(); return; }
+    if (location.protocol === 'file:') { coachState.status = 'offline'; setTimeout(cb, 0); return; }
     coachState.status = 'unknown';
     fetch('api/coach', { method: 'GET', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : { configured: false, missing: r.status === 404 }; })
       .then(function (j) { coachState.status = j.configured ? 'ready' : (j.missing ? 'nobackend' : 'nokey'); cb(); })
@@ -1040,9 +1040,9 @@
     var statusHtml = {
       unknown: '<span class="fx-status">בודק חיבור…</span>',
       ready: '<span class="fx-status ok">● מחובר</span>',
-      nokey: '<span class="fx-status warn">● לא מחובר: חסר מפתח</span>',
-      nobackend: '<span class="fx-status warn">● לא מחובר: אין שרת</span>',
-      offline: '<span class="fx-status warn">● לא מחובר (אופליין / קובץ מקומי)</span>'
+      nokey: '<span class="fx-status free">● מאמן חינמי (לא AI)</span>',
+      nobackend: '<span class="fx-status free">● מאמן חינמי (לא AI)</span>',
+      offline: '<span class="fx-status free">● מאמן חינמי (לא AI)</span>'
     }[coachState.status];
     var insights = C.coachInsights(st, tk, api.habits().map(api.habitDef)).concat(extraInsights());
     var plan = C.weeklyPlan(st, tk, 180);
@@ -1050,12 +1050,12 @@
     el.innerHTML = '<div class="page-head"><div><h2 class="page-title">מאמן AI</h2><p class="page-sub">שיחה עם מאמן שרואה את המשימות, ההרגלים, האימונים והתזונה שלך</p></div>' + statusHtml + '</div>' +
       (ready ? '' : setupCardHtml()) +
       '<div class="fx-coach-actions">' + COACH_ACTIONS.map(function (a) {
-        return '<button class="fx-coach-btn" data-coach="' + a[0] + '"' + (!ready ? ' disabled title="דורש חיבור AI"' : '') + '>' + ic(a[2]) + '<span>' + a[1] + '</span></button>';
+        return '<button class="fx-coach-btn" data-coach="' + a[0] + '"' + '' + '>' + ic(a[2]) + '<span>' + a[1] + '</span></button>';
       }).join('') + '</div>' +
       '<div class="card fx-card-gap co-chat"><div class="fx-row-between"><h3>שיחה</h3>' + (thread.length ? '<button class="btn btn-ghost btn-sm" id="co-new">' + ic('plus') + 'שיחה חדשה</button>' : '') + '</div>' +
-        '<div class="co-thread" id="co-thread">' + (thread.length ? thread.map(bubbleHtml).join('') : '<div class="co-empty page-sub">' + (ready ? 'שאל כל דבר, או לחץ על אחד הכפתורים למעלה. המאמן זוכר את השיחה עד שתתחיל חדשה.' : 'השיחה תיפתח אחרי חיבור ה-AI.') + '</div>') + '</div>' +
-        (ready ? '<div class="co-prompts">' + COACH_PROMPTS.map(function (q) { return '<button class="ft-chip" data-cprompt="' + esc(q) + '">' + esc(q) + '</button>'; }).join('') + '</div>' : '') +
-        '<form class="co-form" id="coach-form"><textarea id="coach-q" rows="1" maxlength="1500" placeholder="' + (ready ? 'כתוב הודעה למאמן…' : 'זמין אחרי חיבור AI') + '"' + (!ready ? ' disabled' : '') + '></textarea><button type="submit" class="btn btn-primary" aria-label="שלח"' + (!ready ? ' disabled' : '') + '>' + ic('send') + '</button></form>' +
+        '<div class="co-thread" id="co-thread">' + (thread.length ? thread.map(bubbleHtml).join('') : '<div class="co-empty page-sub">' + (ready ? 'שאל כל דבר, או לחץ על אחד הכפתורים למעלה. המאמן זוכר את השיחה עד שתתחיל חדשה.' : 'המאמן החינמי עונה לפי הנתונים שלך: משימות, הרגלים, אימונים ותזונה. לחץ על כפתור או שאל שאלה, למשל "תכנן לי את היום".') + '</div>') + '</div>' +
+        '<div class="co-prompts">' + COACH_PROMPTS.map(function (q) { return '<button class="ft-chip" data-cprompt="' + esc(q) + '">' + esc(q) + '</button>'; }).join('') + '</div>' +
+        '<form class="co-form" id="coach-form"><textarea id="coach-q" rows="1" maxlength="1500" placeholder="כתוב הודעה למאמן…"></textarea><button type="submit" class="btn btn-primary" aria-label="שלח">' + ic('send') + '</button></form>' +
       '</div>' +
       '<div class="card fx-card-gap"><h3>תובנות מהירות <span class="fx-chip">חישוב לפי כללים · לא AI</span></h3>' +
         (insights.length ? (function () {
@@ -1090,17 +1090,15 @@
     });
   }
   function setupCardHtml() {
-    var why = { nokey: 'השרת קיים אבל חסר בו מפתח API.', nobackend: 'לא נמצא שרת המאמן (זה קורה כשפותחים את האפליקציה לא מהאתר ב-Vercel).', offline: 'אין חיבור לאינטרנט, או שהאפליקציה פתוחה כקובץ מקומי.', unknown: '' }[coachState.status] || '';
-    return '<div class="card fx-card-gap fx-note-warn co-setup"><div class="fx-row-between"><b>איך מחברים את המאמן החכם</b><button class="btn btn-ghost btn-sm" data-co-retry>' + ic('reset') + 'בדוק שוב</button></div>' +
-      (why ? '<p class="page-sub" style="margin:4px 0 8px;">' + why + '</p>' : '') +
-      '<ol class="fx-steps"><li>נכנסים ל-<b dir="ltr">console.anthropic.com</b>, נרשמים ומוסיפים אמצעי תשלום (Billing).</li><li>ב-API Keys לוחצים Create Key ומעתיקים את המפתח.</li><li>ב-Vercel: הפרויקט ← Settings ← Environment Variables. שם: <code dir="ltr">ANTHROPIC_API_KEY</code>, ערך: המפתח. מסמנים Production ושומרים.</li><li>Deployments ← שלוש נקודות ← <b>Redeploy</b>.</li><li>חוזרים לכאן ולוחצים "בדוק שוב".</li></ol>' +
-      '<p class="page-sub" style="margin:6px 0 0;">המפתח נשמר רק בשרת ולא מגיע לדפדפן. בינתיים יש למטה תובנות שמחושבות לפי כללים (לא AI).</p></div>';
+    return '<div class="card fx-card-gap co-setup"><div class="fx-row-between"><b>🆓 המאמן החינמי פעיל</b></div>' +
+      '<p class="page-sub" style="margin:4px 0 0;">עונה על שאלות לפי הנתונים האמיתיים שלך (משימות, הרגלים, אימונים, תזונה), בלי אינטרנט ובלי תשלום. הוא עובד לפי כללים ולא מודל AI, אז הוא מכסה שאלות נפוצות ולא כל נושא.</p>' +
+      '<details class="ft-more"><summary>רוצה AI אמיתי? (עולה כסף, לא חובה)</summary><p class="page-sub" style="margin:6px 0;">צריך מפתח API בתשלום לפי שימוש (בערך 2-15 דולר בחודש, תלוי בשימוש) והוספה ב-Vercel כמשתנה <code dir="ltr">ANTHROPIC_API_KEY</code> ואז Redeploy. אחרי זה המאמן עובר לאוטומטי ל-AI, והחינמי נשאר כגיבוי.</p><button class="btn btn-ghost btn-sm" data-co-retry>' + ic('reset') + 'בדוק חיבור</button></details></div>';
   }
   function bubbleHtml(m, i) {
     if (m.role === 'user') return '<div class="co-msg co-user"><div class="co-bubble">' + esc(m.label || m.text) + '</div></div>';
     if (m.error) return '<div class="co-msg co-ai"><div class="co-bubble co-err">' + esc(m.text) + '</div></div>';
     var acts = actionLines(m.text);
-    return '<div class="co-msg co-ai"><div class="co-avatar">' + ic('spark') + '</div><div class="co-bubble fx-md">' + mdLite(m.text) +
+    return '<div class="co-msg co-ai"><div class="co-avatar">' + ic('spark') + '</div><div class="co-bubble fx-md">' + (m.local ? '<div class="co-local">🆓 מאמן חינמי · לפי הנתונים שלך</div>' : '') + mdLite(m.text) +
       '<div class="co-tools"><button class="fx-mini" data-co-copy="' + i + '">' + ic('copy') + 'העתק</button>' + (acts.length ? '<button class="fx-mini" data-co-tasks="' + i + '">' + ic('check') + 'הפוך ל-' + acts.length + ' משימות</button>' : '') + '<span class="page-sub">' + new Date(m.at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + '</span></div></div></div>';
   }
   function copyText(t) { try { navigator.clipboard.writeText(t); } catch (e) { var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e2) {} ta.remove(); } }
@@ -1132,6 +1130,15 @@
   function sendCoach(mode, question, label, el) {
     if (coachState.busy) return;
     var st = S(), thread = st.coach.thread = st.coach.thread || [];
+    if (coachState.status !== 'ready') {
+      // free mode: answered on the device from the user's own data (rules, not an AI model)
+      thread.push({ role: 'user', text: question || label, label: label, mode: mode, at: Date.now() });
+      var reply = C.localCoachReply(question || label, coachContext());
+      thread.push({ role: 'assistant', text: reply, local: true, at: Date.now() });
+      st.coach.thread = thread.slice(-30); save();
+      renderCoach(el);
+      return;
+    }
     var history = thread.filter(function (m) { return !m.error; }).slice(-10).map(function (m) { return { role: m.role, content: m.role === 'user' ? (m.text || m.label) : m.text }; });
     thread.push({ role: 'user', text: question || label, label: label, mode: mode, at: Date.now() });
     save(); coachState.busy = true; renderCoach(el);

@@ -155,3 +155,21 @@ test('nutrition estimates parse quantities and pick the first of "X או Y"', ()
   const list = C.shoppingList([{ meals: [{ items: ['2 ביצים', 'בננה'] }] }, { meals: [{ items: ['2 ביצים'] }] }]);
   assert.strictEqual(list.find(x => x.key === 'egg').qty, 4);
 });
+
+test('free local coach answers common questions from the data (no network)', () => {
+  const ctx = { today: '2026-11-26', now: '10:00', openTasks: [{ title: 'דוח', due: '2026-11-25', priority: 'high', estimateMin: 45 }, { title: 'לקנות חלב', due: '2026-11-26', priority: 'low' }], habits14d: [{ name: 'קריאה', rate14: 20, streak: 0 }, { name: 'מים', rate14: 90, streak: 5 }], completionRate: { today: 50, week: 70, prevWeek: 60 }, fitness: { weeklyGoal: 4, trainingDaysLast7: 2, exercisesLast7: { 'לחיצת חזה': { sets: 3 } }, recentSessions: [] }, nutritionLast7: [{ date: '2026-11-26', proteinEst: 60, water: 3 }], nutritionTargets: { protein: 112, water: 10 }, routineToday: [], focusMinutesWeek: 50, doneLast7: 8, streakDays: 3 };
+  const a = q => C.localCoachReply(q, ctx);
+  assert.match(a('תכנן לי את היום'), /באיחור[^\n]*דוח/);
+  assert.match(a('אני עייף היום'), /3 דברים/);
+  assert.match(a('איך לעלות במשקל בלחיצת חזה?'), /2\.5/);
+  assert.match(a('מה לאכול אחרי אימון?'), /חלבון/);
+  assert.match(a('מה לשפר בתזונה'), /60/);
+  assert.match(a('ניתוח האימונים שלי'), /2\/4/);
+  assert.match(a('איך להתמיד בהרגל שאני לא מצליח בו?'), /קריאה/);
+  assert.match(a('סכם את השבוע'), /70%/);
+  assert.match(a('תוכנית שבועית'), /תוכנית לשבוע/);
+  assert.match(a('יש לי שעה פנויה, מה הכי כדאי לעשות?'), /דוח/);
+  assert.match(a('בלה בלה בלה'), /מאמן החינמי/);
+  assert.ok(a('תכנן לי את היום').split('\n').some(l => l.startsWith('- ')), 'bullet lines so they can become tasks');
+  assert.ok(C.localCoachReply('היי', {}).length > 20, 'works with empty data');
+});

@@ -432,7 +432,113 @@
   }
   function weekStartKey(k) { return addDays(k, -parseKey(k).getDay()); }
 
+
+  /* ---------- free local coach: intent rules over the user's real data (NOT an AI model) ---------- */
+  function localCoachReply(question, c) {
+    var q = String(question || '').trim(); c = c || {};
+    var has = function (re) { return re.test(q); };
+    var li = function (a) { return a.map(function (x) { return '- ' + x; }).join('\n'); };
+    var open = arr(c.openTasks), today = c.today || '';
+    var PR = { urgent: 0, high: 1, medium: 2, low: 3 };
+    var byDue = open.slice().sort(function (a, b) { return ((a.due || '9999') > (b.due || '9999') ? 1 : (a.due || '9999') < (b.due || '9999') ? -1 : 0) || (PR[a.priority] - PR[b.priority]); });
+    var overdue = open.filter(function (t) { return t.due && t.due < today; });
+    var dueToday = open.filter(function (t) { return t.due === today; });
+    var habits = arr(c.habits14d).slice().sort(function (a, b) { return a.rate14 - b.rate14; });
+    var cr = c.completionRate || {}, fit = c.fitness || {}, tg = c.nutritionTargets || {};
+    var nutDays = arr(c.nutritionLast7), tn = nutDays[0] && nutDays[0].date === today ? nutDays[0] : null;
+    var h = parseInt(String(c.now || '12:00').split(':')[0], 10);
+    var t0 = function (t) { return t.title + (t.estimateMin ? ' (' + t.estimateMin + ' דק׳)' : ''); };
+    var top3 = byDue.slice().sort(function (a, b) { return (PR[a.priority] - PR[b.priority]) || ((a.due || '9999') > (b.due || '9999') ? 1 : -1); }).slice(0, 3);
+
+    if (has(/עייף|מותש|אין כוח|שחוק|עצוב|לחוץ|מוצף/)) {
+      return '## יום עם פחות אנרגיה\nזה בסדר, וגם יום כזה אפשר לנצל בחכמות.\n' + li(['תבחר **רק 3 דברים** חשובים להיום' + (top3.length ? ': ' + top3.map(function (t) { return t.title; }).join(', ') : ''), 'כל השאר עובר למחר, בלי אשמה', 'עשה כל דבר 10 דקות ואז תחליט אם להמשיך', 'כוס מים, משהו לאכול, ו-5 דקות באוויר צח', 'ללכת לישון מוקדם יותר היום']) + (overdue.length ? '\n\nיש ' + overdue.length + ' משימות באיחור: לא לנסות לסגור הכל היום, רק אחת.' : '');
+    }
+    if (has(/לעלות.{0,12}משקל|להעלות|עומס מתקדם|תקוע|לא מתקדם/)) {
+      return '## איך עולים במשקל בצורה בטוחה\n' + li(['בוחרים טווח חזרות (למשל 8-12) ועובדים עם משקל שמאפשר את כל החזרות בטכניקה טובה', 'כשכל הסטים מגיעים לקצה העליון של הטווח, **מעלים 2.5 ק״ג** (או את המדרגה הקטנה במכונה)', 'אחרי העלאה חוזרים לתחתית הטווח, ושוב מטפסים', 'אם תקוע שבועיים: לבדוק שינה, חלבון ומנוחה בין הסטים (2-3 דקות) לפני שמוסיפים משקל', 'טכניקה לפני משקל: אם היא נשברת, המשקל כבד מדי']) + '\n\nבמסך הכושר, לשונית "לפי תוכנית", האפליקציה מציעה לך את המשקל הבא אוטומטית.';
+    }
+    if (has(/לאכול|אוכל|תזונה|חלבון|ארוחה|ארוחת|קלוריות|רעב/)) {
+      var lines = [];
+      if (has(/אחרי אימון|אחרי ה/)) return '## מה לאכול אחרי אימון\n' + li(['חלבון: משקה או מעדן חלבון, יוגורט, ביצים או טונה', 'פחמימה: בננה, לחם או אורז, כדי למלא אנרגיה', 'תוך שעה-שעתיים מהאימון, לא חייבים מיד', 'כוס מים או שתיים']);
+      if (tn) lines.push('היום עד עכשיו: כ-**' + tn.proteinEst + ' ג׳ חלבון** (יעד ~' + (tg.protein || '?') + ') ו-' + tn.water + ' כוסות מים (יעד ' + (tg.water || '?') + ').');
+      if (nutDays.length) { var avg = Math.round(nutDays.reduce(function (a, d) { return a + (d.proteinEst || 0); }, 0) / nutDays.length); lines.push('ממוצע החלבון בימים שרשמת: כ-' + avg + ' ג׳' + (tg.protein && avg < tg.protein * 0.75 ? ', קצת מתחת ליעד' : '') + '.'); }
+      lines.push('הדרך הכי קלה להוסיף חלבון: מעדן חלבון, יוגורט או 2 ביצים נוספים ביום.');
+      lines.push('אם אתה רעב אחרי הארוחות, לאכול עוד זה בסדר, במיוחד עם אימונים.');
+      return '## תזונה\n' + li(lines) + '\n\n(ההערכות גסות. סימון ארוחות ומים במסך התזונה משפר אותן.)';
+    }
+    if (has(/מים|שתייה|לשתות|צמא/)) {
+      var wl = tn ? 'שתית היום ' + tn.water + ' מתוך ' + (tg.water || '?') + ' כוסות.' : 'עוד לא רשמת מים היום.';
+      return '## מים\n' + li([wl, 'כוס אחת עכשיו, ועוד אחת עם כל ארוחה', 'בקבוק על השולחן או בתיק, ביום אימון קצת יותר', 'אפשר לסמן כוסות במסך התזונה או בווידג׳ט במסך הבית']);
+    }
+    if (has(/אימון|אימונים|כושר|חזרות|סטים|לחיצ|חדר כושר|מתח/)) {
+      var ex = Object.keys(fit.exercisesLast7 || {}), goal = fit.weeklyGoal || 4, n = fit.trainingDaysLast7 || 0, out = [];
+      out.push('אימונים ב-7 הימים האחרונים: **' + n + '/' + goal + '**' + (n >= goal ? ', עמדת ביעד.' : ', חסרים ' + (goal - n) + '.'));
+      if (ex.length) out.push('תרגילים שעשית: ' + ex.slice(0, 6).join(', '));
+      var recent = arr(fit.recentSessions).slice(-1)[0]; if (recent) out.push('אימון אחרון: ' + (recent.day || 'חופשי') + ', ' + recent.minutes + ' דק׳, ' + recent.sets + ' סטים' + (recent.prs && recent.prs.length ? ', שיא ב' + recent.prs.join(', ') : ''));
+      out.push(n >= goal ? 'שמור על מנוחה ושינה, ושקול להעלות משקל בתרגיל שהגעת בו לראש הטווח.' : 'גם אימון קצר של 30-40 דקות נחשב. אפשר לרשום סט בודד בלשונית "רישום".');
+      if (!ex.length && !fit.recentSessions.length) out = ['עוד לא רשמת אימונים השבוע. תתחיל מסט אחד בלשונית "רישום" או מאימון לפי התוכנית.'];
+      return '## האימונים שלך\n' + li(out);
+    }
+    if (has(/הרגל|להתמיד|התמדה|רצף/)) {
+      var weak = habits.filter(function (x) { return x.rate14 < 60; }).slice(0, 3);
+      return '## הרגלים והתמדה\n' + (weak.length ? 'ההרגלים שהכי צריכים חיזוק (שבועיים אחרונים):\n' + li(weak.map(function (x) { return '**' + x.name + '**: ' + x.rate14 + '%'; })) + '\n\n' : (habits.length ? 'ההרגלים שלך במצב טוב. ' : '')) + 'איך מתמידים:\n' + li(['להקטין את ההרגל ל-**2 דקות** (עושים רק את הגרסה הקטנה)', 'להצמיד אותו לפעולה קבועה, למשל "אחרי ארוחת ערב"', 'לא לפספס פעמיים ברצף', 'לסמן מיד אחרי שעושים: ההנאה מהסימון עוזרת']);
+    }
+    if (has(/שינה|לישון|ללכת לישון|נרדם|ישן/)) {
+      return '## שינה\n' + li(['8-9 שעות בגיל שלך, עם שעת שינה קבועה', 'מסכים כבויים חצי שעה לפני', 'חדר קריר וחשוך', 'לא לאכול ארוחה כבדה ממש לפני', 'שינה טובה היא הבסיס של שריר, ריכוז ואנרגיה']);
+    }
+    if (has(/מוטיבציה|משעמם|דחיינות|לא בא לי|לא מצליח להתחיל|מתקשה להתחיל/)) {
+      return '## להתחיל כשלא בא לך\n' + li(['**כלל 5 הדקות**: אתה מתחייב רק על 5 דקות. לרוב ממשיכים', 'להתחיל מהחלק הכי קטן והכי קל של המשימה' + (top3[0] ? ' (למשל: ' + top3[0].title + ')' : ''), 'טיימר פוקוס של 25 דקות במסך "פוקוס", אפשר עם מוזיקת הרקע', 'לשים את הטלפון בחדר אחר', 'אחרי שמסיימים, לסמן ✓ וליהנות מה-XP']);
+    }
+    if (has(/סכם|סיכום|נתח|התקדמות|ביצועים|איך הולך|איך אני/)) {
+      var o = ['ביצוע היום: **' + (cr.today == null ? 'אין נתונים' : cr.today + '%') + '**, השבוע: **' + (cr.week == null ? 'אין נתונים' : cr.week + '%') + '**' + (cr.prevWeek != null && cr.week != null ? ' (שבוע קודם ' + cr.prevWeek + '%, ' + (cr.week >= cr.prevWeek ? 'שיפור' : 'ירידה') + ')' : '')];
+      o.push('משימות שהושלמו ב-7 ימים: ' + (c.doneLast7 || 0) + ' · ריכוז: ' + (c.focusMinutesWeek || 0) + ' דק׳ · רצף ' + (c.streakDays || 0) + ' ימים');
+      if (fit.weeklyGoal) o.push('אימונים: ' + (fit.trainingDaysLast7 || 0) + '/' + fit.weeklyGoal);
+      if (habits.length && habits[0].rate14 < 60) o.push('הרגל שצריך חיזוק: ' + habits[0].name + ' (' + habits[0].rate14 + '%)');
+      if (overdue.length) o.push('באיחור: ' + overdue.length + ' משימות');
+      var best = habits.length ? habits[habits.length - 1] : null; if (best && best.rate14 >= 70) o.push('הכי חזק: ' + best.name + ' (' + best.rate14 + '%)');
+      return '## סיכום\n' + li(o) + '\n\n**צעד הבא:** ' + (overdue.length ? 'לסגור משימה אחת באיחור.' : top3[0] ? 'להתחיל מ"' + top3[0].title + '".' : 'להוסיף משימה אחת לשבוע הקרוב.');
+    }
+    if (has(/שבוע|שבועית/)) {
+      var days = {}, order = [];
+      for (var i = 0; i < 7; i++) { var k = addDays(today, i); days[k] = { mins: 0, items: [] }; order.push(k); }
+      byDue.forEach(function (t) { var k = t.due && days[t.due] ? t.due : null; if (!k) { k = order.slice().sort(function (a, b) { return days[a].mins - days[b].mins; })[0]; } days[k].mins += +t.estimateMin || 30; days[k].items.push(t.title); });
+      var HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+      var any = order.some(function (k) { return days[k].items.length; });
+      return '## תוכנית לשבוע\n' + (any ? li(order.filter(function (k) { return days[k].items.length; }).map(function (k) { return '**' + HE[parseKey(k).getDay()] + '**: ' + days[k].items.slice(0, 3).join(', ') + (days[k].items.length > 3 ? ' ועוד ' + (days[k].items.length - 3) : ''); })) + '\n\nחילקתי לפי תאריך יעד ועומס, בערך עד 3 שעות ביום. אפשר ללחוץ "החל תאריכים" בהצעה למטה כדי לקבוע אותם.' : 'אין משימות פתוחות לחלק. תוסיף משימות במסך המשימות ואחלק לך אותן.');
+    }
+    if (has(/תכנן|תכנון|סדר יום|היום שלי|תוכנית ליום|מה לעשות היום/)) {
+      var plan = [];
+      if (overdue.length) plan.push('קודם כל **משימה אחת באיחור**: ' + overdue[0].title);
+      top3.filter(function (t) { return overdue.indexOf(t) < 0; }).slice(0, 3 - Math.min(overdue.length, 1)).forEach(function (t) { plan.push(t0(t)); });
+      var rt = arr(c.routineToday).filter(function (r) { return !r.done && !r.optional; }).slice(0, 2); if (rt.length) plan.push('בשגרה היום עוד: ' + rt.map(function (r) { return r.title + ' (' + r.time + ')'; }).join(', '));
+      var hb = habits.filter(function (x) { return x.rate14 < 60; })[0]; if (hb) plan.push('הרגל להיום: ' + hb.name);
+      if (!plan.length) plan.push('אין משימות פתוחות. תבחר דבר אחד חשוב ותתחיל ממנו');
+      var tot = byDue.filter(function (t) { return t.due === today; }).reduce(function (a, t) { return a + (+t.estimateMin || 30); }, 0);
+      return '## תכנון להיום\n' + li(plan) + (tot > 300 ? '\n\nיש כ-' + Math.round(tot / 60) + ' שעות משימות להיום, זה עמוס. כדאי להעביר חלק למחר.' : '') + '\n\nטיפ: את המשימה הקשה ביותר לעשות בשעה שבה אתה הכי חד' + (c.bestHour != null ? ' (' + c.bestHour + ':00)' : '') + '.';
+    }
+    if (has(/שעה|פנוי|עכשיו|רגע|זמן/)) {
+      var avail = has(/שעה/) ? 60 : has(/חצי שעה/) ? 30 : 45;
+      var fit1 = byDue.filter(function (t) { return !t.estimateMin || t.estimateMin <= avail; })[0] || byDue[0];
+      var s = [];
+      if (fit1) s.push('המשימה הכי מתאימה: **' + t0(fit1) + '**');
+      if (h >= 16 && h < 22) s.push('אימון קצר או הליכה, אם עוד לא התאמנת היום');
+      s.push('סשן פוקוס של 25 דקות על משהו חשוב');
+      var hb2 = habits.filter(function (x) { return x.rate14 < 60; })[0]; if (hb2) s.push('להספיק את ההרגל: ' + hb2.name);
+      return '## יש לך זמן? הנה מה שכדאי\n' + li(s);
+    }
+    if (has(/דיבור|הגייה|קלינאית|ס וש|ס\/ש/)) {
+      return '## דיבור ס/ש\nתרגלת השבוע כ-' + (c.speechPracticeMinutesWeek || 0) + ' דקות.\n' + li(['5-10 דקות ביום עדיפות על שעה פעם בשבוע', 'שורה אחת מהתרגילים של השלב הנוכחי, ואז משפט', 'הקלט את עצמך והאזן', 'במסך "דיבור ס/ש" יש בדיקה עצמית אם כדאי לחזור לקלינאית']);
+    }
+    if (has(/פוקוס|ריכוז|להתרכז|ללמוד/)) {
+      return '## ריכוז\n' + li(['25 דקות עבודה, 5 דקות הפסקה, במסך "פוקוס"', 'משימה אחת בכל סשן, כזו שבחרת מראש', 'טלפון בחדר אחר, ואפשר מוזיקת רקע ריכוז', 'ריכוז השבוע: ' + (c.focusMinutesWeek || 0) + ' דקות']);
+    }
+    var snap = [];
+    if (open.length) snap.push('יש ' + open.length + ' משימות פתוחות' + (overdue.length ? ', ' + overdue.length + ' מהן באיחור' : ''));
+    if (cr.week != null) snap.push('ביצוע שבועי: ' + cr.week + '%');
+    return '## אני המאמן החינמי\nאני עובד לפי כללים על הנתונים שלך ולא מודל AI, אז אני טוב בשאלות מהסוגים האלה:\n' + li(['"תכנן לי את היום" או "יש לי שעה פנויה"', '"תוכנית שבועית" או "סכם את השבוע"', '"ניתוח האימונים שלי" או "איך לעלות במשקל"', '"מה לאכול אחרי אימון" או "מה לשפר בתזונה"', '"איך להתמיד בהרגל", "אני עייף", "אין לי מוטיבציה"']) + (snap.length ? '\n\nכרגע: ' + snap.join(', ') + '.' : '');
+  }
+
   return {
+    localCoachReply: localCoachReply,
     estimateFood: estimateFood, estimateMeals: estimateMeals, shoppingList: shoppingList,
     e1rm: e1rm, parseRepRange: parseRepRange, suggestNext: suggestNext, nextSplitIndex: nextSplitIndex, weekStartKey: weekStartKey,
     SCHEMA_VERSION: SCHEMA_VERSION, DEFAULT_WIDGETS: DEFAULT_WIDGETS, PRIORITY_RANK: PRIORITY_RANK, STATUSES: STATUSES,
