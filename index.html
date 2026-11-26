@@ -1098,6 +1098,7 @@
 <script src="extras.js"></script>
 <script src="fitness.js"></script>
 <script src="nutrition.js"></script>
+<script src="music.js"></script>
 <script>
 (function () {
   'use strict';
@@ -4842,7 +4843,8 @@
     var byId = {};
     items.forEach(function (n) { byId[n.id] = n; });
     modal.innerHTML = '<div class="sheet-handle"></div>' +
-      (window.MaslulFeatures ? '<div class="fx-btn-row" style="margin:0 0 6px;"><button class="sb-search" id="more-search" style="flex:1;margin:0;">' + icon('search') + '<span>חיפוש בכל האפליקציה</span></button>' + (window.MaslulFeatures.checkForUpdates ? '<button class="sb-search" id="more-update" style="width:auto;margin:0;">' + icon('reset') + '<span>בדוק עדכונים</span></button>' : '') + '</div>' : '') +
+      (window.MaslulFeatures ? '<div class="fx-btn-row" style="margin:0 0 6px;"><button class="sb-search" id="more-search" style="flex:1;margin:0;">' + icon('search') + '<span>חיפוש בכל האפליקציה</span></button>' + (window.MaslulFeatures.checkForUpdates ? '<button class="sb-search" id="more-update" style="width:auto;margin:0;">' + icon('reset') + '<span>בדוק עדכונים</span></button>' : '') + '</div>' +
+        (window.MaslulFeatures.music ? '<button class="sb-search more-music' + (window.MaslulFeatures.music.isPlaying() ? ' on' : '') + '" id="more-music" style="margin:0 0 6px;">🎵<span>' + (window.MaslulFeatures.music.isPlaying() ? 'השהה מוזיקת רקע' : 'נגן מוזיקת רקע') + '</span></button>' : '') : '') +
       groups.map(function (g) {
       var tiles = g.ids.filter(function (id) { return byId[id]; }).map(function (id) {
         var n = byId[id];
@@ -4852,6 +4854,8 @@
     }).join('');
     var ms = modal.querySelector('#more-search');
     if (ms) ms.addEventListener('click', function () { closeModal(); window.MaslulFeatures.openSearch(); });
+    var mm = modal.querySelector('#more-music');
+    if (mm) mm.addEventListener('click', function () { window.MaslulFeatures.music.toggle(); closeModal(); });
     var mu = modal.querySelector('#more-update');
     if (mu) mu.addEventListener('click', function () { closeModal(); window.MaslulFeatures.checkForUpdates(); });
     Array.prototype.forEach.call(modal.querySelectorAll('[data-more-panel]'), function (b) {

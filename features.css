@@ -499,3 +499,18 @@ body:has(#panel-fitness:not([hidden])) .fx-fab { display: none; }
 .co-setup .fx-steps { margin: 6px 0; }
 .fx-coach-actions { grid-template-columns: repeat(2, 1fr) !important; }
 @media (min-width: 760px) { .fx-coach-actions { grid-template-columns: repeat(3, 1fr) !important; } }
+
+/* ---- background music ---- */
+.mu-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.mu-toggle { min-width: 96px; justify-content: center; }
+.mu-styles { display: flex; gap: 4px; flex-wrap: wrap; }
+.mu-vol { display: flex; align-items: center; gap: 6px; flex: 1 1 160px; font-size: 13px; }
+.mu-vol input { flex: 1; accent-color: var(--accent); }
+.mu-eq { display: flex; align-items: flex-end; gap: 3px; height: 18px; }
+.mu-eq i { width: 4px; border-radius: 2px; background: var(--accent); animation: mueq 1.1s ease-in-out infinite; }
+.mu-eq i:nth-child(2) { animation-delay: .2s; } .mu-eq i:nth-child(3) { animation-delay: .45s; } .mu-eq i:nth-child(4) { animation-delay: .7s; }
+@keyframes mueq { 0%, 100% { height: 4px; } 50% { height: 18px; } }
+.sb-music { font-size: 15px; filter: grayscale(1) opacity(.6); }
+.sb-music.on { filter: none; background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.more-music.on { border-color: var(--accent); color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .mu-eq i { animation: none; height: 10px; } }

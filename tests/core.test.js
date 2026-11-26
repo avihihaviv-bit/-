@@ -109,7 +109,7 @@ test('version.json matches the version baked into extras.js (update checker reli
   const src = fs.readFileSync(path.join(__dirname, '..', 'extras.js'), 'utf8');
   assert.ok(src.includes("var APP_VERSION = '" + v + "'"), 'bump APP_VERSION in extras.js together with version.json');
   const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
-  ['core.js', 'features.js', 'extras.js', 'fitness.js', 'nutrition.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
+  ['core.js', 'features.js', 'extras.js', 'fitness.js', 'nutrition.js', 'music.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
 });
 
 test('fitness: e1rm, rep range parsing, progressive overload suggestion', () => {
