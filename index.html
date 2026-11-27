@@ -1099,6 +1099,7 @@
 <script src="fitness.js"></script>
 <script src="nutrition.js"></script>
 <script src="music.js"></script>
+<script src="routine.js"></script>
 <script>
 (function () {
   'use strict';
@@ -5323,6 +5324,7 @@
               '<button class="t-check' + (t.done ? ' done' : '') + '" data-check="' + t.id + '" aria-label="סמן כבוצע"></button>' +
               '<span class="t-time num">' + t.time + '</span>' +
               '<span class="t-title">' + escapeAttr(t.title) + '</span>' +
+              (window.MaslulFeatures && window.MaslulFeatures.hasActivityInfo && window.MaslulFeatures.hasActivityInfo(t) ? '<span class="t-note-ic" title="יש פרטים, לחץ כדי לראות">' + icon('note') + '</span>' : '') +
               xpBadge +
               '<span class="t-cat-dot" title="' + CATS[t.category].label + '"></span>' +
             '</div></div>';
@@ -5375,7 +5377,7 @@
     Array.prototype.forEach.call(el.querySelectorAll('[data-open]'), function (row) {
       row.addEventListener('click', function () {
         var t = list.find(function (x) { return x.id === row.dataset.open; });
-        openTaskModal(t);
+        if (window.MaslulFeatures && window.MaslulFeatures.openActivity) window.MaslulFeatures.openActivity(t); else openTaskModal(t);
       });
     });
     wireDragReorder(el.querySelector('#t-timeline'), list);
@@ -7074,6 +7076,7 @@
     goalProgress: goalProgress,
     isoWeekKey: function () { return isoWeekKey(todayDate()); },
     setRoutineDone: function (id, val) { setTaskDone(id, val); },
+    openTaskModal: function (t) { openTaskModal(t); },
     applyPrefs: applyPrefs,
     migratedFrom: function () { return loadInfo.migratedFrom; },
     nutritionLegacy: function () { return { PLAN: NUTRITION_PLAN, RULES: NUTRITION_QUANTITY_RULE }; },

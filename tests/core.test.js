@@ -109,7 +109,7 @@ test('version.json matches the version baked into extras.js (update checker reli
   const src = fs.readFileSync(path.join(__dirname, '..', 'extras.js'), 'utf8');
   assert.ok(src.includes("var APP_VERSION = '" + v + "'"), 'bump APP_VERSION in extras.js together with version.json');
   const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
-  ['core.js', 'features.js', 'extras.js', 'fitness.js', 'nutrition.js', 'music.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
+  ['core.js', 'features.js', 'extras.js', 'fitness.js', 'nutrition.js', 'music.js', 'routine.js', 'features.css'].forEach(f => assert.ok(sw.includes("'./" + f + "'"), f + ' cached by service worker'));
 });
 
 test('fitness: e1rm, rep range parsing, progressive overload suggestion', () => {
@@ -172,4 +172,17 @@ test('free local coach answers common questions from the data (no network)', () 
   assert.match(a('בלה בלה בלה'), /מאמן החינמי/);
   assert.ok(a('תכנן לי את היום').split('\n').some(l => l.startsWith('- ')), 'bullet lines so they can become tasks');
   assert.ok(C.localCoachReply('היי', {}).length > 20, 'works with empty data');
+});
+
+test('activity details: keyed by normalised name, day note overrides, migrate adds the store', () => {
+  assert.strictEqual(C.activityKey('  אימון   ביתי '), C.activityKey('אימון ביתי'));
+  const notes = { [C.activityKey('אימון ביתי')]: { text: 'שכיבות סמיכה, בטן' } };
+  assert.deepStrictEqual(C.activityInfo(notes, { title: 'אימון ביתי ', notes: '' }), { text: 'שכיבות סמיכה, בטן', scope: 'all' });
+  assert.deepStrictEqual(C.activityInfo(notes, { title: 'אימון ביתי', notes: 'היום רגליים' }), { text: 'היום רגליים', scope: 'day' });
+  assert.strictEqual(C.activityInfo(notes, { title: 'פסנתר' }), null);
+  assert.strictEqual(C.activityInfo({}, null), null);
+  const s = C.migrate({ tasksByDate: {}, goals: [] });
+  assert.deepStrictEqual(s.activityNotes, {});
+  s.activityNotes.x = { text: 'keep' };
+  assert.strictEqual(C.migrate(s).activityNotes.x.text, 'keep');
 });

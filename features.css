@@ -516,3 +516,25 @@ body:has(#panel-fitness:not([hidden])) .fx-fab { display: none; }
 @media (prefers-reduced-motion: reduce) { .mu-eq i { animation: none; height: 10px; } }
 .fx-status.free { color: var(--accent); }
 .co-local { font-size: 11.5px; color: var(--text-faint); margin-bottom: 4px; }
+
+/* ---- routine activity details ---- */
+.t-note-ic { display: inline-flex; color: var(--accent); flex-shrink: 0; }
+.t-note-ic svg { width: 14px; height: 14px; }
+.rt-sheet { max-width: 520px; }
+.rt-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.rt-time { font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 3px 9px; border-radius: 8px; background: var(--surface-2); color: var(--text-soft); }
+.rt-title { margin: 0; font-size: 20px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rt-body { margin: 12px 0 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface-2); font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+.rt-body p { margin: 4px 0; }
+.rt-body ul { margin: 6px 0; padding-inline-start: 22px; }
+.rt-body li { margin: 3px 0; }
+.rt-body a { word-break: break-all; }
+.rt-gap { height: 8px; }
+.rt-scope { font-size: 12px; margin: 0 2px 4px; }
+.rt-empty { display: flex; gap: 12px; align-items: flex-start; margin: 14px 0 6px; padding: 14px; border-radius: 14px; border: 1px dashed var(--border-strong); }
+.rt-empty > svg { width: 22px; height: 22px; color: var(--accent); margin-top: 2px; }
+.rt-actions { flex-wrap: wrap; }
+.rt-sheet textarea { width: 100%; min-height: 180px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-size: 15px; line-height: 1.6; resize: vertical; }
+.rt-sheet textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.rt-day { display: flex; gap: 10px; align-items: flex-start; margin: 12px 0 4px; font-size: 14px; cursor: pointer; }
+.rt-day input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); }

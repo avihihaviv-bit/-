@@ -57,6 +57,7 @@
       s.fitness.sessions = arr(s.fitness.sessions);
       s.fitness.bodyweight = arr(s.fitness.bodyweight);
       s.fitness.weeklyGoal = s.fitness.weeklyGoal || 4;
+      s.activityNotes = obj(s.activityNotes);
       s.nutrition = obj(s.nutrition);
       s.nutrition.log = obj(s.nutrition.log);
       s.nutrition.water = obj(s.nutrition.water);
@@ -433,6 +434,18 @@
   function weekStartKey(k) { return addDays(k, -parseKey(k).getDay()); }
 
 
+  /* ---------- routine activity details ----------
+     A description belongs to the activity NAME, so it shows on every day that has that activity.
+     A note written on a single day's instance (task.notes) overrides it for that day only. */
+  function activityKey(title) { return String(title || '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  function activityInfo(notesMap, task) {
+    var inst = String((task && task.notes) || '').trim();
+    if (inst) return { text: inst, scope: 'day' };
+    var g = obj(notesMap)[activityKey(task && task.title)];
+    var t = g && g.text ? String(g.text).trim() : '';
+    return t ? { text: t, scope: 'all' } : null;
+  }
+
   /* ---------- free local coach: intent rules over the user's real data (NOT an AI model) ---------- */
   function localCoachReply(question, c) {
     var q = String(question || '').trim(); c = c || {};
@@ -538,6 +551,7 @@
   }
 
   return {
+    activityKey: activityKey, activityInfo: activityInfo,
     localCoachReply: localCoachReply,
     estimateFood: estimateFood, estimateMeals: estimateMeals, shoppingList: shoppingList,
     e1rm: e1rm, parseRepRange: parseRepRange, suggestNext: suggestNext, nextSplitIndex: nextSplitIndex, weekStartKey: weekStartKey,
